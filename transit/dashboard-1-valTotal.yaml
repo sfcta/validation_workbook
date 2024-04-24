@@ -1,0 +1,132 @@
+header:
+  tab: "Transit Ridership Total"
+  title: "Transit Ridership Total"
+  description: ""
+
+
+layout:
+  Service type:
+    - type: text
+      title: '2019 Transit Ridership by Service Type'
+      description: >
+        The table is structured to present a detailed comparison between observed and 
+        modeled transit ridership figures for various Service Type on an 
+        average weekday. It effectively highlights the discrepancies between the actual 
+        observed data and the projected estimates, offering a clear insight into transit 
+        patterns across different service categories and operators.
+      file: "./table/valTotal_Service.md"
+
+    - type: plotly
+      #height: 10
+      title: 2019 Transit Ridership by Service Type
+      description: 
+      datasets:
+        dataset: "./val_Total/valTotal_Service.csv"
+      traces:
+        - type: bar
+          x: $dataset.Observed
+          y: $dataset.Service Type
+          name: 'Observed'
+          orientation: h
+          colorRamp: Spectral
+
+        - type: bar
+          x: $dataset.Modeled
+          y: $dataset.Service Type
+          name: 'Modeled'
+          orientation: h
+          colorRamp: Spectral
+
+      layout:
+        xaxis:
+          title: Ridership
+          color: '#444'
+          type: '-'
+        barmode: group
+        yaxis:
+          #title: Service Type
+          categoryorder: 'total ascending'
+          color: '#444'
+          type: '-'
+
+  table:
+    - type: text
+      height: 14
+      title: '2019 Transit Ridership by Operator and Submode'
+      description: >
+        Source: NTD 2019 Annual Agency Profile
+      file: "./table/valTotal_Operator.md"
+
+    - type: plotly
+      #height: 10
+      title: 2019 Transit Ridership by Operator and Submode
+      description: 
+      datasets:
+        dataset: "./val_Total/valTotal_Operator.csv"
+      traces:
+        - type: bar
+          x: $dataset.Observed
+          y: $dataset.Operator
+          name: 'Observed'
+          orientation: h
+          colorRamp: Spectral
+
+        - type: bar
+          x: $dataset.Modeled
+          y: $dataset.Operator
+          name: 'Modeled'
+          orientation: h
+          colorRamp: Spectral
+
+      layout:
+        xaxis:
+          title: Ridership
+          color: '#444'
+          type: '-'
+        barmode: group
+        yaxis:
+          categoryorder: 'total ascending'
+          #title: Service Type
+          color: '#444'
+          type: '-'
+
+  table2:
+    - type: text
+      height: 14
+      title: '2019 Transit Ridership by Operato'
+      description: >
+        Source: NTD 2019 Annual Agency Profile
+      file: "./table/valTotal_Operator2.md"
+
+    - type: plotly
+      #height: 10
+      title: 2019 Transit Ridership by Operato
+      description: 
+      datasets:
+        dataset: "./val_Total/valTotal_Operator2.csv"
+      traces:
+        - type: bar
+          x: $dataset.Observed
+          y: $dataset.Operator
+          name: 'Observed'
+          orientation: h
+          colorRamp: Spectral
+
+        - type: bar
+          x: $dataset.Modeled
+          y: $dataset.Operator
+          name: 'Modeled'
+          orientation: h
+          colorRamp: Spectral
+
+      layout:
+        xaxis:
+          title: Ridership
+          color: '#444'
+          type: '-'
+        barmode: group
+        yaxis:
+          categoryorder: 'total ascending'
+          #title: Service Type
+          color: '#444'
+          type: '-'

@@ -1,0 +1,582 @@
+header:
+  tab: "Val BART"
+  title: "Validation of BART Station"
+  description: ""
+
+layout:
+  Boardings:
+    - type: text
+      title: 'BART Station Boardings - All Day'
+      description: >
+        This table presents a comprehensive overview of BART station boardings for an 
+        average weekday, encompassing data for all stations. Core Sf: EMBR, MONT, POWL,
+        CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
+      file: './table/BART_boarding_allday.md'
+
+    - type: map
+      height: 10
+      title: BART Station Boardings Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 11.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_br_map.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_br.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+
+
+
+  Boardings AM: 
+    - type: text
+      title: 'BART Station Boardings - AM'
+      description: >
+        This table displays morning boardings at BART stations for an average weekday, 
+        providing a focused view of early-day commuter trends across the Bay Area Rapid 
+        Transit network. Core Sf: EMBR, MONT, POWL,CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. 
+        Oakland Core: 12TH, 19TH.
+      file: './table/BART_boarding_am.md'
+
+    - type: map
+      height: 10
+      title: BART Station Boardings AM Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 11.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_br_map_am.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_br_am.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+
+
+
+  Boardings PM:
+    - type: text
+      title: 'BART Station Boardings - PM'
+      description: >
+        This table displays evening boardings at BART stations for an average weekday, 
+        providing a focused view of late-day commuter trends across the Bay Area Rapid 
+        Transit network. Core Sf: EMBR, MONT, POWL,
+        CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
+      file: './table/BART_boarding_pm.md'
+
+    - type: map
+      height: 10
+      title: BART Station Boardings PM Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 11.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_br_map_pm.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_br_pm.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+          #- shapes:Station_na
+  
+  Alightings:
+    - type: text
+      title: 'BART Station Alightings - All Day'
+      description: >
+        This table presents all-day alightings at BART stations for an average weekday, 
+        capturing daily passenger exit patterns. Core Sf: EMBR, MONT, POWL,
+        CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
+      file: './table/BART_at_allday.md'
+
+    - type: map
+      height: 10
+      title: BART Station Alightings Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 10.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_at_map.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_at.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+          #- shapes.Station
+          #- shapes.Observed
+          #- Shapes.Modeled
+          #- Shapes.Diff
+          #- shapes.Percentage
+          #- shapes.Station_na
+
+
+  Alightings AM:
+    - type: text
+      title: 'BART Station Alightings - AM'
+      description: >
+        This table shows AM alightings at BART stations on an average weekday, 
+        highlighting morning disembarkation trends. Core Sf: EMBR, MONT, POWL,
+        CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
+      file: './table/BART_at_am.md'
+
+    - type: map
+      height: 10
+      title: BART Station Alightings AM Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 10.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_at_map_am.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_at_am.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+
+
+  Alightings PM:
+    - type: text
+      title: 'BART Station Alightings - PM'
+      description: >
+        This table shows PM alightings at BART stations on an average weekday, 
+        highlighting evening disembarkation trends. Core Sf: EMBR, MONT, POWL,
+        CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
+      file: './table/BART_at_pm.md'
+
+    - type: map
+      height: 10
+      title: BART Station Alightings PM Validation
+      description: This map displays the daily average ridership difference for the BART Station
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 10.1
+      center:
+          - -122.35
+          - 37.76
+      shapes: ./shp/BART_at_map_pm.shp
+      datasets:
+          observed:
+              file: ./val_BART/BART_at_pm.csv
+              join: Station     
+      display:
+          fill:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 12
+
+          radius:
+              dataset: observed
+              columnName: ABS Diff
+              scaleFactor: 100
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+
+
+
+  County1:
+    - type: text
+      title: 'County Boardings - All Day'
+      description: >
+        This table displays all-day boardings in each county for an average weekday, 
+        providing an overview of daily transit usage.
+      file: './table/county_br_day.md'
+
+    - type: 'bar'
+      title: 'County Boardings - All Day'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_br_day.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  County1 AM:
+    - type: text
+      title: 'County Boardings - AM'
+      description: >
+        This table shows morning boardings in each county for an average weekday, 
+        highlighting early-day transit trends.
+      file: './table/county_br_am.md'
+
+    - type: 'bar'
+      title: 'County Boardings - AM'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_br_am.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  County1 PM:
+    - type: text
+      title: 'County Boardings - PM'
+      description: >
+        This table shows evening boardings in each county for an average weekday, 
+        highlighting late-day transit trends.
+      file: './table/county_br_pm.md'
+
+    - type: 'bar'
+      title: 'County Boardings - PM'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_br_pm.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  County2:
+    - type: text
+      title: 'County Alightings - All Day'
+      description: >
+        This table presents all-day alightings at BART stations for an average weekday, 
+        capturing daily passenger exit patterns. 
+      file: './table/county_at_day.md'
+
+    - type: 'bar'
+      title: 'County Alightings - All Day'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_at_day.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  County2 AM:
+    - type: text
+      title: 'County Alightings - AM'
+      description: >
+        This table summarizes morning alightings in each county for an average weekday, 
+        reflecting early-day passenger disembarkations. 
+      file: './table/county_at_am.md'
+
+    - type: 'bar'
+      title: 'County Alightings - AM'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_at_am.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  County2 PM:
+    - type: text
+      title: 'Countye Alightings - PM'
+      description: >
+        This table summarizes afternoon alightings in each county for an average weekday, 
+        reflecting late-day passenger disembarkations. 
+      file: './table/county_at_pm.md'
+
+    - type: 'bar'
+      title: 'County Alightings - PM'
+      description: ''
+      width: 1
+      dataset: './val_BART/county_at_pm.csv'
+      x: 'County'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'County'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+
+  TBart IN:
+    - type: text
+      title: 'Transbay BART - Inbound'
+      description: >
+        This table presents Transbay screenline ridership for the inbound direction, 
+        segmented by various times of day. It includes both observed and modeled values, 
+        the difference between these values, and the percentage difference, aimed at 
+        validating transportation models.
+        
+      file: './table/transbay_BART_IB.md'
+
+    - type: 'line'
+      title: 'Transbay BART IB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_Screenline/transbay_BART_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  TBart OB:
+    - type: text
+      title: 'Transbay BART - Outbound'
+      description: >
+        This table presents Transbay screenline ridership for the outbound direction, 
+        segmented by various times of day. It includes both observed and modeled values, 
+        the difference between these values, and the percentage difference, aimed at 
+        validating transportation models.
+      file: './table/transbay_BART_OB.md'
+
+    - type: 'line'
+      title: 'Transbay BART OB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_Screenline/transbay_BART_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  CBart IB:
+    - type: text
+      title: 'SF - San Mateo Countyline BART - Inbound'
+      description: >
+        This table presents a comparison between observed and modeled inbound 
+        ridership for the Countyline Bart screenline, offering an assessment of the
+        accuracy of the ridership predictions.
+      file: './table/Countyline_BART_IB.md'
+
+    - type: 'line'
+      title: 'SF - San Mateo Countyline BART IB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_Screenline/Countyline_BART_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  CBart OB:
+    - type: text
+      title: 'SF - San Mateo Countyline BART - Outbound'
+      description: >
+        This table presents a comparison between observed and modeled inbound 
+        ridership for the Countyline Bart screenline, offering an assessment of the
+        accuracy of the ridership predictions.
+      file: './table/Countyline_BART_OB.md'
+
+    - type: 'line'
+      title: 'SF - San Mateo Countyline BART OB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_Screenline/Countyline_BART_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  IntraSFIB:
+    - type: text
+      title: 'Intra-SF - Inbound'
+      description: >
+        This table presents travel within SF -- Between downtown stations Embarcadero, 
+        Montgomery, Powell, Civic Center and stations outside of downtown 16th St. Mission, 
+        24th St. Mission, Glen Park, Balboa Park. It details observed and modeled values, 
+        the discrepancies between them, and the percentage differences, serving as a 
+        tool for validation within San Francisco's transit system. 
+      file: './table/SF_in.md'
+
+    - type: 'line'
+      title: 'Intra-SF BART OB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_BART/Intra_SF_BART_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  IntraSFOB:
+    - type: text
+      title: 'Intra-SF - Outbound'
+      description: >
+        This table presents travel within SF -- Between downtown stations Embarcadero, 
+        Montgomery, Powell, Civic Center and stations outside of downtown 16th St. Mission, 
+        24th St. Mission, Glen Park, Balboa Park. It details observed and modeled values, 
+        the discrepancies between them, and the percentage differences, serving as a 
+        tool for validation within San Francisco's transit system. 
+      file: './table/SF_out.md'
+
+    - type: 'line'
+      title: 'Intra-SF BART OB by TOD'
+      description: ''
+      width: 1
+      dataset: './val_BART/Intra_SF_BART_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']

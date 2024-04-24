@@ -1,0 +1,14 @@
+header:
+  tab: "Obs BART Screenline"
+  title: "Observation of BART Screenline Ridership"
+  description: ""
+
+  
+layout:
+  TBart:
+    - type: text
+      height: 13
+      title: 'BART Screenline Ridership'
+      description: >
+        by Direction & TOD for Average Weekday
+      file: './table/obs_BART_SL.md'

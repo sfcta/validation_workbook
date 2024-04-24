@@ -1,0 +1,14 @@
+header:
+  tab: "Obs Screenline"
+  title: "Observation of Screenline Ridership"
+  description: ""
+
+  
+layout:
+  TBart:
+    - type: text
+      height: 37
+      title: 'Screenline Ridership'
+      description: >
+        by Direction & TOD for Average Weekday
+      file: './table/obs_Screenlines.md'

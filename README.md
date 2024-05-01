@@ -35,7 +35,7 @@ Change the root directory path (e.g., `X:\Projects\Miscellaneous\validation_simw
 ## Running the Scripts
 
 1. Ensure all input files are placed in the specified `transit_input_dir`.
-2. Run `transit.py` to execute the model.
+2. Run `transit.py` to execute the script.
 3. Check the specified output directories for results.
 
 Ensure all dashboard YAML files are placed in the `transit` folder.

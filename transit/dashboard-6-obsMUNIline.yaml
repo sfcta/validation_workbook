@@ -1,0 +1,15 @@
+header:
+  tab: "Obs MUNI Line"
+  title: "Observation of MUNI Line"
+  description: ""
+
+  
+layout:
+  TBart:
+    - type: text
+      height: 45
+      title: 'MUNI Line Ridership'
+      description: >
+        by Direction & TOD for Average Weekday
+        
+      file: './table/obs_MUNI_line.md'

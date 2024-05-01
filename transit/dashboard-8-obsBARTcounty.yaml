@@ -1,0 +1,14 @@
+header:
+  tab: "Obs BART County"
+  title: "Observation of BART County"
+  description: ""
+
+  
+layout:
+  TBart:
+    - type: text
+      height: 10
+      title: 'BART County Boardings & Alightings'
+      description: >
+        by TOD for Average Weekday  
+      file: './table/obs_BART_county.md'

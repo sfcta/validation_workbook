@@ -1,0 +1,272 @@
+header:
+  tab: "Val MUNI"
+  title: "Validation of MUNI Line Ridership"
+  description: ""
+
+layout:
+  Mode:
+    - type: text
+      title: 'Mode - All Day'
+      description: >
+        This table provides an overview of Muni line ridership by mode for an entire 
+        average weekday.
+      file: './table/MUNI_mode_day.md'
+
+    - type: 'bar'
+      title: 'MUNI Ridership by Mode'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_mode.csv'
+      x: 'Mode'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'Mode'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Mode AM:
+    - type: text
+      title: 'Mode - AM'
+      description: >
+        This table displays Muni line ridership by mode for the morning (AM) hours of an 
+        average weekday.
+      file: './table/MUNI_mode_am.md'
+
+    - type: 'bar'
+      title: 'MUNI Ridership by Mode AM'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_mode_am.csv'
+      x: 'Mode'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'Mode'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Mode PM:
+    - type: text
+      title: 'Mode - PM'
+      description: >
+        This table displays Muni line ridership by mode for the afternoon (PM) hours of 
+        an average weekday.
+      file: './table/MUNI_mode_pm.md'
+
+    - type: 'bar'
+      title: 'MUNI Ridership by Mode PM'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_mode_pm.csv'
+      x: 'Mode'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'Mode'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Day:
+    - type: text
+      title: 'Time of Day'
+      description: >
+        This table provides an overview of Muni line ridership by time of day for an average
+        weekkday.
+      file: './table/MUNI_tod.md'
+
+    - type: 'line'
+      title: 'MUNI Ridership by TOD'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_tod.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+  
+  EB_by_tod:
+    - type: text
+      title: 'Express Bus by TOD'
+      description: >
+
+      file: './table/MUNI_EB.md'
+
+    - type: 'line'
+      title: 'Express Bus by TOD'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_EB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+    
+  LB_by_tod:
+    - type: text
+      title: 'Local Bus by TOD'
+      description: >
+
+      file: './table/MUNI_LB.md'
+
+    - type: 'line'
+      title: 'Local Bus by TOD'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_LB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Rail_by_tod:
+    - type: text
+      title: 'Rail by TOD'
+      description: >
+
+      file: './table/MUNI_Rail.md'
+
+    - type: 'line'
+      title: 'Rail by TOD'
+      description: ''
+      width: 1
+      dataset: './val_MUNI/MUNI_Rail.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Inbound:
+    - type: text
+      title: 'Inbound - All Day'
+      description: >
+        This table validates the model by comparing observed and modeled inbound 
+        Muni line ridership for the entire day, showing differences and percentage differences.
+      file: './table/MUNI_ib_day.md'
+
+    - type: text
+      title: 'Inbound - AM'
+      description: >
+        This table validates the model by comparing observed and modeled inbound Muni line 
+        ridership for the morning (AM) hours, showing differences and percentage differences.
+      file: './table/MUNI_ib_am.md'
+  
+    - type: text
+      title: 'Inbound - PM'
+      description: >
+        This table validates the model by comparing observed and modeled inbound Muni line 
+        ridership for the Afternoon (PM) hours, showing differences and percentage differences.
+      file: './table/MUNI_ib_pm.md'
+
+  Outbound:
+    - type: text
+      title: 'Outbound - All Day'
+      description: >
+        This table validates the model by comparing observed and modeled outbound 
+        Muni line ridership for the entire day, showing differences and percentage differences
+      file: './table/MUNI_ob_day.md'
+
+    - type: text
+      title: 'Outbound - AM'
+      description: >
+        This table validates the model by comparing observed and modeled outbound Muni line 
+        ridership for the morning (AM) hours, showing differences and percentage differences.
+      file: './table/MUNI_ob_am.md'
+  
+    - type: text
+      title: 'Outbound - PM'
+      description: >
+        This table validates the model by comparing observed and modeled outbound Muni line 
+        ridership for the Afternoon (PM) hours, showing differences and percentage differences
+      file: './table/MUNI_ob_pm.md'
+
+  Map Muni Bus:
+    - type: map
+      height: 10
+      title: MUNI Line Ridership IB Validation
+      description: This map displays the daily average ridership difference for the MUNI Line 
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 11.1
+      center:
+          - -122.42
+          - 37.77
+      shapes: ./shp/muni_ib.shp
+      datasets:
+          observed:
+              file: ./val_MUNI/MUNI_map_IB.csv
+              join: AB     
+      display:
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 8
+                breakpoints: -0.5, -0.2, -0.1, 0, 0.1, 0.2, 0.5
+
+          lineWidth:
+              dataset: observed
+              columnName: Diff
+              scaleFactor: 500
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+          - shapes.AB
+          - shapes.Route
+          - shapes.Observed
+          - Shapes.Modeled
+          - Shapes.Diff
+
+    - type: map
+      height: 10
+      title: MUNI Line Ridership OB Validation
+      description: This map displays the daily average ridership difference for the MUNI Line 
+                   between observed and modeled values. The color represents the percentage 
+                   difference in ridership, while the line width indicates the magnitude of 
+                   the ridership difference.
+      zoom: 11.1
+      center:
+          - -122.42
+          - 37.77
+      shapes: ./shp/muni_ob.shp
+      datasets:
+          observed:
+              file: ./val_MUNI/MUNI_map_OB.csv
+              join: AB     
+      display:
+          lineColor:
+              dataset:  observed
+              columnName: Percentage Diff
+              colorRamp:
+                ramp: PRGn
+                steps: 8
+                breakpoints: -0.5, -0.2, -0.1, 0, 0.1, 0.2, 0.5
+
+          lineWidth:
+              dataset: observed
+              columnName: Diff
+              scaleFactor: 500
+      filters:
+          # shapes.FT!: "6"
+          # observed.Diff!: "0"
+      tooltip:
+          - shapes.AB
+          - shapes.Route
+          - shapes.Observed
+          - Shapes.Modeled
+          - Shapes.Diff

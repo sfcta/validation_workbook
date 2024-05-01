@@ -1,0 +1,14 @@
+header:
+  tab: "Obs BART Station"
+  title: "Observation of BART Station"
+  description: ""
+
+  
+layout:
+  TBart:
+    - type: text
+      height: 20
+      title: 'BART Station Boardings & Alightings'
+      description: >
+        by TOD for Average Weekday     
+      file: './table/obs_BART_station.md'

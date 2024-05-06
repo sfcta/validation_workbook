@@ -1,15 +1,61 @@
-Validation/road Documentation
+# Road Validation Documentation
 
-Scatter Plot.
-The script is in here Q:\Model Development\Simwrapper Validation\notebooks\roads\Scatter\scatter.py
-There must be 5 dbf files ( ['AM', 'MD', 'PM', 'EV', 'EA']) as the input. And the observations follow the structure of  "Q:\Model Development\Simwrapper Validation\templates\Road_Validation_Draft_v2_Run17.xlsx" tab (Loc Data), because the first line was skipped
-The output should have 2 scatter vaga.json corresponding to each element in the grouping variable. And a csv file containing every cols we want named by {Chosen_time_period_ for calculating_all_metrics}_all_data.csv
-The specific titlies and description need to be edited in the generated yaml file
-Stats
-Script is in Q:\Model Development\Simwrapper Validation\notebooks\roads\RMSE\calculation.py
-Eveytime changing the Group_var in Q:\Model Development\Simwrapper Validation\notebooks\roads\RMSE\config_template.ini, the script will generate 3 concise csv(rmse, relative err, E/O)and their melted version, except the “xxx_count.csv”. (so 7 in total). This is because Simwrapper does not support the group bar chart in vegalite documentation. In order to display this kind of chart, the imported csv needs to be melted, which means 1 record per row.
-Since each row in Simwrapper contains the data for a single metrics but including all grouping methods, the yaml file needs to be written after all csv has been generated. But you can use the one “dashboard1-ValRmse.yaml” as a template.
-Map
-Script is in X:\Projects\Miscellaneous\validation_simwrapper\roads\map\shapefile.py
-The config file is here X:\Projects\Miscellaneous\validation_simwrapper\roads\map\map_config.ini
-The parameters we might want to change are in YAML section. And the hover-over stuff is better for us to add manually. * the output data have 2 versions, 1 is a csv, and 1 is a shp. When we want to add the hover things, we need to call data.colname
+This repository contains scripts and documentation for the validation of road models using the Simwrapper environment. Below you'll find details about each component, including the expected input, output, and configuration files.
+
+## Contents
+
+- [Scatter Plot Validation](#scatter-plot-validation)
+- [Statistical Metrics Calculation](#statistical-metrics-calculation)
+- [Map Visualization](#map-visualization)
+
+## Scatter Plot Validation
+
+### Description
+Generates scatter plots for road validation using time-specific dbf files.
+
+### Scripts
+Located at `Q:\Model Development\Simwrapper Validation\notebooks\roads\Scatter\scatter.py`
+
+### Inputs
+- **DBF Files:** Requires 5 dbf files for different time periods (`AM`, `MD`, `PM`, `EV`, `EA`).
+- **Template Structure:** Observations should follow the structure outlined in `Q:\Model Development\Simwrapper Validation\templates\Road_Validation_Draft_v2_Run17.xlsx` (Loc Data tab).
+
+### Outputs
+- **JSON Files:** Two Vega-Lite configuration files for each grouping variable.
+- **CSV:** A detailed CSV file named `{Chosen_time_period}_all_data.csv` with all desired columns.
+
+### Configuration
+Edit specific titles and descriptions in the generated YAML file.
+
+## Statistical Metrics Calculation
+
+### Description
+Calculates and exports several statistical metrics for road validation.
+
+### Scripts
+Located at `Q:\Model Development\Simwrapper Validation\notebooks\roads\RMSE\calculation.py`
+
+### Configuration
+Adjust the `Group_var` in `Q:\Model Development\Simwrapper Validation\notebooks\roads\RMSE\config_template.ini`.
+
+### Outputs
+- **CSV Files:** Three concise CSVs (`rmse`, `relative error`, `E/O`) and their melted versions, totaling 7 files.
+
+### Notes
+Use `dashboard1-ValRmse.yaml` as a template for the YAML configuration file. The configuration allows display adjustments in Simwrapper.
+
+## Map Visualization
+
+### Description
+Creates geographic visualizations of road data.
+
+### Scripts
+Located at `X:\Projects\Miscellaneous\validation_simwrapper\roads\map\shapefile.py`
+
+### Configuration
+Refer to `X:\Projects\Miscellaneous\validation_simwrapper\roads\map\map_config.ini`.
+
+### Outputs
+- **CSV and SHP Files:** Outputs both CSV and SHP formats.
+- **Hover Information:** Add hover-over details manually by calling `data.colname` in the scripts.
+

@@ -1,0 +1,42 @@
+header:
+  description: ''
+  tab: Scatter plots
+  title: Scatter plots
+layout:
+  row1:
+  - config: all_Estimation Volume.vega.json
+    description: ''
+    title: all - Estimation Volume
+    type: vega
+  - config: all_Percent Errors.vega.json
+    description: ''
+    title: all - Percent Errors
+    type: vega
+  row2:
+  - config: SF Count_Estimation Volume.vega.json
+    description: ''
+    title: SF Count - Estimation Volume
+    type: vega
+  - config: SF Count_Percent Errors.vega.json
+    description: ''
+    title: SF Count - Percent Errors
+    type: vega
+  row3:
+  - config: SF Screenline_Estimation Volume.vega.json
+    description: ''
+    title: SF Screenline - Estimation Volume
+    type: vega
+  - config: SF Screenline_Percent Errors.vega.json
+    description: ''
+    title: SF Screenline - Percent Errors
+    type: vega
+  row4:
+  - config: 101_280_Estimation Volume.vega.json
+    description: ''
+    title: 101_280 - Estimation Volume
+    type: vega
+  - config: 101_280_Percent Errors.vega.json
+    description: ''
+    title: 101_280 - Percent Errors
+    type: vega
+

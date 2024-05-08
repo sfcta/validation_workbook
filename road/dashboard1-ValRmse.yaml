@@ -1,0 +1,179 @@
+header:
+  tab: "Validation statistics"
+  title: "Validation statistics"
+  description: ""
+
+layout:
+  loc type RMSE :
+    - type: csv
+      title: 'Location type Percent RMSE'
+      description: ""
+      dataset: rmse/loctype_percent_rmse.csv
+    - title: Location type RMSE
+      type: vega
+      description: ''
+      config: rmse/loctype_percent_rmse.vega.json
+
+  AT RMSE:
+    - type: csv
+      title: 'Area type Percent RMSE'
+      description: ""
+      dataset: rmse/at_percent_rmse.csv  
+    - title: Area type RMSE
+      type: vega
+      description: ''
+      config: 'rmse/at_percent_rmse.vega.json'
+
+  FT RMSE:
+    - type: csv
+      title: 'Facility type Percent RMSE'
+      description: ""
+      dataset: 'rmse/ft_percent_rmse.csv'  
+    - title: Facility type RMSE
+      type: vega
+      description: ''
+      config: 'rmse/ft_percent_rmse.vega.json'
+
+  OBserved Vol RMSE:   
+    - type: csv
+      title: 'Observed Volume Percent RMSE'
+      description: ""
+      dataset: 'rmse/observedvolume_percent_rmse.csv'
+    - title: Observed Volume RMSE
+      type: vega
+      description: ''
+      config: 'rmse/observedvolume_percent_rmse.vega.json'
+
+  Loc type relative err:
+    - type: csv
+      title: 'Location type relative error'
+      description: ""
+      dataset: 'rmse/loctype_relative_error.csv'
+    - title: Location type Relative Error
+      type: vega
+      description: ''
+      config: rmse/loctype_relative_error.vega.json
+
+  AT relative err:  
+    - type: csv
+      title: 'Area type relative error'
+      description: ""
+      dataset: 'rmse/at_relative_error.csv'
+    - title: Area type Relative Error
+      type: vega
+      description: ''
+      config: rmse/at_relative_error.vega.json
+  FT relative err:  
+    - type: csv
+      title: 'Facility type relative error'
+      description: ""
+      dataset: 'rmse/ft_relative_error.csv'
+    - title: Facility type Relative Error
+      type: vega
+      description: ''
+      config: rmse/ft_relative_error.vega.json
+
+  Observed Vol relative err:    
+    - type: csv
+      title: 'Observed Volume relative error'
+      description: ""
+      dataset: 'rmse/observedvolume_relative_error.csv'
+    - title: Observed Volume Relative Error
+      type: vega
+      description: ''
+      config: 'rmse/observedvolume_relative_error.vega.json'
+
+  Loc type EO:
+    - type: csv
+      title: 'Location type Estimate/Obesrvation'
+      description: ""
+      dataset: 'rmse/loctype_est_obs_ratio.csv'
+    - title: Location type Estimate/Obesrvation
+      type: vega
+      description: ''
+      config: rmse/loctype_est_obs_ratio.vega.json
+  
+  AT EO:
+    - type: csv
+      title: 'Area type Estimate/Obesrvation'
+      description: ""
+      dataset: 'rmse/at_est_obs_ratio.csv'   
+    - title: Area type Estimate/Obesrvation
+      type: vega
+      description: ''
+      config: rmse/at_est_obs_ratio.vega.json
+  
+  FT EO:
+    - type: csv
+      title: 'Facility type Estimate/Obesrvation'
+      description: ""
+      dataset: 'rmse/ft_est_obs_ratio.csv'
+    - title: Facility type Estimate/Obesrvation
+      type: vega
+      description: ''
+      config: rmse/ft_est_obs_ratio.vega.json
+  
+  Observed Vol EO:
+    - type: csv
+      title: 'Observed Volume Estimate/Obesrvation'
+      description: ""
+      dataset: 'rmse/observedvolume_est_obs_ratio.csv'
+    - title: Observed Volume Estimate/Obesrvation
+      type: vega
+      description: ''
+      config: 'rmse/observedvolume_est_obs_ratio.vega.json'
+
+  Count Chart:
+    - type: 'bar'
+      title: 'Location Type Count'
+      description:
+      width: 2
+      dataset: 'rmse/loctype_count.csv'
+      x: 'Loc Type'
+      xAxisName: 'Location Types'
+      yAxisName: 'Count'
+
+    - type: 'bar'
+      title: 'Area Type Count'
+      description:
+      width: 2
+      dataset: 'rmse/at_count.csv'
+      x: 'AT'
+      xAxisName: 'Area Types'
+      yAxisName: 'Count'
+    
+    - type: 'bar'
+      title: Facility type Count
+      description:
+      width: 2
+      dataset: 'rmse/ft_count.csv'
+      x: 'FT'
+      xAxisName: 'Facility Types'
+      yAxisName: 'Count'
+    
+    - title: Observed Volume Count
+      type: 'bar'
+      description:
+      width: 2
+      dataset: 'rmse/observedvolume_count.csv'
+      x: 'Observed Volume'
+      xAxisName: 'Observed Volume'
+      yAxisName: 'Count'
+      
+  Count(n):
+    - type: csv
+      title: Location Type Count
+      dataset: 'rmse/loctype_count.csv'
+
+    - type: csv
+      title: Area Type Count
+      dataset: 'rmse/at_count.csv'
+
+    - type: csv
+      title: Facility type Count
+      dataset: 'rmse/ft_count.csv'
+
+    - type: csv
+      title: Observed Volume Count
+      dataset: 'rmse/observedvolume_count.csv'
+    

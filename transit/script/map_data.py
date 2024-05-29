@@ -1,7 +1,7 @@
 import shapefile
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import Point
+from shapely.geometry import Point, LineString
 import numpy as np
 from os import listdir
 from os.path import isfile, join
@@ -167,6 +167,11 @@ def format_percentage(x):
         return f"{float(x):.0f}%" if x not in ['-', ''] else x
     except ValueError:
         return x
+    
+# Function to concatenate ordered geometries
+def concat_ordered_geometries(group):
+    sorted_geoms = group.sort_values(by='SEQ')['geometry']
+    return LineString([pt for geom in sorted_geoms for pt in geom.coords])
 
 abbr_to_full = {
     '12TH' : 'Oakland City Center',
@@ -266,7 +271,7 @@ station = station.merge(df_station_name,  on='Station', how='left')
 #MUNI
 MUNI = []
 for path in files_path:
-    df = read_dbf_and_groupby_sum(path, "SF MUNI", ['FULLNAME', 'NAME','AB'], 'AB_BRDA')
+    df = read_dbf_and_groupby_sum(path, "SF MUNI", ['FULLNAME', 'NAME','AB','SEQ'], 'AB_BRDA')
     df = sort_dataframe_by_mixed_column(df, 'FULLNAME')
     df ['Direction'] = df ['NAME'].apply(map_name_to_direction)
     period = path[-6:-4]
@@ -274,55 +279,101 @@ for path in files_path:
     MUNI.append(df)
     
 MUNI_day = pd.concat(MUNI)
-MUNI_day = MUNI_day.groupby(['FULLNAME','NAME','AB', 'Direction'], as_index=False)['AB_BRDA'].sum()
+MUNI_day = MUNI_day.groupby(['FULLNAME','NAME','AB', 'SEQ', 'Direction'], as_index=False)['AB_BRDA'].sum()
 MUNI_day = MUNI_day.rename(columns={"NAME": "Name"})
 model_MUNI_line = pd.read_csv(os.path.join(OUTPUT_FOLDER,'model_MUNI_line.csv'))
 MUNI_map = model_MUNI_line.merge(MUNI_day, on='Name', how='left')
-MUNI_map = MUNI_map[['Name','Line','AB']]
+MUNI_map = MUNI_map[['Name','Line','AB', 'SEQ']]
 MUNI_map ['Direction'] = MUNI_map ['Name'].apply(map_name_to_direction)
 
 MUNI_IB = pd.read_csv(os.path.join(MUNI_output_dir,'MUNI_IB.csv'))
 MUNI_map_IN = MUNI_map[MUNI_map['Direction'] =='IB']
 MUNI_map_IN = MUNI_map_IN.rename(columns={"Line": "Route"})
 MUNI_IB = MUNI_IB.merge(MUNI_map_IN, on='Route', how='left')
-MUNI_map_IB = MUNI_IB.copy()
-MUNI_map_IB['Percentage Diff'] = pd.to_numeric(MUNI_map_IB['Percentage Diff'].str.replace('%', '').str.strip(), errors='coerce')
-MUNI_map_IB['Percentage Diff'] = MUNI_map_IB['Percentage Diff']/100
-# List of columns to convert
-columns_to_convert = ['Observed', 'Diff', 'Modeled']
-for column in columns_to_convert:
-    MUNI_map_IB[column] = pd.to_numeric(MUNI_map_IB[column].str.replace(',', '').str.strip(), errors='coerce')
-MUNI_map_IB = MUNI_map_IB[['Route','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'Direction']]
-MUNI_map_IB = MUNI_map_IB.drop_duplicates()
-MUNI_map_IB.to_csv(os.path.join(MUNI_output_dir,"MUNI_map_IB.csv"), index=False)
 
 MUNI_map_OUT = MUNI_map[MUNI_map['Direction'] =='OB']
 MUNI_map_OUT = MUNI_map_OUT.rename(columns={"Line": "Route"})
 MUNI_OB = pd.read_csv(os.path.join(MUNI_output_dir,"MUNI_OB.csv"))
 MUNI_OB = MUNI_OB.merge(MUNI_map_OUT, on='Route', how='left')
-MUNI_map_OB = MUNI_OB.copy()
-MUNI_map_OB['Percentage Diff'] = pd.to_numeric(MUNI_map_OB['Percentage Diff'].str.replace('%', '').str.strip(), errors='coerce')
-MUNI_map_OB['Percentage Diff'] = MUNI_map_OB['Percentage Diff']/100
-for column in columns_to_convert:
-    MUNI_map_OB[column] = pd.to_numeric(MUNI_map_OB[column].str.replace(',', '').str.strip(), errors='coerce')
-MUNI_map_OB = MUNI_map_OB[['Route','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'Direction']]
-MUNI_map_OB = MUNI_map_OB.drop_duplicates()
-MUNI_map_OB.to_csv(os.path.join(MUNI_output_dir,"MUNI_map_OB.csv"), index=False)
-
 
 #GEO info
 freeflow = gpd.read_file(FREEFLOW_SHP)
 freeflow.crs = 'epsg:2227'
 freeflow = freeflow.to_crs(epsg=4236)
 node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
-MUNI_IB = MUNI_IB[['Route','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'Direction']]
+MUNI_IB = MUNI_IB[['Route','Name','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'SEQ', 'Direction']]
 muni_ib = MUNI_IB.merge(node_geo, on='AB', how='left').dropna().drop_duplicates()
 muni_ib_geo = gpd.GeoDataFrame(muni_ib, geometry='geometry')
-muni_ib_geo.to_file(os.path.join(SHP_file_dir,"muni_ib.shp"))
-MUNI_OB = MUNI_OB[['Route','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'Direction']]
+# Apply aggregation function using `apply` instead of `agg`
+aggregated_muni_ib = muni_ib_geo.groupby('Name').apply(lambda x: pd.Series({
+    'Route': x['Route'].iloc[0],
+    'Observed': x['Observed'].iloc[0],
+    'Modeled': x['Modeled'].iloc[0],
+    'Diff': x['Diff'].iloc[0],
+    'Percentage Diff': x['Percentage Diff'].iloc[0],
+    'AB': x['AB'].iloc[0],
+    'Direction': x['Direction'].iloc[0],
+    'geometry': concat_ordered_geometries(x)
+})).reset_index()
+
+aggregated_muni_ib = aggregated_muni_ib.groupby('Route').apply(lambda x: pd.Series({
+    'Observed': x['Observed'].iloc[0],
+    'Modeled': x['Modeled'].iloc[0],
+    'Diff': x['Diff'].iloc[0],
+    'Percentage Diff': x['Percentage Diff'].iloc[0],
+    'AB': x['AB'].iloc[0],
+    'Direction': x['Direction'].iloc[0],
+    'geometry':  x['geometry'].iloc[0],
+})).reset_index()
+
+# Convert to GeoDataFrame
+aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry='geometry')
+aggregated_muni_ib.to_file(os.path.join(SHP_file_dir,"muni_ib.shp"))
+MUNI_map_IB = aggregated_muni_ib[["Route", "Observed","Modeled","Diff",	"Percentage Diff", 'Direction']].copy()
+MUNI_map_IB['Percentage Diff'] = pd.to_numeric(MUNI_map_IB['Percentage Diff'].str.replace('%', '').str.strip(), errors='coerce')
+MUNI_map_IB['Percentage Diff'] = MUNI_map_IB['Percentage Diff']/100
+# List of columns to convert
+columns_to_convert = ['Observed', 'Diff', 'Modeled']
+for column in columns_to_convert:
+    MUNI_map_IB[column] = pd.to_numeric(MUNI_map_IB[column].str.replace(',', '').str.strip(), errors='coerce')
+MUNI_map_IB_ = MUNI_map_IB[['Route', 'Observed', 'Modeled', 'Diff', 'Percentage Diff','Direction']]
+MUNI_map_IB = MUNI_map_IB.drop_duplicates()
+MUNI_map_IB.to_csv(os.path.join(MUNI_output_dir,"MUNI_map_IB.csv"), index=False)
+
+MUNI_OB = MUNI_OB[['Route', 'Name','Observed', 'Modeled', 'Diff', 'Percentage Diff','AB', 'SEQ', 'Direction']]
 muni_ob = MUNI_OB.merge(node_geo, on='AB', how='left').dropna().drop_duplicates()
 muni_ob_geo = gpd.GeoDataFrame(muni_ob, geometry='geometry')
-muni_ob_geo.to_file(os.path.join(SHP_file_dir,"muni_ob.shp"))
+# Apply aggregation function using `apply` instead of `agg`
+aggregated_muni_ob = muni_ob_geo.groupby('Name').apply(lambda x: pd.Series({
+    'Route': x['Route'].iloc[0],
+    'Observed': x['Observed'].iloc[0],
+    'Modeled': x['Modeled'].iloc[0],
+    'Diff': x['Diff'].iloc[0],
+    'Percentage Diff': x['Percentage Diff'].iloc[0],
+    'AB': x['AB'].iloc[0],
+    'Direction': x['Direction'].iloc[0],
+    'geometry': concat_ordered_geometries(x)
+})).reset_index()
+
+aggregated_muni_ob = aggregated_muni_ob.groupby('Route').apply(lambda x: pd.Series({
+    'Observed': x['Observed'].iloc[0],
+    'Modeled': x['Modeled'].iloc[0],
+    'Diff': x['Diff'].iloc[0],
+    'Percentage Diff': x['Percentage Diff'].iloc[0],
+    'AB': x['AB'].iloc[0],
+    'Direction': x['Direction'].iloc[0],
+    'geometry':  x['geometry'].iloc[0],
+})).reset_index()
+
+aggregated_muni_ob.to_file(os.path.join(SHP_file_dir,"muni_ob.shp"))
+MUNI_map_OB = aggregated_muni_ob[["Route", "Observed","Modeled","Diff",	"Percentage Diff", 'Direction']].copy()
+MUNI_map_OB['Percentage Diff'] = pd.to_numeric(MUNI_map_OB['Percentage Diff'].str.replace('%', '').str.strip(), errors='coerce')
+MUNI_map_OB['Percentage Diff'] = MUNI_map_OB['Percentage Diff']/100
+for column in columns_to_convert:
+    MUNI_map_OB[column] = pd.to_numeric(MUNI_map_OB[column].str.replace(',', '').str.strip(), errors='coerce')
+MUNI_map_OB = MUNI_map_OB[['Route','Observed', 'Modeled', 'Diff', 'Percentage Diff','Direction']]
+MUNI_map_OB = MUNI_map_OB.drop_duplicates()
+MUNI_map_OB.to_csv(os.path.join(MUNI_output_dir,"MUNI_map_OB.csv"), index=False)
 
 #BART
 BART_boarding_allday = pd.read_csv(os.path.join(BART_output_dir,"BART_boarding_allday.csv"))

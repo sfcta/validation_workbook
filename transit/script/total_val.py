@@ -13,6 +13,7 @@ OUTPUT_FOLDER           =  config['folder_setting']['markdown_output_dir']
 INPUT_FOLDER            =  config['folder_setting']['transit_input_dir']
 total_output_dir        =  config['folder_setting']['total_output_dir']
 Transit_Templet         =  os.path.join(INPUT_FOLDER, config['transit']['Transit_Templet'])
+observed_NTD             =  os.path.join(INPUT_FOLDER, config['transit']['observed_NTD'])
 AM_dbf                  =  os.path.join(INPUT_FOLDER, config['transit']['SFALLMSAAM_DBF'])
 PM_dbf                  =  os.path.join(INPUT_FOLDER, config['transit']['SFALLMSAPM_DBF'])
 MD_dbf                  =  os.path.join(INPUT_FOLDER, config['transit']['SFALLMSAMD_DBF'])
@@ -171,7 +172,7 @@ def read_dbf_and_groupby_sum(dbf_file_path, groupby_columns, sum_column):
     
 # Get Observed data from NTD
 # Read the Excel file, assuming headers are not in the first row
-df = pd.read_excel(Transit_Templet, usecols = "B:D", sheet_name='obs_NTD', skiprows = list(range(4)), header=None, engine='openpyxl')
+df = df = pd.read_excel(observed_NTD, usecols = "B:D", skiprows = list(range(4)), header=None, engine='openpyxl')
 
 # A list to hold all the tables as DataFrames
 tables = []

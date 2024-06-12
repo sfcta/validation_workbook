@@ -10,7 +10,12 @@ config.read('transit.ctl')
 WORKING_FOLDER          =  config['folder_setting']['transit_output_dir']
 OUTPUT_FOLDER           =  config['folder_setting']['markdown_output_dir']
 INPUT_FOLDER            =  config['folder_setting']['transit_input_dir']
-Transit_Templet         =  os.path.join(INPUT_FOLDER, config['transit']['Transit_Templet'])
+observed_BART           =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART'])
+observed_BART_county    =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_county'])
+observed_BART_SL        =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_SL'])
+observed_MUNI_Line      =  os.path.join(INPUT_FOLDER, config['transit']['observed_MUNI_Line'])
+observed_SL             =  os.path.join(INPUT_FOLDER, config['transit']['observed_SL'])
+observed_NTD             =  os.path.join(INPUT_FOLDER, config['transit']['observed_NTD'])
 
 def dataframe_to_markdown(df, file_name='dataframe_table.md', highlight_rows=None, center_align_columns=None, column_widths = 100):
     """
@@ -73,31 +78,31 @@ def format_numeric(x):
     except ValueError:
         return x
     
-obs_MUNI_line = pd.read_excel(Transit_Templet, usecols = "B:H", sheet_name='obs_MUNI_line', skiprows = list(range(9)))
+obs_MUNI_line = pd.read_csv(observed_MUNI_Line)
 obs_MUNI_line['Ridership'] = obs_MUNI_line['Ridership'].apply(lambda x: format_numeric(x))
 dataframe_to_markdown(obs_MUNI_line, os.path.join(OUTPUT_FOLDER,'obs_MUNI_line.md'), highlight_rows=None, center_align_columns=['Mode','Direction','TOD','Key_line_dir','Key_line_tod_dir'], column_widths = 100)
 
-obs_BART_line = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_station', skiprows = list(range(6)))
+obs_BART_line = pd.read_csv(observed_BART)
 obs_BART_line['Boardings'] = obs_BART_line['Boardings'].apply(lambda x: format_numeric(x))
 obs_BART_line['Alightings'] = obs_BART_line['Alightings'].apply(lambda x: format_numeric(x))
 dataframe_to_markdown(obs_BART_line, os.path.join(OUTPUT_FOLDER,'obs_BART_station.md'), highlight_rows=None, center_align_columns=['TOD','Key'], column_widths = 100)
 
-obs_BART_county = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_county', skiprows = list(range(6)))
+obs_BART_county = pd.read_csv(observed_BART_county)
 obs_BART_county['Boardings'] = obs_BART_county['Boardings'].apply(lambda x: format_numeric(x))
 obs_BART_county['Alightings'] = obs_BART_county['Alightings'].apply(lambda x: format_numeric(x))
 dataframe_to_markdown(obs_BART_county, os.path.join(OUTPUT_FOLDER,'obs_BART_county.md'), highlight_rows=None, center_align_columns=['TOD','Key'], column_widths = 100)
 
-obs_BART_SL = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_SL', skiprows = list(range(6))) 
+obs_BART_SL = pd.read_csv(observed_BART_SL)
 obs_BART_SL['Ridership'] = obs_BART_SL['Ridership'].apply(lambda x: format_numeric(x))
 dataframe_to_markdown(obs_BART_SL, os.path.join(OUTPUT_FOLDER,'obs_BART_SL.md'), highlight_rows=None, center_align_columns=['Direction','TOD','Key'], column_widths = 100)
 
-obs_SL = pd.read_excel(Transit_Templet, usecols = "B:H", sheet_name='obs_Screenlines', skiprows = list(range(6))) 
+obs_SL = pd.read_csv(observed_SL)
 obs_SL['Ridership'] = obs_SL['Ridership'].apply(lambda x: format_numeric(x))
 dataframe_to_markdown(obs_SL, os.path.join(OUTPUT_FOLDER,'obs_Screenlines.md'), highlight_rows=None, center_align_columns=['Direction','TOD','Key', 'Operator', 'Mode'], column_widths = 100)
 
 
-def NTD_to_df(Transit_Templet):
-    df = pd.read_excel(Transit_Templet, usecols = "B:D", sheet_name='obs_NTD', skiprows = list(range(4)), header=None, engine='openpyxl')
+def NTD_to_df(observed_NTD):
+    df = pd.read_excel(observed_NTD, usecols = "B:D", skiprows = list(range(4)), header=None, engine='openpyxl')
     tables = []
     current_table_start = None
 
@@ -123,7 +128,7 @@ def NTD_to_df(Transit_Templet):
         tables[i] = table
     return tables
 
-tables = NTD_to_df(Transit_Templet)
+tables = NTD_to_df(observed_NTD)
 
 
 

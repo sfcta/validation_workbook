@@ -22,8 +22,8 @@ PM_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALL
 MD_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAMD_DBF'])
 EV_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAEV_DBF'])
 EA_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAEA_DBF'])
+observed_BART           =  os.path.join(WORKING_FOLDER, config['transit']['observed_BART'])
 FREEFLOW_SHP            =  os.path.join(Base_model_dir, config['transit']['FREEFLOW_SHP'])
-Transit_Templet         =  os.path.join(WORKING_FOLDER, config['transit']['Transit_Templet'])
 files_path = [AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf]
 
 file_create = [ OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, SHP_file_dir]
@@ -173,6 +173,7 @@ def concat_ordered_geometries(group):
     sorted_geoms = group.sort_values(by='SEQ')['geometry']
     return LineString([pt for geom in sorted_geoms for pt in geom.coords])
 
+# Convert station abbreviation to full name
 abbr_to_full = {
     '12TH' : 'Oakland City Center',
     '16TH' : '16th/Mission',
@@ -182,6 +183,7 @@ abbr_to_full = {
     'ASHB' : 'Ashby',
     'BALB' : 'Balboa Park',
     'BAYF' : 'Bay Fair',
+    'BERY' : 'Berryessa',
     'CAST' : 'Castro Valley',
     'CIVC' : 'Civic Center',
     'COLM' : 'Colma',
@@ -201,6 +203,7 @@ abbr_to_full = {
     'MCAR' : 'MacArthur',
     'MLBR' : 'Millbrae',
     'MONT' : 'Montgomery',
+    'MLPT' : 'Milpitas',
     'NBRK' : 'North Berkeley',
     'NCON' : 'North Concord',
     'OAKL' : 'OAKL',                   # NOT IN MODEL (Oakland International Airport)
@@ -227,11 +230,13 @@ abbr_to_full = {
 station_name = {'Station': ['12TH', '16TH', '19TH', '24TH', 'ANTC', 'ASHB', 'BALB', 'BAYF', 'CAST', 'CIVC', 'COLM', 'COLS', 
                          'CONC', 'DALY', 'DBRK', 'DELN', 'DUBL', 'EMBR', 'FRMT', 'FTVL', 'GLEN', 'HAYW', 'LAFY', 'LAKE', 
                          'MCAR', 'MLBR', 'MONT', 'NBRK', 'NCON', 'OAKL', 'ORIN', 'PCTR', 'PHIL', 'PITT', 'PLZA', 'POWL', 
-                         'RICH', 'ROCK', 'SANL', 'SBRN', 'SFIA', 'SHAY', 'SSAN', 'UCTY', 'WARM', 'WCRK', 'WDUB', 'WOAK'],
+                         'RICH', 'ROCK', 'SANL', 'SBRN', 'SFIA', 'SHAY', 'SSAN', 'UCTY', 'WARM', 'WCRK', 'WDUB', 'WOAK', 
+                         'MLPT', 'BERY'],
                 'Node': [16509, 16515, 16508, 16516, 15231, 16525, 16518, 16530, 16537, 16514, 16539, 16532,
                          16501, 16519, 16523, 16521, 16538, 16511, 16526, 16533, 16517, 16529, 16504, 16534,
                          16507, 16543, 16512, 16524, 16535, 16000, 16505, 15230, 16502, 16536, 16522, 16513,
-                         16520, 16506, 16531, 16541, 16542, 16528, 16540, 16527, 16544, 16503, 16545 , 16510]}
+                         16520, 16506, 16531, 16541, 16542, 16528, 16540, 16527, 16544, 16503, 16545 , 16510, 
+                         11093, 15203]}
 df_station_name = pd.DataFrame(station_name)
 df_station_name['Station_name'] = df_station_name['Station'].apply(lambda x : abbr_to_full[x])
 
@@ -239,7 +244,9 @@ station_name = {
     'Station': ['12TH', '16TH', '19TH', '24TH', 'EMBR', 'MONT', 'POWL', 'CIVC', 'GLEN', 'BALB', 'DALY', 'ANTC',
                 'ASHB', 'UCTY', 'BAYF', 'CAST', 'COLM', 'COLS', 'CONC', 'DBRK', 'DELN', 'DUBL', 'FRMT', 'FTVL',
                 'HAYW', 'LAFY', 'LAKE', 'MCAR', 'MLBR', 'NBRK', 'NCON', 'OAKL', 'ORIN', 'PCTR', 'PHIL', 'PITT',
-                'PLZA', 'RICH', 'ROCK', 'SANL', 'SBRN', 'SFIA', 'SHAY', 'SSAN', 'WARM', 'WCRK', 'WDUB', 'WOAK' ],
+                'PLZA', 'RICH', 'ROCK', 'SANL', 'SBRN', 'SFIA', 'SHAY', 'SSAN', 'WARM', 'WCRK', 'WDUB', 'WOAK', 
+                'MLPT', 'BERY' ],
+    # Find geometry in X:\Projects\ConnectSF\2050_Baseline
     'geometry': [
         (6049767.14, 2119506.7165), (6006767.6834, 2106509.6581), (6050867.2736, 2121607.9255),
         (6007065.5285, 2101807.0389), (6013668.588, 2116709.2907), (6012268.7237, 2115308.7612),
@@ -256,7 +263,8 @@ station_name = {
         (6042168.6724, 2155907.4969), (6027067.3566, 2168806.3649), (6055968.0873, 2135207.2884), 
         (6081167.6265, 2090007.967), (6006665.742, 2060908.5058), (6014967.7221, 2051908.139), 
         (6111466.3558, 2057608.1106), (5999066.9282, 2069808.0747), (6142865.7593, 2009107.7673),
-        (6109469.0872, 2155705.9545), (6148868.323, 2080406.2284), (6043866.7193, 2120206.1134)
+        (6109469.0872, 2155705.9545), (6148868.323, 2080406.2284), (6043866.7193, 2120206.1134),
+        (6156866.4816, 1974108.2663), (6162684.7021, 1961206.4605)
     ]
 }
 
@@ -377,7 +385,7 @@ MUNI_map_OB.to_csv(os.path.join(MUNI_output_dir,"MUNI_map_OB.csv"), index=False)
 
 #BART
 BART_boarding_allday = pd.read_csv(os.path.join(BART_output_dir,"BART_boarding_allday.csv"))
-obs_BART_line = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_station', skiprows = list(range(6)))  
+obs_BART_line = pd.read_csv(observed_BART)  
 model_BART_line = pd.read_csv(os.path.join(OUTPUT_FOLDER,'model_BART.csv'))
 
 def BART_map(type, group_by, TOD, obs_BART_line, model_BART_line, csv, shp):

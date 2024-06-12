@@ -13,12 +13,16 @@ INPUT_FOLDER            =  config['folder_setting']['transit_input_dir']
 MUNI_output_dir         =  config['folder_setting']['MUNI_output_dir']
 BART_output_dir         =  config['folder_setting']['BART_output_dir']
 Screenline_output_dir   =  config['folder_setting']['Screenline_output_dir']
+observed_BART           =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART'])
+observed_BART_county    =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_county'])
+observed_BART_SL        =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_SL'])
+observed_MUNI_Line      =  os.path.join(INPUT_FOLDER, config['transit']['observed_MUNI_Line'])
+observed_SL             =  os.path.join(INPUT_FOLDER, config['transit']['observed_SL'])
 model_BART              =  os.path.join(WORKING_FOLDER, config['output']['model_BART'])
 model_BART_county       =  os.path.join(WORKING_FOLDER, config['output']['model_BART_county'])
 model_BART_SL           =  os.path.join(WORKING_FOLDER, config['output']['model_BART_SL'])
 model_MUNI_Line         =  os.path.join(WORKING_FOLDER, config['output']['model_MUNI_line'])
 model_SL                =  os.path.join(WORKING_FOLDER, config['output']['model_SL'])
-Transit_Templet         =  os.path.join(INPUT_FOLDER, config['transit']['Transit_Templet'])
 
 file_create = [ OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, Screenline_output_dir]
 for path in file_create:
@@ -151,6 +155,7 @@ def process_data(obs_MUNI_line, model_MUNI_line, filters, groupby_column, sum_co
 
     # Apply the custom function to convert values
     model_MUNI_line[groupby_column] = model_MUNI_line[groupby_column].apply(convert_to_integer)
+    obs_MUNI_line[groupby_column] = obs_MUNI_line[groupby_column].apply(convert_to_integer)
 
     # Apply filters
     if filters is not None:
@@ -187,7 +192,7 @@ def process_data(obs_MUNI_line, model_MUNI_line, filters, groupby_column, sum_co
     return MUNI_IB
 
 
-obs_MUNI_line = pd.read_excel(Transit_Templet, usecols = "B:H", sheet_name='obs_MUNI_line', skiprows = list(range(9)))  
+obs_MUNI_line = pd.read_csv(observed_MUNI_Line)  
 model_MUNI_line = pd.read_csv(model_MUNI_Line)
 tod_order = ['EA', 'AM', 'MD', 'PM', 'EV', 'Total']
 MUNI_IB = process_data(obs_MUNI_line, model_MUNI_line, [('Direction', 'IB')], 'Line', 'Ridership', 'Route', 'left')
@@ -359,7 +364,7 @@ custom_order = [
 
 
 # BART
-obs_BART_line = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_station', skiprows = list(range(6)))  
+obs_BART_line = pd.read_csv(observed_BART)  
 model_BART_line = pd.read_csv(model_BART)
 BART_boarding_allday = process_BART_data(obs_BART_line, model_BART_line, None, None, 'Station', 'Boardings')
 BART_boarding_allday= sort_dataframe_by_custom_order(BART_boarding_allday, 'Station', custom_order)
@@ -383,7 +388,7 @@ BART_at_pm= sort_dataframe_by_custom_order(BART_at_pm, 'Station', custom_order)
 dataframe_to_markdown(BART_at_pm, file_name=os.path.join(OUTPUT_FOLDER,'BART_at_pm.md'), highlight_rows=[11, 12, 13, 14], center_align_columns=None, column_widths = 80)
 
 
-obs_BART_county = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_county', skiprows = list(range(6)))  
+obs_BART_county = pd.read_csv(observed_BART_county)  
 model_BART_county = pd.read_csv(model_BART_county)
 county_order = ['San Francisco', 'San Mateo', 'Contra Costa', 'Alameda', 'Total']
 county_br_day = process_data(obs_BART_county, model_BART_county, None, 'County', 'Boardings', 'County', 'left')
@@ -419,7 +424,7 @@ county_at_pm.to_csv(os.path.join(BART_output_dir,"county_at_pm.csv"), index=Fals
 
 
 # BART Screenline
-obs_BART_SL = pd.read_excel(Transit_Templet, usecols = "B:F", sheet_name='obs_BART_SL', skiprows = list(range(6)))  
+obs_BART_SL = pd.read_csv(observed_BART_SL)  
 model_BART_SL = pd.read_csv(model_BART_SL)
 transbay_BART_IB = process_data(obs_BART_SL, model_BART_SL, [('Screenline', 'Transbay'),('Direction', 'IB')], 'TOD', 'Ridership', 'TOD', 'left')
 transbay_BART_IB['TOD'] = pd.Categorical(transbay_BART_IB['TOD'], categories=tod_order, ordered=True)
@@ -460,7 +465,8 @@ Intra_SF_BART_OB[~Intra_SF_BART_OB['TOD'].isin(['Total'])].to_csv(os.path.join(B
 
 
 #Valdiation for Screenlines
-obs_SL = pd.read_excel(Transit_Templet, usecols = "B:H", sheet_name='obs_Screenlines', skiprows = list(range(6)))  
+obs_SL = pd.read_csv(observed_SL)
+obs_SL['Ridership'] = obs_SL['Ridership'].replace({'-': '0', ' -   ': '0'}).str.replace(',', '').astype(float)
 model_SL = pd.read_csv(model_SL)
 transbay_AC_IB = process_data(obs_SL, model_SL, [('Screenline', 'Transbay'),('Operator', 'AC Transit'), ('Direction', 'IB')], 'TOD', 'Ridership', 'TOD', 'left')
 transbay_AC_IB['TOD'] = pd.Categorical(transbay_AC_IB['TOD'], categories=tod_order, ordered=True)

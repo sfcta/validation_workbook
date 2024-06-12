@@ -548,7 +548,7 @@ layout:
       title: 'Intra-SF BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_BART/Intra_SF_BART_IB.csv'
+      dataset: './val_Screenline/Intra_SF_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -572,7 +572,7 @@ layout:
       title: 'Intra-SF BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_BART/Intra_SF_BART_OB.csv'
+      dataset: './val_Screenline/Intra_SF_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'

@@ -3,12 +3,12 @@ import pandas as pd
 from os import listdir
 from os.path import isfile, join
 import os
-import configparser
+import tomllib
 
-config = configparser.ConfigParser()
-config.read('transit.ctl')
-WORKING_FOLDER          =  config['folder_setting']['transit_input_dir']
-OUTPUT_FOLDER           =  config['folder_setting']['transit_output_dir']
+with open("transit.toml", "rb") as f:
+    config = tomllib.load(f)
+WORKING_FOLDER          =  config['directories']['transit_input_dir']
+OUTPUT_FOLDER           =  config['directories']['transit_output_dir']
 AM_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAAM_DBF'])
 PM_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAPM_DBF'])
 MD_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAMD_DBF'])

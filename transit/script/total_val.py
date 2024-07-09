@@ -4,14 +4,14 @@ from os import listdir
 from os.path import isfile, join
 import os
 import shapefile
-import configparser
+import tomllib
 
-config = configparser.ConfigParser()
-config.read('transit.ctl')
-WORKING_FOLDER          =  config['folder_setting']['transit_output_dir']
-OUTPUT_FOLDER           =  config['folder_setting']['markdown_output_dir']
-INPUT_FOLDER            =  config['folder_setting']['transit_input_dir']
-total_output_dir        =  config['folder_setting']['total_output_dir']
+with open("transit.toml", "rb") as f:
+    config = tomllib.load(f)
+WORKING_FOLDER          =  config['directories']['transit_output_dir']
+OUTPUT_FOLDER           =  config['directories']['markdown_output_dir']
+INPUT_FOLDER            =  config['directories']['transit_input_dir']
+total_output_dir        =  config['directories']['total_output_dir']
 Transit_Templet         =  os.path.join(INPUT_FOLDER, config['transit']['Transit_Templet'])
 observed_NTD             =  os.path.join(INPUT_FOLDER, config['transit']['observed_NTD'])
 AM_dbf                  =  os.path.join(INPUT_FOLDER, config['transit']['SFALLMSAAM_DBF'])

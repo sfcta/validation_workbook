@@ -3,16 +3,16 @@ import pandas as pd
 from os import listdir
 from os.path import isfile, join
 import os
-import configparser
+import tomllib
 
-config = configparser.ConfigParser()
-config.read('transit.ctl')
-WORKING_FOLDER          =  config['folder_setting']['transit_output_dir']
-OUTPUT_FOLDER           =  config['folder_setting']['markdown_output_dir']
-INPUT_FOLDER            =  config['folder_setting']['transit_input_dir']
-MUNI_output_dir         =  config['folder_setting']['MUNI_output_dir']
-BART_output_dir         =  config['folder_setting']['BART_output_dir']
-Screenline_output_dir   =  config['folder_setting']['Screenline_output_dir']
+with open("transit.toml", "rb") as f:
+    config = tomllib.load(f)
+WORKING_FOLDER          =  config['directories']['transit_output_dir']
+OUTPUT_FOLDER           =  config['directories']['markdown_output_dir']
+INPUT_FOLDER            =  config['directories']['transit_input_dir']
+MUNI_output_dir         =  config['directories']['MUNI_output_dir']
+BART_output_dir         =  config['directories']['BART_output_dir']
+Screenline_output_dir   =  config['directories']['Screenline_output_dir']
 observed_BART           =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART'])
 observed_BART_county    =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_county'])
 observed_BART_SL        =  os.path.join(INPUT_FOLDER, config['transit']['observed_BART_SL'])

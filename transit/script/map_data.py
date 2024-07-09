@@ -6,17 +6,17 @@ import numpy as np
 from os import listdir
 from os.path import isfile, join
 import os
-import configparser
+import tomllib
 
 #MUNI
-config = configparser.ConfigParser()
-config.read('transit.ctl')
-WORKING_FOLDER          =  config['folder_setting']['transit_input_dir']
-OUTPUT_FOLDER           =  config['folder_setting']['transit_output_dir']
-MUNI_output_dir         =  config['folder_setting']['MUNI_output_dir']
-BART_output_dir         =  config['folder_setting']['BART_output_dir']
-Base_model_dir          =  config['folder_setting']['Base_model_dir']
-SHP_file_dir            =  config['folder_setting']['SHP_file_dir']
+with open("transit.toml", "rb") as f:
+    config = tomllib.load(f)
+WORKING_FOLDER          =  config['directories']['transit_input_dir']
+OUTPUT_FOLDER           =  config['directories']['transit_output_dir']
+MUNI_output_dir         =  config['directories']['MUNI_output_dir']
+BART_output_dir         =  config['directories']['BART_output_dir']
+Base_model_dir          =  config['directories']['Base_model_dir']
+SHP_file_dir            =  config['directories']['SHP_file_dir']
 AM_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAAM_DBF'])
 PM_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAPM_DBF'])
 MD_dbf                  =  os.path.join(WORKING_FOLDER, config['transit']['SFALLMSAMD_DBF'])

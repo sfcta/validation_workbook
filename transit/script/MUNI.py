@@ -1,5 +1,6 @@
 import os
 import tomllib
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -9,27 +10,50 @@ import shapefile
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
 from transit import transit_assignment_filepaths
 
+
+def read_transit_lines(model_run_dir, transit_line_rename_filepath):
+    line_names = pd.read_csv(
+        Path(model_run_dir) / "transitLineToVehicle.csv",
+        usecols=["Name", "Line", "System"],
+    )
+    line_names = line_names[line_names["System"] == "SF MUNI"]
+    line_names = line_names[["Name", "Line"]]
+
+    # TODO simplify this logic; it shouldn't require such computationally intensive
+    # creation of Serieses and then dicts... Seems like a polars join then using
+    # when/then/otherwise would be much simpler and efficient
+    rename = pd.read_csv(transit_line_rename_filepath)
+    rename["new_name"] = rename["New"].str.extract(r"(\d+[A-Za-z]*)")
+    name_to_trn_asgn_new = pd.Series(
+        rename.Trn_asgn_new.values, index=rename.NAME
+    ).to_dict()
+    new_name_to_line = pd.Series(
+        rename.new_name.values, index=rename.Trn_asgn_new
+    ).to_dict()
+
+    # Map the Name & Line in line_names to transit_line_rename using the mappings
+    line_names["Name"] = (
+        line_names["Name"].map(name_to_trn_asgn_new).fillna(line_names["Name"])
+    )
+    line_names["Line"] = (
+        line_names["Name"].map(new_name_to_line).fillna(line_names["Line"])
+    )
+    return line_names
+
+
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
 model_run_dir = config["directories"]["model_run"]
 transit_assignments = transit_assignment_filepaths(model_run_dir)
+transit_line_rename_filepath = (
+    config["directories"]["resources"] / config["transit"]["line_rename_filename"]
+)
+line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
-WORKING_FOLDER = config["directories"]["transit_input_dir"]
+WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-Line_Name_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Name_File"])
-Line_Rename_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Rename_File"])
-Transit_Templet = os.path.join(WORKING_FOLDER, config["transit"]["Transit_Templet"])
-
-file_check = [
-    WORKING_FOLDER,
-    Line_Name_File,
-    Line_Rename_File,
-    Transit_Templet,
-] + transit_assignments
-for path in file_check:
-    if not os.path.exists(path):
-        print(f"{path}: Not Exists")
+Transit_Templet = WORKING_FOLDER / config["transit"]["Transit_Templet"]
 
 
 def read_dbf_and_groupby_sum(dbf_file_path, system_filter, groupby_columns, sum_column):
@@ -90,25 +114,7 @@ MUNI_Day = pd.concat(MUNI)
 MUNI_Day = MUNI_Day.sort_values(by="FULLNAME").reset_index(drop=True)
 MUNI_Day = MUNI_Day.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
 
-line_name = pd.read_csv(Line_Name_File)
-line_name = line_name[line_name["System"] == "SF MUNI"]
-line_name = line_name[["Name", "Line"]]
-
-MUNI_full = pd.merge(MUNI_Day, line_name, on="Name", how="left")
-rename = pd.read_csv(Line_Rename_File)
-rename["new_name"] = rename["New"].str.extract(r"(\d+[A-Za-z]*)")
-name_to_trn_asgn_new = pd.Series(
-    rename.Trn_asgn_new.values, index=rename.NAME
-).to_dict()
-new_name_to_line = pd.Series(
-    rename.new_name.values, index=rename.Trn_asgn_new
-).to_dict()
-
-# Map the Name in df1 to Trn_asgn_new using the mapping
-MUNI_full["Name"] = (
-    MUNI_full["Name"].map(name_to_trn_asgn_new).fillna(MUNI_full["Name"])
-)
-MUNI_full["Line"] = MUNI_full["Name"].map(new_name_to_line).fillna(MUNI_full["Line"])
+MUNI_full = pd.merge(MUNI_Day, line_names, on="Name", how="left")
 
 
 def transform_line(line):

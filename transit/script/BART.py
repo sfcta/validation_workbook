@@ -1,5 +1,6 @@
 import os
 import tomllib
+from pathlib import Path
 
 import pandas as pd
 import shapefile
@@ -8,15 +9,23 @@ import shapefile
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
 from transit import transit_assignment_filepaths
 
+
+def read_nodes(model_run_dir):
+    filepath = Path(model_run_dir) / "nodes.xls"
+    return pd.read_excel(
+        filepath, header=None, names=["Node", "Node Name"], skiprows=1
+    )  # TODO why are we skipping the initial row? verify and document
+
+
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
 model_run_dir = config["directories"]["model_run"]
 transit_assignments = transit_assignment_filepaths(model_run_dir)
+nodes = read_nodes(model_run_dir)
 
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-Nodes_File_Name = os.path.join(WORKING_FOLDER, config["transit"]["Nodes_File_Name"])
 
 file_create = [OUTPUT_FOLDER]
 for path in file_create:
@@ -27,13 +36,11 @@ for path in file_create:
     else:
         print(f"Folder '{path}' already exists.")
 
-file_check = [WORKING_FOLDER, Nodes_File_Name] + transit_assignments
+file_check = [WORKING_FOLDER] + transit_assignments
 for path in file_check:
     if not os.path.exists(path):
         print(f"{path}: Not Exists")
 
-node = pd.read_excel(Nodes_File_Name, header=None, skiprows=1)
-node.columns = ["Node", "Node Name"]
 
 station_name = {
     "Station": [
@@ -175,7 +182,7 @@ def read_dbf_and_groupby_sum(dbf_file_path, system_filter, groupby_columns, sum_
     return grouped_sum_df
 
 
-def process_BART_data(file_name, time, node, station):
+def process_BART_data(file_name, time, nodes, station):
     # Process BART data for different routes and columns
     BART_BRDA = read_dbf_and_groupby_sum(file_name, "BART", ["A"], "AB_BRDA")
     EBART_BRDA = read_dbf_and_groupby_sum(file_name, "EBART", ["A"], "AB_BRDA")
@@ -195,7 +202,7 @@ def process_BART_data(file_name, time, node, station):
     BART_B.columns = ["Node", "AB_XITA"]
 
     # Merge with other dataframes
-    BART_A = pd.merge(BART_A, node, on="Node", how="left")
+    BART_A = pd.merge(BART_A, nodes, on="Node", how="left")
     BART_A = pd.merge(BART_A, station, on="Node", how="right")
     BART = pd.merge(BART_A, BART_B, on="Node", how="right")
 
@@ -229,7 +236,7 @@ data_frames = []  # List to collect DataFrames
 
 for path in transit_assignments:
     period = path[-6:-4]
-    df = process_BART_data(path, period, node, df_station_name)
+    df = process_BART_data(path, period, nodes, df_station_name)
     df["TOD"] = period  # Add/ensure a 'TOD' column
     data_frames.append(df)
 
@@ -398,7 +405,9 @@ def determineSL(x):
         return False
 
 
-def process_SL_data(path, lines, node_df, df_station_name, relevant_stations, TOD):
+def process_SL_data(
+    path, lines, nodes: pd.DataFrame, df_station_name, relevant_stations, TOD
+):
     # Read, group, and sum data for each line
     dfs = [read_dbf_and_groupby_sum(path, line, ["A", "B"], "AB_VOL") for line in lines]
 
@@ -406,7 +415,7 @@ def process_SL_data(path, lines, node_df, df_station_name, relevant_stations, TO
     intra_am = pd.concat(dfs)
 
     # Mapping from Node and Station DataFrames
-    node_mapping = node_df.set_index("Node")["Node Name"].to_dict()
+    node_mapping = nodes.set_index("Node")["Node Name"].to_dict()
     station_mapping = df_station_name.set_index("Node")["Station"].to_dict()
 
     # Apply mappings
@@ -445,7 +454,7 @@ BART_sl_sf = []  # List to collect DataFrames
 
 for path in transit_assignments:
     period = path[-6:-4]
-    df = process_SL_data(path, lines, node, df_station_name, relevant_stations, period)
+    df = process_SL_data(path, lines, nodes, df_station_name, relevant_stations, period)
     BART_sl_sf.append(df)
 
 intra_sf = pd.concat(BART_sl_sf)

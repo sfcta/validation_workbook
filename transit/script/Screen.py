@@ -16,8 +16,6 @@ transit_assignments = transit_assignment_filepaths(model_run_dir)
 
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-Line_Name_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Name_File"])
-Line_Rename_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Rename_File"])
 MUNI_OBS = os.path.join(WORKING_FOLDER, config["transit"]["Transit_Templet"])
 model_BART_SL = os.path.join(OUTPUT_FOLDER, config["output"]["model_BART_SL"])
 

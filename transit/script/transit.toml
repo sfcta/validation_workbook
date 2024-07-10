@@ -1,5 +1,8 @@
 [directories]
 model_run = "../"
+# TODO consider directly committing transit_line_rename.csv into the repo
+# and removing directories.resources
+resources = "Q:/Model Development/Simwrapper Validation/resources"
 transit_input_dir = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed"
 transit_output_dir = "Q:/Model Development/Simwrapper Validation/notebooks/transit/Output"
 control_file = "Q:/Model Development/Simwrapper Validation/notebooks/transit/script/transit.ctl"
@@ -14,10 +17,8 @@ necessary_scripts_for_vmt_folder = "Y:/Users/Patricie/champ/champ/scripts/summar
 
 # Input
 [transit]
-Nodes_File_Name = "nodes.xls"
-Line_Name_File = "transitLineToVehicle.csv"
-Line_Rename_File = "transit_line_rename.csv"
-Transit_Templet = "Transit_Validation_2019 - MA.xlsx"
+line_rename_filename = "transit_line_rename.csv"
+Transit_Templet = "Transit_Validation_2019 - MA.xlsx"  # MA refers to Max Alfaro
 FREEFLOW_SHP = "freeflow.shp"
 observed_BART = "BART_station_ridership_2023.csv"
 observed_BART_county = "BART_county_ridership_2023.csv"

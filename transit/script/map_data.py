@@ -3,12 +3,11 @@ import tomllib
 
 import geopandas as gpd
 import pandas as pd
-import shapefile
 from shapely.geometry import LineString, Point
 
 # we should be importing functions in this file into transit.py instead
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import transit_assignment_filepaths
+from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
 
 # MUNI
 with open("transit.toml", "rb") as f:
@@ -34,42 +33,6 @@ for path in file_create:
         print(f"Folder '{path}' did not exist and was created.")
     else:
         print(f"Folder '{path}' already exists.")
-
-
-def read_dbf_and_groupby_sum(dbf_file_path, system_filter, groupby_columns, sum_column):
-    """
-    Reads a DBF file, filters by system, groups by specified columns,
-    and calculates sum of a specified column.
-
-    Parameters:
-    dbf_file_path (str): The path to the DBF file.
-    system_filter (str): The value to filter by on the 'SYSTEM' column.
-    groupby_columns (list): The list of columns to group by.
-    sum_column (str): The column on which to calculate the sum.
-
-    Returns:
-    DataFrame: Pandas DataFrame with the groupby and sum applied.
-    """
-    # Create a shapefile reader object
-    sf = shapefile.Reader(dbf_file_path)
-
-    # Extract fields and records from the DBF file
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-
-    # Create a DataFrame using the extracted data
-    df = pd.DataFrame(columns=fields, data=records)
-
-    # Filter the DataFrame based on the 'SYSTEM' column
-    filtered_df = df[df["SYSTEM"] == system_filter]
-
-    # Group by the specified columns and sum the specified column
-    grouped_sum = filtered_df.groupby(groupby_columns)[sum_column].sum()
-
-    # Resetting index to convert it back to a DataFrame
-    grouped_sum_df = grouped_sum.reset_index()
-
-    return grouped_sum_df
 
 
 def sort_dataframe_by_mixed_column(df, column_name):

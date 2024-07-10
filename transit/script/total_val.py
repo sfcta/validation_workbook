@@ -1,12 +1,12 @@
 import os
 import tomllib
 
+import geopandas as gpd
 import pandas as pd
-import shapefile
 
 # we should be importing functions in this file into transit.py instead
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import transit_assignment_filepaths
+from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
 
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
@@ -148,41 +148,6 @@ def convert_to_integer(value):
         return int(value)
     except ValueError:
         return value
-
-
-def read_dbf_and_groupby_sum(dbf_file_path, groupby_columns, sum_column):
-    """
-    Reads a DBF file, filters by system, groups by specified columns, and calculates sum of a specified column.
-
-    Parameters:
-    dbf_file_path (str): The path to the DBF file.
-    system_filter (str): The value to filter by on the 'SYSTEM' column.
-    groupby_columns (list): The list of columns to group by.
-    sum_column (str): The column on which to calculate the sum.
-
-    Returns:
-    DataFrame: Pandas DataFrame with the groupby and sum applied.
-    """
-    # Create a shapefile reader object
-    sf = shapefile.Reader(dbf_file_path)
-
-    # Extract fields and records from the DBF file
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-
-    # Create a DataFrame using the extracted data
-    df = pd.DataFrame(columns=fields, data=records)
-
-    # Filter the DataFrame based on the 'SYSTEM' column
-    # filtered_df = df[df['SYSTEM'] == system_filter]
-
-    # Group by the specified columns and sum the specified column
-    grouped_sum = df.groupby(groupby_columns)[sum_column].sum()
-
-    # Resetting index to convert it back to a DataFrame
-    grouped_sum_df = grouped_sum.reset_index()
-
-    return grouped_sum_df
 
 
 # Get Observed data from NTD
@@ -374,20 +339,16 @@ def assign_ferry_name(name):
         return "Other"
 
 
-def ferry_total(dbf_file_path, filter_columns, sum_column):
-    sf = shapefile.Reader(dbf_file_path)
-    # Extract fields and records from the DBF file
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-    # Create a DataFrame using the extracted data
-    df = pd.DataFrame(columns=fields, data=records)
+def ferry_total(dbf_filepath, filter_columns, sum_column):
+    # TODO very much similar logic to transit.read_dbf_and_groupby_sum()
+    # simplify/merge also with muni_total and ac_total
+    gdf = gpd.read_file(dbf_filepath)
     # Filter the DataFrame based on the 'SYSTEM' column
-    filtered_df = df[df["SYSTEM"] == filter_columns]
+    filtered_df = gdf[gdf["SYSTEM"] == filter_columns]
     filtered_df = filtered_df[["A", "B", "NAME", sum_column]]
     # Apply the function to each row in the DataFrame to create the new column
     filtered_df["Ferry_name"] = filtered_df["NAME"].apply(assign_ferry_name)
     filtered_df = filtered_df.groupby("Ferry_name")["AB_BRDA"].sum().reset_index()
-
     return filtered_df
 
 
@@ -415,15 +376,12 @@ def assign_muni_name(name):
         return "Bus"
 
 
-def muni_total(dbf_file_path):
-    sf = shapefile.Reader(dbf_file_path)
-    # Extract fields and records from the DBF file
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-    # Create a DataFrame using the extracted data
-    df = pd.DataFrame(columns=fields, data=records)
+def muni_total(dbf_filepath):
+    # TODO very much similar logic to transit.read_dbf_and_groupby_sum()
+    # simplify/merge also with ferry_total and ac_total
+    gdf = gpd.read_file(dbf_filepath)
     # Filter the DataFrame based on the 'SYSTEM' column
-    filtered_df = df[df["SYSTEM"] == "SF MUNI"]
+    filtered_df = gdf[gdf["SYSTEM"] == "SF MUNI"]
     filtered_df = filtered_df[["A", "B", "VEHTYPE", "AB_BRDA"]]
     # Apply the function to each row in the DataFrame to create the new column
     filtered_df["MUNI_name"] = filtered_df["VEHTYPE"].apply(assign_muni_name)
@@ -445,19 +403,15 @@ model_muni_cable = muni[muni["MUNI_name"] == "Cable Car"]["AB_BRDA"].mean()
 model_muni_rail = all_mode[all_mode["Operator"] == 15]["Modeled"].mean()
 
 
-def ac_total(dbf_file_path, system):
-    sf = shapefile.Reader(dbf_file_path)
-    # Extract fields and records from the DBF file
-    fields = [x[0] for x in sf.fields][1:]
-    records = sf.records()
-    # Create a DataFrame using the extracted data
-    df = pd.DataFrame(columns=fields, data=records)
+def ac_total(dbf_filepath, system):
+    # TODO very much similar logic to transit.read_dbf_and_groupby_sum()
+    # simplify/merge also with muni_total and ferry_total
+    gdf = gpd.read_file(dbf_filepath)
     # Filter the DataFrame based on the 'SYSTEM' column
-    filtered_df = df[df["SYSTEM"] == system]
+    filtered_df = gdf[gdf["SYSTEM"] == system]
     filtered_df = filtered_df[["A", "B", "MODE", "AB_BRDA"]]
     # Apply the function to each row in the DataFrame to create the new column
     filtered_df = filtered_df.groupby("MODE")["AB_BRDA"].sum().reset_index()
-
     return filtered_df
 
 

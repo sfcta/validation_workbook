@@ -1,21 +1,21 @@
 import subprocess
+from pathlib import Path
+
+time_periods = ["EA", "AM", "MD", "PM", "EV"]
+
+
+def transit_assignment_filepaths(model_run_dir, time_periods=time_periods):
+    model_run_dir = Path(model_run_dir)
+    return [model_run_dir / f"SFALLMSA{t}.DBF" for t in time_periods]
+
+
+def read_transit_assignments(model_run_dir, time_periods=time_periods):
+    filepaths = transit_assignment_filepaths(model_run_dir, time_periods=time_periods)
+    # TODO consolidate from each subscript to this script & pass as function arg instead
+    raise NotImplementedError
+
 
 if __name__ == "__main__":
-    # required_packages = ['pandas==1.3.4', 'shapefile==0.7.2', 'xlrd==2.0.1', 'numpy==1.21.4', 'geopandas==0.14.2', 'sqlalchemy==1.4.27', 'tables==3.6.1']
-
-    # # Get a list of installed packages
-    # installed_packages = subprocess.check_output(['pip', 'freeze']).decode()
-
-    # # Check if each required package is installed
-    # missing_packages = []
-    # for package in required_packages:
-    #     if package not in installed_packages:
-    #         missing_packages.append(package)
-
-    # Install missing packages
-    # if missing_packages:
-    #     subprocess.check_call(['pip', 'install'] + missing_packages)
-
     scripts = [
         "BART.py",
         "MUNI.py",

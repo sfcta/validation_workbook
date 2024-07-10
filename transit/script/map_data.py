@@ -6,23 +6,25 @@ import pandas as pd
 import shapefile
 from shapely.geometry import LineString, Point
 
+# we should be importing functions in this file into transit.py instead
+# HOTFIX TODO pass results of read_transit_assignments() directly as arg
+from transit import transit_assignment_filepaths
+
 # MUNI
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
+
+model_run_dir = config["directories"]["model_run"]
+transit_assignments = transit_assignment_filepaths(model_run_dir)
+
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
 MUNI_output_dir = config["directories"]["MUNI_output_dir"]
 BART_output_dir = config["directories"]["BART_output_dir"]
 Base_model_dir = config["directories"]["Base_model_dir"]
 SHP_file_dir = config["directories"]["SHP_file_dir"]
-AM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAAM_DBF"])
-PM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAPM_DBF"])
-MD_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAMD_DBF"])
-EV_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEV_DBF"])
-EA_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEA_DBF"])
 observed_BART = os.path.join(WORKING_FOLDER, config["transit"]["observed_BART"])
 FREEFLOW_SHP = os.path.join(Base_model_dir, config["transit"]["FREEFLOW_SHP"])
-files_path = [AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf]
 
 file_create = [OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, SHP_file_dir]
 for path in file_create:
@@ -36,7 +38,8 @@ for path in file_create:
 
 def read_dbf_and_groupby_sum(dbf_file_path, system_filter, groupby_columns, sum_column):
     """
-    Reads a DBF file, filters by system, groups by specified columns, and calculates sum of a specified column.
+    Reads a DBF file, filters by system, groups by specified columns,
+    and calculates sum of a specified column.
 
     Parameters:
     dbf_file_path (str): The path to the DBF file.
@@ -467,7 +470,7 @@ station = station.merge(df_station_name, on="Station", how="left")
 
 # MUNI
 MUNI = []
-for path in files_path:
+for path in transit_assignments:
     df = read_dbf_and_groupby_sum(
         path, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
     )

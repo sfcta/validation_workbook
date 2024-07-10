@@ -5,31 +5,28 @@ import numpy as np
 import pandas as pd
 import shapefile
 
+# we should be importing functions in this file into transit.py instead
+# HOTFIX TODO pass results of read_transit_assignments() directly as arg
+from transit import transit_assignment_filepaths
+
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
+
+model_run_dir = config["directories"]["model_run"]
+transit_assignments = transit_assignment_filepaths(model_run_dir)
+
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-AM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAAM_DBF"])
-PM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAPM_DBF"])
-MD_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAMD_DBF"])
-EV_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEV_DBF"])
-EA_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEA_DBF"])
 Line_Name_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Name_File"])
 Line_Rename_File = os.path.join(WORKING_FOLDER, config["transit"]["Line_Rename_File"])
 Transit_Templet = os.path.join(WORKING_FOLDER, config["transit"]["Transit_Templet"])
-files_path = [AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf]
 
 file_check = [
     WORKING_FOLDER,
-    AM_dbf,
-    PM_dbf,
-    MD_dbf,
-    EV_dbf,
-    EA_dbf,
     Line_Name_File,
     Line_Rename_File,
     Transit_Templet,
-]
+] + transit_assignments
 for path in file_check:
     if not os.path.exists(path):
         print(f"{path}: Not Exists")
@@ -82,7 +79,7 @@ def map_name_to_direction(name):
 
 MUNI = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     period = path[-6:-4]
     df = read_dbf_and_groupby_sum(path, "SF MUNI", ["FULLNAME", "NAME"], "AB_BRDA")
     df["Direction"] = df["NAME"].apply(map_name_to_direction)

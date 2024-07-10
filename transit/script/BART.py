@@ -4,17 +4,19 @@ import tomllib
 import pandas as pd
 import shapefile
 
+# we should be importing functions in this file into transit.py instead
+# HOTFIX TODO pass results of read_transit_assignments() directly as arg
+from transit import transit_assignment_filepaths
+
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
+
+model_run_dir = config["directories"]["model_run"]
+transit_assignments = transit_assignment_filepaths(model_run_dir)
+
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-AM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAAM_DBF"])
-PM_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAPM_DBF"])
-MD_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAMD_DBF"])
-EV_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEV_DBF"])
-EA_dbf = os.path.join(WORKING_FOLDER, config["transit"]["SFALLMSAEA_DBF"])
 Nodes_File_Name = os.path.join(WORKING_FOLDER, config["transit"]["Nodes_File_Name"])
-files_path = [AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf]
 
 file_create = [OUTPUT_FOLDER]
 for path in file_create:
@@ -25,7 +27,7 @@ for path in file_create:
     else:
         print(f"Folder '{path}' already exists.")
 
-file_check = [WORKING_FOLDER, AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf, Nodes_File_Name]
+file_check = [WORKING_FOLDER, Nodes_File_Name] + transit_assignments
 for path in file_check:
     if not os.path.exists(path):
         print(f"{path}: Not Exists")
@@ -225,7 +227,7 @@ def process_BART_data(file_name, time, node, station):
 
 data_frames = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     period = path[-6:-4]
     df = process_BART_data(path, period, node, df_station_name)
     df["TOD"] = period  # Add/ensure a 'TOD' column
@@ -351,7 +353,7 @@ transbay_node = [16510, 16511]  # 16510 in, 16511 out
 
 BART_sl_tb = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     period = path[-6:-4]
     df = process_BART_SL_data(path, period, transbay_node[0], transbay_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
@@ -363,7 +365,7 @@ countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
 
 BART_sl_ct = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     period = path[-6:-4]
     df = process_BART_SL_data(path, period, countyline_node[0], countyline_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
@@ -441,7 +443,7 @@ lines = ["BART", "EBART", "OAC"]
 
 BART_sl_sf = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     period = path[-6:-4]
     df = process_SL_data(path, lines, node, df_station_name, relevant_stations, period)
     BART_sl_sf.append(df)

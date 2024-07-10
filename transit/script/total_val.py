@@ -4,20 +4,23 @@ import tomllib
 import pandas as pd
 import shapefile
 
+# we should be importing functions in this file into transit.py instead
+# HOTFIX TODO pass results of read_transit_assignments() directly as arg
+from transit import transit_assignment_filepaths
+
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
+
+
+model_run_dir = config["directories"]["model_run"]
+transit_assignments = transit_assignment_filepaths(model_run_dir)
+
 WORKING_FOLDER = config["directories"]["transit_output_dir"]
 OUTPUT_FOLDER = config["directories"]["markdown_output_dir"]
 INPUT_FOLDER = config["directories"]["transit_input_dir"]
 total_output_dir = config["directories"]["total_output_dir"]
 Transit_Templet = os.path.join(INPUT_FOLDER, config["transit"]["Transit_Templet"])
 observed_NTD = os.path.join(INPUT_FOLDER, config["transit"]["observed_NTD"])
-AM_dbf = os.path.join(INPUT_FOLDER, config["transit"]["SFALLMSAAM_DBF"])
-PM_dbf = os.path.join(INPUT_FOLDER, config["transit"]["SFALLMSAPM_DBF"])
-MD_dbf = os.path.join(INPUT_FOLDER, config["transit"]["SFALLMSAMD_DBF"])
-EV_dbf = os.path.join(INPUT_FOLDER, config["transit"]["SFALLMSAEV_DBF"])
-EA_dbf = os.path.join(INPUT_FOLDER, config["transit"]["SFALLMSAEA_DBF"])
-files_path = [AM_dbf, PM_dbf, MD_dbf, EV_dbf, EA_dbf]
 
 # Create output file if is not exsits
 file_create = [OUTPUT_FOLDER, total_output_dir]
@@ -315,7 +318,7 @@ name_mapping = {
 
 data_frames = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     df = read_dbf_and_groupby_sum(path, ["SYSTEM"], "AB_BRDA")
     data_frames.append(df)
 
@@ -326,7 +329,7 @@ model_operator = all.copy()
 
 data_frames_mode = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     df = read_dbf_and_groupby_sum(path, ["MODE"], "AB_BRDA")
     data_frames_mode.append(df)
 
@@ -390,7 +393,7 @@ def ferry_total(dbf_file_path, filter_columns, sum_column):
 
 ferry_df = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     df = ferry_total(path, "Ferry", "AB_BRDA")
     ferry_df.append(df)
 
@@ -431,7 +434,7 @@ def muni_total(dbf_file_path):
 
 muni_df = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     df = muni_total(path)
     muni_df.append(df)
 
@@ -460,7 +463,7 @@ def ac_total(dbf_file_path, system):
 
 ac_df = []  # List to collect DataFrames
 
-for path in files_path:
+for path in transit_assignments:
     df = ac_total(path, "AC Transit")
     ac_df.append(df)
 

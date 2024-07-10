@@ -1,5 +1,6 @@
 import os
 import tomllib
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
@@ -16,23 +17,17 @@ with open("transit.toml", "rb") as f:
 model_run_dir = config["directories"]["model_run"]
 transit_assignments = transit_assignment_filepaths(model_run_dir)
 
-WORKING_FOLDER = config["directories"]["transit_input_dir"]
-OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-MUNI_output_dir = config["directories"]["MUNI_output_dir"]
-BART_output_dir = config["directories"]["BART_output_dir"]
-Base_model_dir = config["directories"]["Base_model_dir"]
-SHP_file_dir = config["directories"]["SHP_file_dir"]
-observed_BART = os.path.join(WORKING_FOLDER, config["transit"]["observed_BART"])
-FREEFLOW_SHP = os.path.join(Base_model_dir, config["transit"]["FREEFLOW_SHP"])
+WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
+OUTPUT_FOLDER = Path(config["directories"]["transit_output_dir"])
+MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
+BART_output_dir = Path(config["directories"]["BART_output_dir"])
+Base_model_dir = Path(config["directories"]["Base_model_dir"])
+SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
+observed_BART = WORKING_FOLDER / config["transit"]["observed_BART"]
+FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
 
-file_create = [OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, SHP_file_dir]
-for path in file_create:
-    if not os.path.exists(path):
-        # If the folder does not exist, create it
-        os.makedirs(path)
-        print(f"Folder '{path}' did not exist and was created.")
-    else:
-        print(f"Folder '{path}' already exists.")
+for d in [OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, SHP_file_dir]:
+    d.mkdir(exist_ok=True)
 
 
 def sort_dataframe_by_mixed_column(df, column_name):

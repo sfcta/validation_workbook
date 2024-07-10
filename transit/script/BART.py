@@ -1,4 +1,3 @@
-import os
 import tomllib
 from pathlib import Path
 
@@ -23,23 +22,8 @@ model_run_dir = config["directories"]["model_run"]
 transit_assignments = transit_assignment_filepaths(model_run_dir)
 nodes = read_nodes(model_run_dir)
 
-WORKING_FOLDER = config["directories"]["transit_input_dir"]
-OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-
-file_create = [OUTPUT_FOLDER]
-for path in file_create:
-    if not os.path.exists(path):
-        # If the folder does not exist, create it
-        os.makedirs(path)
-        print(f"Folder '{path}' did not exist and was created.")
-    else:
-        print(f"Folder '{path}' already exists.")
-
-file_check = [WORKING_FOLDER] + transit_assignments
-for path in file_check:
-    if not os.path.exists(path):
-        print(f"{path}: Not Exists")
-
+transit_output_dir = Path(config["directories"]["transit_output_dir"])
+transit_output_dir.mkdir(exist_ok=True)
 
 station_name = {
     "Station": [
@@ -208,7 +192,7 @@ for path in transit_assignments:
 BART = pd.concat(data_frames)
 BART = BART[["Station", "TOD", "Key", "Boardings", "Alightings"]]
 BART = BART.sort_values(by="Key").reset_index(drop=True)
-BART.to_csv(os.path.join(OUTPUT_FOLDER, "model_BART.csv"), index=False)
+BART.to_csv(transit_output_dir / "model_BART.csv", index=False)
 
 BART_county = BART.copy()
 counties = {
@@ -271,7 +255,7 @@ BART_county = (
     .sum()
     .reset_index()
 )
-BART_county.to_csv(os.path.join(OUTPUT_FOLDER, "model_BART_county.csv"), index=False)
+BART_county.to_csv(transit_output_dir / "model_BART_county.csv", index=False)
 
 
 # BART Screenline
@@ -429,4 +413,4 @@ intra_sf = intra_sf[["Screenline", "Direction", "TOD", "Key", "Ridership"]]
 intra_sf = intra_sf.sort_values(by=["Direction", "TOD"]).reset_index(drop=True)
 
 BART_SL = pd.concat([BART_SL_TB, BART_SL_CT, intra_sf], ignore_index=True)
-BART_SL.to_csv(os.path.join(OUTPUT_FOLDER, "model_BART_SL.csv"), index=False)
+BART_SL.to_csv(transit_output_dir / "model_BART_SL.csv", index=False)

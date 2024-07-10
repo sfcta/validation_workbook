@@ -1,8 +1,9 @@
 import os
-import tomllib
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
+import tomllib
 
 # we should be importing functions in this file into transit.py instead
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
@@ -11,26 +12,18 @@ from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
-
-model_run_dir = config["directories"]["model_run"]
+model_run_dir = Path(config["directories"]["model_run"])
 transit_assignments = transit_assignment_filepaths(model_run_dir)
 
-WORKING_FOLDER = config["directories"]["transit_output_dir"]
-OUTPUT_FOLDER = config["directories"]["markdown_output_dir"]
-INPUT_FOLDER = config["directories"]["transit_input_dir"]
-total_output_dir = config["directories"]["total_output_dir"]
-Transit_Templet = os.path.join(INPUT_FOLDER, config["transit"]["Transit_Templet"])
-observed_NTD = os.path.join(INPUT_FOLDER, config["transit"]["observed_NTD"])
+WORKING_FOLDER = Path(config["directories"]["transit_output_dir"])
+OUTPUT_FOLDER = Path(config["directories"]["markdown_output_dir"])
+INPUT_FOLDER = Path(config["directories"]["transit_input_dir"])
+total_output_dir = Path(config["directories"]["total_output_dir"])
+Transit_Templet = INPUT_FOLDER / config["transit"]["Transit_Templet"]
+observed_NTD = INPUT_FOLDER / config["transit"]["observed_NTD"]
 
-# Create output file if is not exsits
-file_create = [OUTPUT_FOLDER, total_output_dir]
-for path in file_create:
-    if not os.path.exists(path):
-        # If the folder does not exist, create it
-        os.makedirs(path)
-        print(f"Folder '{path}' did not exist and was created.")
-    else:
-        print(f"Folder '{path}' already exists.")
+for d in [OUTPUT_FOLDER, total_output_dir]:
+    d.mkdir(exist_ok=True)
 
 
 # function to create markdown file

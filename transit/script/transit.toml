@@ -1,10 +1,9 @@
 [directories]
-model_run = "../"
+model_run = "X:/Projects/CHAMP7/Run25z_Market"
 # TODO consider directly committing transit_line_rename.csv into the repo
-# and removing directories.resources
+# and removing directories.resources, or move it to somwhere in Y:/networks
 resources = "Q:/Model Development/Simwrapper Validation/resources"
 transit_input_dir = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed"
-transit_output_dir = "Q:/Model Development/Simwrapper Validation/notebooks/transit/Output"
 control_file = "Q:/Model Development/Simwrapper Validation/notebooks/transit/script/transit.ctl"
 markdown_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/table"
 MUNI_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_MUNI"

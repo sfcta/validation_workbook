@@ -1,18 +1,28 @@
 import subprocess
+import tomllib
 from pathlib import Path
 
 import geopandas as gpd
 
+with open("transit.toml", "rb") as f:
+    config = tomllib.load(f)
+
+model_run_dir = Path(config["directories"]["model_run"])
+output_dir = model_run_dir / "validation_workbook" / "output"
+output_transit_dir = output_dir / "transit"
+output_transit_dir.mkdir(parents=True, exist_ok=True)
+
 time_periods = ["EA", "AM", "MD", "PM", "EV"]
 
 
-def transit_assignment_filepaths(model_run_dir, time_periods=time_periods):
-    model_run_dir = Path(model_run_dir)
-    return [model_run_dir / f"SFALLMSA{t}.DBF" for t in time_periods]
+def transit_assignment_filepaths(
+    model_run_dir=model_run_dir, time_periods=time_periods
+):
+    return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}
 
 
 def read_transit_assignments(model_run_dir, time_periods=time_periods):
-    filepaths = transit_assignment_filepaths(model_run_dir, time_periods=time_periods)
+    # transit_assignment_filepaths(model_run_dir, time_periods=time_periods)
     # TODO consolidate from each subscript to this script & pass as function arg instead
     raise NotImplementedError
 

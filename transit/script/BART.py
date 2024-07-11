@@ -1,11 +1,15 @@
-import tomllib
 from pathlib import Path
 
 import pandas as pd
 
 # we should be importing functions in this file into transit.py instead
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
+from transit import (
+    model_run_dir,
+    output_transit_dir,
+    read_dbf_and_groupby_sum,
+    transit_assignment_filepaths,
+)
 
 
 def read_nodes(model_run_dir):
@@ -15,15 +19,8 @@ def read_nodes(model_run_dir):
     )  # TODO why are we skipping the initial row? verify and document
 
 
-with open("transit.toml", "rb") as f:
-    config = tomllib.load(f)
-
-model_run_dir = config["directories"]["model_run"]
-transit_assignments = transit_assignment_filepaths(model_run_dir)
+transit_assignments_filepaths = transit_assignment_filepaths()
 nodes = read_nodes(model_run_dir)
-
-transit_output_dir = Path(config["directories"]["transit_output_dir"])
-transit_output_dir.mkdir(exist_ok=True)
 
 station_name = {
     "Station": [
@@ -182,8 +179,7 @@ def process_BART_data(file_name, time, nodes, station):
 
 data_frames = []  # List to collect DataFrames
 
-for path in transit_assignments:
-    period = path[-6:-4]
+for period, path in transit_assignments_filepaths.items():
     df = process_BART_data(path, period, nodes, df_station_name)
     df["TOD"] = period  # Add/ensure a 'TOD' column
     data_frames.append(df)
@@ -192,7 +188,7 @@ for path in transit_assignments:
 BART = pd.concat(data_frames)
 BART = BART[["Station", "TOD", "Key", "Boardings", "Alightings"]]
 BART = BART.sort_values(by="Key").reset_index(drop=True)
-BART.to_csv(transit_output_dir / "model_BART.csv", index=False)
+BART.to_csv(output_transit_dir / "model_BART.csv", index=False)
 
 BART_county = BART.copy()
 counties = {
@@ -255,7 +251,7 @@ BART_county = (
     .sum()
     .reset_index()
 )
-BART_county.to_csv(transit_output_dir / "model_BART_county.csv", index=False)
+BART_county.to_csv(output_transit_dir / "model_BART_county.csv", index=False)
 
 
 # BART Screenline
@@ -308,8 +304,7 @@ transbay_node = [16510, 16511]  # 16510 in, 16511 out
 
 BART_sl_tb = []  # List to collect DataFrames
 
-for path in transit_assignments:
-    period = path[-6:-4]
+for period, path in transit_assignments_filepaths.items():
     df = process_BART_SL_data(path, period, transbay_node[0], transbay_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
     BART_sl_tb.append(df)
@@ -320,8 +315,7 @@ countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
 
 BART_sl_ct = []  # List to collect DataFrames
 
-for path in transit_assignments:
-    period = path[-6:-4]
+for period, path in transit_assignments_filepaths.items():
     df = process_BART_SL_data(path, period, countyline_node[0], countyline_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
     BART_sl_ct.append(df)
@@ -400,8 +394,7 @@ lines = ["BART", "EBART", "OAC"]
 
 BART_sl_sf = []  # List to collect DataFrames
 
-for path in transit_assignments:
-    period = path[-6:-4]
+for period, path in transit_assignments_filepaths.items():
     df = process_SL_data(path, lines, nodes, df_station_name, relevant_stations, period)
     BART_sl_sf.append(df)
 
@@ -413,4 +406,4 @@ intra_sf = intra_sf[["Screenline", "Direction", "TOD", "Key", "Ridership"]]
 intra_sf = intra_sf.sort_values(by=["Direction", "TOD"]).reset_index(drop=True)
 
 BART_SL = pd.concat([BART_SL_TB, BART_SL_CT, intra_sf], ignore_index=True)
-BART_SL.to_csv(transit_output_dir / "model_BART_SL.csv", index=False)
+BART_SL.to_csv(output_transit_dir / "model_BART_SL.csv", index=False)

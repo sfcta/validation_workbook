@@ -8,13 +8,6 @@ Before running the scripts, configure the paths to all necessary input and outpu
 
 Specify the paths for the required input files under the `[transit]` section in the control file:
 
-- `SFALLMSAAM.DBF`
-- `SFALLMSAPM.DBF`
-- `SFALLMSAMD.DBF`
-- `SFALLMSAEV.DBF`
-- `SFALLMSAEA.DBF`
-- `nodes.xls`
-- `transitLineToVehicle.csv`
 - `transit_line_rename.csv`
 - `Transit_Validation_2019 - MA.xlsx`
 

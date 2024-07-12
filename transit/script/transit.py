@@ -1,8 +1,8 @@
 import subprocess
-import tomllib
 from pathlib import Path
 
 import geopandas as gpd
+import tomllib
 
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
@@ -63,10 +63,10 @@ if __name__ == "__main__":
     scripts = [
         "bart.py",
         "muni.py",
-        "Screen.py",
-        "Simwrapper_table.py",
+        "screen.py",
+        "simwrapper_table.py",
         "map_data.py",
-        "Obs.py",
+        "obs.py",
         "total_val.py",
     ]
     for script_name in scripts:

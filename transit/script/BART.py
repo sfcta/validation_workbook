@@ -19,7 +19,7 @@ def read_nodes(model_run_dir):
     )  # TODO why are we skipping the initial row? verify and document
 
 
-transit_assignments_filepaths = transit_assignment_filepaths()
+transit_assignment_filepaths = transit_assignment_filepaths(model_run_dir=model_run_dir)
 nodes = read_nodes(model_run_dir)
 
 station_name = {
@@ -179,7 +179,7 @@ def process_BART_data(file_name, time, nodes, station):
 
 data_frames = []  # List to collect DataFrames
 
-for period, path in transit_assignments_filepaths.items():
+for period, path in transit_assignment_filepaths.items():
     df = process_BART_data(path, period, nodes, df_station_name)
     df["TOD"] = period  # Add/ensure a 'TOD' column
     data_frames.append(df)
@@ -304,7 +304,7 @@ transbay_node = [16510, 16511]  # 16510 in, 16511 out
 
 BART_sl_tb = []  # List to collect DataFrames
 
-for period, path in transit_assignments_filepaths.items():
+for period, path in transit_assignment_filepaths.items():
     df = process_BART_SL_data(path, period, transbay_node[0], transbay_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
     BART_sl_tb.append(df)
@@ -315,7 +315,7 @@ countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
 
 BART_sl_ct = []  # List to collect DataFrames
 
-for period, path in transit_assignments_filepaths.items():
+for period, path in transit_assignment_filepaths.items():
     df = process_BART_SL_data(path, period, countyline_node[0], countyline_node[1])
     df["TOD"] = period  # Add/ensure a 'TOD' column
     BART_sl_ct.append(df)
@@ -394,7 +394,7 @@ lines = ["BART", "EBART", "OAC"]
 
 BART_sl_sf = []  # List to collect DataFrames
 
-for period, path in transit_assignments_filepaths.items():
+for period, path in transit_assignment_filepaths.items():
     df = process_SL_data(path, lines, nodes, df_station_name, relevant_stations, period)
     BART_sl_sf.append(df)
 

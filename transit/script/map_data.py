@@ -15,7 +15,6 @@ with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
 model_run_dir = config["directories"]["model_run"]
-transit_assignments = transit_assignment_filepaths(model_run_dir)
 
 WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
 OUTPUT_FOLDER = Path(config["directories"]["transit_output_dir"])
@@ -428,13 +427,12 @@ station = station.merge(df_station_name, on="Station", how="left")
 
 # MUNI
 MUNI = []
-for path in transit_assignments:
+for period, path in transit_assignment_filepaths(model_run_dir=model_run_dir).items():
     df = read_dbf_and_groupby_sum(
         path, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
     )
     df = sort_dataframe_by_mixed_column(df, "FULLNAME")
     df["Direction"] = df["NAME"].apply(map_name_to_direction)
-    period = path[-6:-4]
     df["TOD"] = period
     MUNI.append(df)
 

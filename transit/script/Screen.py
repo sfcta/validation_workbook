@@ -11,11 +11,9 @@ with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
 model_run_dir = config["directories"]["model_run"]
-transit_assignments = transit_assignment_filepaths(model_run_dir)
 
 WORKING_FOLDER = config["directories"]["transit_input_dir"]
 OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-MUNI_OBS = os.path.join(WORKING_FOLDER, config["transit"]["Transit_Templet"])
 model_BART_SL = os.path.join(OUTPUT_FOLDER, config["output"]["model_BART_SL"])
 
 
@@ -49,9 +47,10 @@ HWY_SCREENS = {
 
 
 def process_data(file_name, system, TOD, A, B, Screenline, Operator, Mode):
-    # Create DataFrames for IB and OB
-    ST_IB = pd.DataFrame({"A": A, "B": B})
-    ST_OB = pd.DataFrame({"A": B, "B": A})
+    # ST_IB, ST_OB: HOTFIX commented out for now; TODO remove if unused
+    # # Create DataFrames for IB and OB
+    # ST_IB = pd.DataFrame({"A": A, "B": B})
+    # ST_OB = pd.DataFrame({"A": B, "B": A})
 
     # Read the DBF file and group by 'A' and 'B' while summing 'AB_VOL'
     ST_TOD = read_dbf_and_groupby_sum(file_name, system, ["A", "B"], "AB_VOL")
@@ -90,12 +89,11 @@ def process_data(file_name, system, TOD, A, B, Screenline, Operator, Mode):
     return ST_TOD1
 
 
-def screen_df(transit_assignments, HWY_SCREENS):
+def screen_df(transit_assignment_filepaths, HWY_SCREENS):
     df_total = []
     for i in HWY_SCREENS.keys():
         df_i = []
-        for path in transit_assignments:
-            period = path[-6:-4]
+        for period, path in transit_assignment_filepaths.itmes():
             df = process_data(
                 path,
                 HWY_SCREENS[i][2][0],
@@ -118,7 +116,9 @@ def screen_df(transit_assignments, HWY_SCREENS):
     return model_Screenlines
 
 
-model_Screenlines = screen_df(transit_assignments, HWY_SCREENS)
+model_Screenlines = screen_df(
+    transit_assignment_filepaths(model_run_dir=model_run_dir), HWY_SCREENS
+)
 BART_Screenlines = pd.read_csv(model_BART_SL)
 BART_Screenlines["Operator"] = "BART"
 BART_Screenlines["Mode"] = "BART"

@@ -1,9 +1,9 @@
 import os
+import tomllib
 from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-import tomllib
 
 # we should be importing functions in this file into transit.py instead
 # HOTFIX TODO pass results of read_transit_assignments() directly as arg
@@ -13,13 +13,15 @@ with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
 model_run_dir = Path(config["directories"]["model_run"])
-transit_assignments = transit_assignment_filepaths(model_run_dir)
+transit_assignment_filepaths = transit_assignment_filepaths(model_run_dir)
 
 WORKING_FOLDER = Path(config["directories"]["transit_output_dir"])
 OUTPUT_FOLDER = Path(config["directories"]["markdown_output_dir"])
 INPUT_FOLDER = Path(config["directories"]["transit_input_dir"])
 total_output_dir = Path(config["directories"]["total_output_dir"])
-Transit_Templet = INPUT_FOLDER / config["transit"]["Transit_Templet"]
+transit_validation_2019_alfaro_filepath = config["transit"][
+    "transit_validation_2019_alfaro_filepath"
+]
 observed_NTD = INPUT_FOLDER / config["transit"]["observed_NTD"]
 
 for d in [OUTPUT_FOLDER, total_output_dir]:
@@ -276,7 +278,7 @@ name_mapping = {
 
 data_frames = []  # List to collect DataFrames
 
-for path in transit_assignments:
+for path in transit_assignment_filepaths.values():
     df = read_dbf_and_groupby_sum(path, ["SYSTEM"], "AB_BRDA")
     data_frames.append(df)
 
@@ -287,7 +289,7 @@ model_operator = all.copy()
 
 data_frames_mode = []  # List to collect DataFrames
 
-for path in transit_assignments:
+for path in transit_assignment_filepaths.values():
     df = read_dbf_and_groupby_sum(path, ["MODE"], "AB_BRDA")
     data_frames_mode.append(df)
 
@@ -347,7 +349,7 @@ def ferry_total(dbf_filepath, filter_columns, sum_column):
 
 ferry_df = []  # List to collect DataFrames
 
-for path in transit_assignments:
+for path in transit_assignment_filepaths.values():
     df = ferry_total(path, "Ferry", "AB_BRDA")
     ferry_df.append(df)
 
@@ -385,7 +387,7 @@ def muni_total(dbf_filepath):
 
 muni_df = []  # List to collect DataFrames
 
-for path in transit_assignments:
+for path in transit_assignment_filepaths.values():
     df = muni_total(path)
     muni_df.append(df)
 
@@ -410,7 +412,7 @@ def ac_total(dbf_filepath, system):
 
 ac_df = []  # List to collect DataFrames
 
-for path in transit_assignments:
+for path in transit_assignment_filepaths.values():
     df = ac_total(path, "AC Transit")
     ac_df.append(df)
 
@@ -448,8 +450,10 @@ model_dic = {
 df_model_dic = pd.DataFrame(model_dic)
 
 df_modeled = pd.concat([all, df_model_dic])
+# TODO do NOT use "Transit_Validation_2019 - MA.xlsx" file for just line names etc
+# put the info/data into a CSV and put it into the resources dir or commit to repo
 df = pd.read_excel(
-    Transit_Templet,
+    transit_validation_2019_alfaro_filepath,
     usecols="C:D",
     sheet_name="val_Tot",
     skiprows=list(range(4)) + list(range(37, 51)),

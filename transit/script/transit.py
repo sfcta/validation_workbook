@@ -7,6 +7,12 @@ import geopandas as gpd
 with open("transit.toml", "rb") as f:
     config = tomllib.load(f)
 
+transit_line_rename_filepath = (
+    Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
+)
+transit_validation_2019_alfaro_filepath = config["transit"][
+    "transit_validation_2019_alfaro_filepath"
+]
 model_run_dir = Path(config["directories"]["model_run"])
 output_dir = model_run_dir / "validation_workbook" / "output"
 output_transit_dir = output_dir / "transit"
@@ -21,7 +27,7 @@ def transit_assignment_filepaths(
     return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}
 
 
-def read_transit_assignments(model_run_dir, time_periods=time_periods):
+def read_transit_assignments(model_run_dir=model_run_dir, time_periods=time_periods):
     # transit_assignment_filepaths(model_run_dir, time_periods=time_periods)
     # TODO consolidate from each subscript to this script & pass as function arg instead
     raise NotImplementedError
@@ -51,16 +57,18 @@ def read_dbf_and_groupby_sum(dbf_filepath, system_filter, groupby_columns, sum_c
 
 
 if __name__ == "__main__":
+    # TODO call functions from each script directly rather than use subprocess
+    # make sure that there are no circular imports by passing data structures directly
+    # rather than importing the shared read functions from here to the scripts
     scripts = [
-        "BART.py",
-        "MUNI.py",
+        "bart.py",
+        "muni.py",
         "Screen.py",
         "Simwrapper_table.py",
         "map_data.py",
         "Obs.py",
         "total_val.py",
     ]
-
     for script_name in scripts:
         print(f"Running {script_name}")
         result = subprocess.run(["python", script_name], capture_output=True, text=True)

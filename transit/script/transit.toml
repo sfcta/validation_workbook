@@ -17,7 +17,12 @@ necessary_scripts_for_vmt_folder = "Y:/Users/Patricie/champ/champ/scripts/summar
 # Input
 [transit]
 line_rename_filename = "transit_line_rename.csv"
-Transit_Templet = "Transit_Validation_2019 - MA.xlsx"  # MA refers to Max Alfaro
+# TODO find a permanent home for the data used from "Transit_Validation_2019 - MA.xlsx"
+# only uses the tabs obs_MUNI_line (make a standard format for MUNI observed
+# data instead of having the code read from this bespoke file) and val_Tot (only
+# cols C:D) (put the line names in a CSV file in the resources dir or otherwise)
+# MA refers to Max Alfaro
+transit_validation_2019_alfaro_filepath = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed/Transit_Validation_2019 - MA.xlsx"
 FREEFLOW_SHP = "freeflow.shp"
 observed_BART = "BART_station_ridership_2023.csv"
 observed_BART_county = "BART_county_ridership_2023.csv"

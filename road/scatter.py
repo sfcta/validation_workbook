@@ -4,9 +4,15 @@ import json
 import yaml
 from sklearn.linear_model import LinearRegression
 
-def compute_and_save_errors(est_df, obs_df, chosen_timeperiod, combined_df_cols, classification_col):
+
+def compute_and_save_errors(
+        est_df,
+        obs_df,
+        chosen_timeperiod,
+        combined_df_cols,
+        classification_col):
     # Compute errors
-    times = ['Daily','AM', 'MD', 'PM', 'EV', 'EA']
+    times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
     error = {col: est_df[col] - obs_df[col] for col in times}
     error_df = pd.DataFrame(error)
     error_squared_df = error_df.pow(2)
@@ -14,31 +20,51 @@ def compute_and_save_errors(est_df, obs_df, chosen_timeperiod, combined_df_cols,
     error_percent_df = error_percent_df.apply(lambda x: x * 100, axis=1)
 
     # Combine dataframes
-    combined_df = pd.concat([est_df, obs_df[times], error_df, error_squared_df, error_percent_df], axis=1)
+    combined_df = pd.concat(
+        [est_df, obs_df[times], error_df, error_squared_df, error_percent_df], axis=1)
     Select_time_period_df = combined_df.filter(like=chosen_timeperiod)
     specific_columns_combined_df = combined_df[combined_df_cols]
-    Select_time_period_loc_df = pd.concat([specific_columns_combined_df, Select_time_period_df], axis=1)
+    Select_time_period_loc_df = pd.concat(
+        [specific_columns_combined_df, Select_time_period_df], axis=1)
 
     # Set column names
-    calculation_cols = ['Estimated Volume', 'Observed Volume', 'Errors', 'Squared Errors', 'Percent Errors']
+    calculation_cols = [
+        'Estimated Volume',
+        'Observed Volume',
+        'Errors',
+        'Squared Errors',
+        'Percent Errors']
     Select_time_period_loc_df.columns = combined_df_cols + calculation_cols
 
     # Drop duplicates
-    Select_time_period_loc_df = Select_time_period_loc_df.drop_duplicates(subset=['A', 'B'], keep='first')
+    Select_time_period_loc_df = Select_time_period_loc_df.drop_duplicates(
+        subset=['A', 'B'], keep='first')
 
     # Save to CSV
     file_name = f"{chosen_timeperiod}_Scatter_data.csv"
     Select_time_period_loc_df.to_csv(file_name, index=False)
 
     # Get classification column types
-    classification_col_types = Select_time_period_loc_df[classification_col].unique()
-    
-    return Select_time_period_loc_df, classification_col_types,file_name
+    classification_col_types = Select_time_period_loc_df[classification_col].unique(
+    )
+
+    return Select_time_period_loc_df, classification_col_types, file_name
+
 
 def sanitize_filename(filename):
     return filename.replace('/', '_').replace('\\', '_')
 
-def generate_vega_lite_json_EST(csv_file, classification_col, classification_col_types, x_field, y_field, fields, nominal_fields, name, include_all_data = False):
+
+def generate_vega_lite_json_EST(
+        csv_file,
+        classification_col,
+        classification_col_types,
+        x_field,
+        y_field,
+        fields,
+        nominal_fields,
+        name,
+        include_all_data=False):
     df = pd.read_csv(csv_file)
     if not include_all_data:
         df = df[df[classification_col] == classification_col_types]
@@ -54,11 +80,13 @@ def generate_vega_lite_json_EST(csv_file, classification_col, classification_col
     diagonal_df = pd.DataFrame({
         x_field: [df[x_field].min(), df[x_field].max()],
         y_field: [df[x_field].min(), df[x_field].max()]  # Diagonal line: y = x
-    }) 
+    })
     equation_text = f"y = {m:.2f}x + {b:.2f}"
     max_value = max(df[x_field].max(), df[y_field].max())
-    tooltip_config = [{"field": field, "type": "nominal" if field in nominal_fields else "quantitative", "title": field} for field in fields]
-    
+    tooltip_config = [{"field": field,
+                       "type": "nominal" if field in nominal_fields else "quantitative",
+                       "title": field} for field in fields]
+
     vega_lite_config = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "A scatterplot with a regression line",
@@ -88,7 +116,7 @@ def generate_vega_lite_json_EST(csv_file, classification_col, classification_col
                     "type": "text",
                     "align": "left",
                     "baseline": "bottom",
-                    "dx": 5, 
+                    "dx": 5,
                     "dy": -5
                 },
                 "data": {"values": [{"text": equation_text}]},
@@ -119,50 +147,69 @@ def generate_vega_lite_json_EST(csv_file, classification_col, classification_col
             },
         ]
     }
-    
+
     base_name = os.path.splitext(csv_file)[0]
     file_path = f"{sanitize_filename(classification_col_types)}_{name}.vega.json"
     with open(file_path, 'w') as file:
         json.dump(vega_lite_config, file, indent=4)
 
-def generate_vega_lite_json_Diffpercent(csv_file, classification_col, classification_col_types, x_field, y_field, fields, nominal_fields, name, include_all_data = False):
-    
-    tooltip_config = [{"field": field, "type": "nominal" if field in nominal_fields else "quantitative", "title": field} for field in fields]
+
+def generate_vega_lite_json_Diffpercent(
+        csv_file,
+        classification_col,
+        classification_col_types,
+        x_field,
+        y_field,
+        fields,
+        nominal_fields,
+        name,
+        include_all_data=False):
+
+    tooltip_config = [{"field": field,
+                       "type": "nominal" if field in nominal_fields else "quantitative",
+                       "title": field} for field in fields]
     vega_lite_config = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "description": "A scatterplot",
-        "data": {"url": csv_file},
-        "transform": [] if include_all_data else [{"filter": f"datum['{classification_col}'] == '{classification_col_types}'"}],
-         "layer": [
-                {
-            "mark": {
-                "type": "rule",
-                "color": "grey",
-                "strokeWidth": 3
-            },
-            "encoding": {
-                "y": {"datum": 0}
-            }
-        },    
-        {
-            "mark": "point",
-            "encoding": {
-                "x": {"field": x_field, "type": "quantitative"},
-                "y": {"field": y_field, "type": "quantitative"},
-                "tooltip": tooltip_config
-            }
-        }
-    ]
-}
+        "data": {
+            "url": csv_file},
+        "transform": [] if include_all_data else [
+            {
+                "filter": f"datum['{classification_col}'] == '{classification_col_types}'"}],
+        "layer": [
+            {
+                "mark": {
+                    "type": "rule",
+                            "color": "grey",
+                            "strokeWidth": 3},
+                "encoding": {
+                    "y": {
+                        "datum": 0}}},
+            {
+                "mark": "point",
+                "encoding": {
+                    "x": {
+                        "field": x_field,
+                        "type": "quantitative"},
+                    "y": {
+                        "field": y_field,
+                        "type": "quantitative"},
+                    "tooltip": tooltip_config}}]}
 
     base_name = os.path.splitext(csv_file)[0]
     file_path = f"{sanitize_filename(classification_col_types)}_{name}.vega.json"
     with open(file_path, 'w') as file:
         json.dump(vega_lite_config, file, indent=4)
 
-def generate_yaml_config(classification_col_type, name1, name2, include_all_data=False):
-    suffix = 'all' if include_all_data else sanitize_filename(classification_col_type)
-    
+
+def generate_yaml_config(
+        classification_col_type,
+        name1,
+        name2,
+        include_all_data=False):
+    suffix = 'all' if include_all_data else sanitize_filename(
+        classification_col_type)
+
     return [
         {
             "title": f"{suffix} - {name1}",
@@ -178,6 +225,7 @@ def generate_yaml_config(classification_col_type, name1, name2, include_all_data
         }
     ]
 
+
 yaml_config = {
     "header": {
         "tab": "Scatter plots",
@@ -186,4 +234,3 @@ yaml_config = {
     },
     "layout": {}
 }
-

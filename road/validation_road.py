@@ -9,6 +9,7 @@ from io import StringIO
 import geopandas as gpd
 from scatter import *
 from stats import *
+from shapefile import *
 
 
 config = configparser.ConfigParser()
@@ -87,6 +88,7 @@ obs_df = pd.read_excel(
     skiprows=1,
     sheet_name=sheet_name,
     usecols=obs_usecols)
+obs_df = obs_df.drop_duplicates(subset=['A', 'B'])
 est_df = filter_and_aggregate(
     excel_file_path,
     sheet_name,
@@ -98,31 +100,48 @@ est_df = filter_and_aggregate(
 
 
 
-# Part 1 - Scatter Plot
+# Part 1
 # Scatter variables
 chosen_timeperiod = config['SCATTER INPUT']['Chosen_period']
 classification_col = config['SCATTER INPUT']['Classification_col']
 combined_df_cols = [col.strip() for col in config['SCATTER INPUT']
                     ['Combined_DF_Cols'].split(',')]
-
 # Est-Obs Plot
 fields1 = config['EST SCATTER PLOT']['Fields'].split(', ')
 nominal_fields1 = config['EST SCATTER PLOT']['NominalFields'].split(', ')
 x_field1 = config['EST SCATTER PLOT']['XField']
 y_field1 = config['EST SCATTER PLOT']['YField']
 name1 = config['EST SCATTER PLOT']['Name']
-
 # Percentile Plot
 fields2 = config['PERCENT SCATTER PLOT']['Fields'].split(', ')
 nominal_fields2 = config['PERCENT SCATTER PLOT']['NominalFields'].split(', ')
 x_field2 = config['PERCENT SCATTER PLOT']['XField']
 y_field2 = config['PERCENT SCATTER PLOT']['YField']
 name2 = config['PERCENT SCATTER PLOT']['Name']
-
 # Dashborad num
-dashboard_num = config['YAML1']['Dashboard_number']
+dashboard_num = config['SCATTER YAML']['Dashboard_number']
+
+# Part 2
+combined_df_cols = [col.strip() for col in config['STATS INPUT']
+                    ['Combined_DF_Cols'].split(',')]
+group_vars = ['Observed Volume', 'Loc Type', 'AT Grp', 'FT Grp']
+times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
+
+# Part 3
+freeflow_path = config['MAP INPUT']['Freeflow_Dir']
+shp_output_path = config['MAP INPUT']['Shp_out_Di']
+
+data_file = config['MAP YAML']['Csv_file']
+shapes_file = config['MAP YAML']['Shape_file']
+join_field =  config['MAP YAML']['Join']
+line_width_col = config['MAP YAML']['Line_wid_col']
+line_color_col = config['MAP YAML']['Line_color_col']
+breakpoints = config['MAP YAML']['breakpoints']
+dashboard_num = config['MAP YAML']['dashboard_num']
+center = config['MAP YAML']['Center']
 
 
+# Scatter Plot
 # calculate the metrics
 Select_time_period_loc_df, classification_col_types, file_name = compute_and_save_errors(
     est_df, obs_df, chosen_timeperiod, combined_df_cols, classification_col)
@@ -182,13 +201,12 @@ with open(yaml_file_path, 'w') as file:
 
 
 # Part 2 - Validation Stats
-# the
-combined_df_cols = [col.strip() for col in config['STATS INPUT']
-                    ['Combined_DF_Cols'].split(',')]
-group_vars = ['Observed Volume', 'Loc Type', 'AT Grp', 'FT Grp']
-times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
-
-
 time_period_dfs = prepare_time_period_dfs(
     est_df, obs_df, times, combined_df_cols)
 generate_and_save_tables(time_period_dfs, group_vars)
+
+
+# Part 3 - Map
+merged_df = calculate_differences(est_df,obs_df)
+process_geospatial_data(merged_df, freeflow_path, shp_output_path)
+create_yaml_file(center, shapes_file, data_file, join_field, line_width_col, line_color_col, breakpoints, dashboard_num)

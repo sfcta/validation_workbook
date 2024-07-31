@@ -9,7 +9,7 @@ from io import StringIO
 import geopandas as gpd
 from scatter import *
 from stats import *
-from shapefile import *
+from map import *
 
 
 config = configparser.ConfigParser()
@@ -99,7 +99,6 @@ est_df = filter_and_aggregate(
     extra_columns)
 
 
-
 # Part 1
 # Scatter variables
 chosen_timeperiod = config['SCATTER INPUT']['Chosen_period']
@@ -133,7 +132,7 @@ shp_output_path = config['MAP INPUT']['Shp_out_Di']
 
 data_file = config['MAP YAML']['Csv_file']
 shapes_file = config['MAP YAML']['Shape_file']
-join_field =  config['MAP YAML']['Join']
+join_field = config['MAP YAML']['Join']
 line_width_col = config['MAP YAML']['Line_wid_col']
 line_color_col = config['MAP YAML']['Line_color_col']
 breakpoints = config['MAP YAML']['breakpoints']
@@ -207,6 +206,14 @@ generate_and_save_tables(time_period_dfs, group_vars)
 
 
 # Part 3 - Map
-merged_df = calculate_differences(est_df,obs_df)
+merged_df = calculate_differences(est_df, obs_df)
 process_geospatial_data(merged_df, freeflow_path, shp_output_path)
-create_yaml_file(center, shapes_file, data_file, join_field, line_width_col, line_color_col, breakpoints, dashboard_num)
+create_yaml_file(
+    center,
+    shapes_file,
+    data_file,
+    join_field,
+    line_width_col,
+    line_color_col,
+    breakpoints,
+    dashboard_num)

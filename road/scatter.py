@@ -55,7 +55,7 @@ def sanitize_filename(filename):
     return filename.replace('/', '_').replace('\\', '_')
 
 
-def generate_vega_lite_json_EST(
+def generate_vega_lite_json_est(
         csv_file,
         classification_col,
         classification_col_types,
@@ -154,7 +154,7 @@ def generate_vega_lite_json_EST(
         json.dump(vega_lite_config, file, indent=4)
 
 
-def generate_vega_lite_json_Diffpercent(
+def generate_vega_lite_json_diffpercent(
         csv_file,
         classification_col,
         classification_col_types,

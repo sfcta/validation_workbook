@@ -22,6 +22,9 @@ dbf_files_time = [dbf_file.strip()
              for dbf_file in config['DBF']['DBF_Files_TIME'].split(',')]
 dbf_column_names = [name.strip() for name in config['DBF']
                     ['DBF_Column_Names'].split(',')]
+# Load mappings from the ini file
+at_mapping = {int(key): value for key, value in config['AT'].items()}
+ft_mapping = {int(key): value for key, value in config['FT'].items()}
 
 # Extract the observed file name and tab
 excel_file_path = config['OBSERVED FILE']['Excel_File_Path']
@@ -45,7 +48,9 @@ est_df = filter_and_aggregate(
     dbf_files,
     dbf_column_names,
     dbf_files_time,
-    extra_columns)
+    extra_columns,
+    at_mapping,
+    ft_mapping)
 
 
 # Part 1

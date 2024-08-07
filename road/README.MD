@@ -47,7 +47,7 @@ Calculates and exports several statistical metrics for road validation.
 Located at `stats.py`
 
 ### Outputs
-- **CSV Files:** Three concise CSVs (`percent_rmse`, `relative_error`, `est_obs_ratio`) and their melted versions, totaling 7 files.
+- **CSV Files:** Three concise CSVs (`percent_rmse`, `relative_error`, `est_obs_ratio`) and their melted versions, totaling 7 files for each grouping variables.
 - **Vega-Lite Config Files:** JSON configuration files for visualizing the statistical metrics.
 
 ### Notes

@@ -1,10 +1,7 @@
+import yaml
+import json
 import pandas as pd
 import geopandas as gpd
-from io import StringIO
-import json
-import geopandas as gpd
-import yaml
-import os
 import numpy as np
 
 

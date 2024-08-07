@@ -74,9 +74,9 @@ def reorder_dataframe(df, group_var):
         '>=50k',
         'All Locations']
 
-    if group_var == 'AT Grp':
+    if group_var == 'AT Group':
         order = area_type_order
-    elif group_var == 'FT Grp':
+    elif group_var == 'FT Group':
         order = facility_type_order
     elif group_var == 'Observed Volume':
         order = volume_classification_order
@@ -172,7 +172,7 @@ def generate_and_save_tables(time_period_dfs, group_vars):
             count_df.columns = [group_var, 'Count']
 
         # Handle NaN values
-        if group_var in ['AT Grp', 'FT Grp']:
+        if group_var in ['AT Group', 'FT Group']:
             count_df[group_var] = count_df[group_var].fillna('Other')
 
         count_df = count_df.groupby(group_var, as_index=False)['Count'].sum()
@@ -228,13 +228,13 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
         "est_obs_ratio_melted.csv"]
 
     group_var_sort_orders = {
-        'AT Grp': [
+        'AT Group': [
             'Core/CBD',
             'UrbBiz',
             'Urb',
             'Sub',
             'All Locations'],
-        'FT Grp': [
+        'FT Group': [
             'Fwy/Ramp',
             'Art',
             'Col',

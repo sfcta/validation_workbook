@@ -9,14 +9,13 @@ DBF_Column_Names = ["A", "B", "AT", "FT", "V_1"]
 
 [OBSERVED]
 # The observed data file path
-Excel_File_Path = "Q:/Model Development/Simwrapper Validation/templates/Road_Validation_Draft_v2_Run17.xlsx"
-Sheet_Name = "LocsData"
+Csv_File_Path = "Q:/Data/Observed/Validation/2019_old/observed_counts.csv"
 
 # The columns used for calculation, usually are 'A,B, and Counts'
-Obs_usecols = ["K", "L", "V", "W", "X", "Y", "Z", "AA"]
+Obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
 
 # The columns we want to include from the observed data, DONT CHANGE A, B!
-Excel_Extra_Columns = ["A", "B", "Loc Type", "Source ID", "Location", "Road", "Dir"]
+Csv_Extra_Columns = ["A", "B", "Loc Type", "Source", "Source ID", "Location", "Dir"]
 
 [SCATTER_INPUT]
 # The time period we want to display in the scatter plot
@@ -52,6 +51,8 @@ Dashboard_number = 1
 [STATS_INPUT]
 # cols displayed
 Combined_DF_Cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+# The output csv file name
+Output_File_Name = scatter.csv
 
 [MAP_INPUT]
 Freeflow_Dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"

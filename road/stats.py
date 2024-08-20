@@ -3,17 +3,17 @@ import pandas as pd
 import numpy as np
 import json
 import yaml
+from validation_road_utils import compute_errors, combine_dataframes
 
 
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
-    error = {col: est_df[col] - obs_df[col] for col in times}
-    error_df = pd.DataFrame(error)
-    error_squared_df = error_df.pow(2)
-    error_percent_df = error_df.divide(obs_df[times]).fillna(0)
-    error_percent_df = error_percent_df.apply(lambda x: x * 100, axis=1)
+    # Compute errors using the utility function
+    error_df, error_squared_df, error_percent_df = compute_errors(est_df, obs_df, times)
 
-    combined_df = pd.concat(
-        [est_df, obs_df[times], error_df, error_squared_df, error_percent_df], axis=1)
+    # Combine dataframes using the utility function
+    combined_df = combine_dataframes(est_df, obs_df[times], error_df, error_squared_df, error_percent_df, combined_df_cols, chosen_timeperiod=None)
+    
+    # Remove duplicates
     combined_df = combined_df.drop_duplicates(subset=['A', 'B'], keep='first')
 
     calculation_cols = [

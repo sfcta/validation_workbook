@@ -10,7 +10,8 @@ def compute_and_save_errors(
         obs_df,
         chosen_timeperiod,
         combined_df_cols,
-        classification_col):
+        classification_col,
+        file_name):
     # Compute errors
     times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
     error = {col: est_df[col] - obs_df[col] for col in times}
@@ -22,10 +23,10 @@ def compute_and_save_errors(
     # Combine dataframes
     combined_df = pd.concat(
         [est_df, obs_df[times], error_df, error_squared_df, error_percent_df], axis=1)
-    Select_time_period_df = combined_df.filter(like=chosen_timeperiod)
+    select_time_period_df = combined_df.filter(like=chosen_timeperiod)
     specific_columns_combined_df = combined_df[combined_df_cols]
-    Select_time_period_loc_df = pd.concat(
-        [specific_columns_combined_df, Select_time_period_df], axis=1)
+    select_time_period_loc_df = pd.concat(
+        [specific_columns_combined_df, select_time_period_df], axis=1)
 
     # Set column names
     calculation_cols = [
@@ -34,21 +35,20 @@ def compute_and_save_errors(
         'Errors',
         'Squared Errors',
         'Percent Errors']
-    Select_time_period_loc_df.columns = combined_df_cols + calculation_cols
+    select_time_period_loc_df.columns = combined_df_cols + calculation_cols
 
     # Drop duplicates
-    Select_time_period_loc_df = Select_time_period_loc_df.drop_duplicates(
+    select_time_period_loc_df = select_time_period_loc_df.drop_duplicates(
         subset=['A', 'B'], keep='first')
 
     # Save to CSV
-    file_name = f"{chosen_timeperiod}_Scatter_data.csv"
-    Select_time_period_loc_df.to_csv(file_name, index=False)
+    select_time_period_loc_df.to_csv(file_name, index=False)
 
     # Get classification column types
-    classification_col_types = Select_time_period_loc_df[classification_col].unique(
+    classification_col_types = select_time_period_loc_df[classification_col].unique(
     )
 
-    return Select_time_period_loc_df, classification_col_types, file_name
+    return select_time_period_loc_df, classification_col_types, file_name
 
 
 def sanitize_filename(filename):

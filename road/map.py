@@ -5,7 +5,7 @@ import geopandas as gpd
 import numpy as np
 
 
-def calculate_differences(est_df, obs_df):
+def calculate_differences(est_df, obs_df,output):
     """
     Merges the estimated and observed dataframes and calculates various difference metrics.
 
@@ -36,7 +36,7 @@ def calculate_differences(est_df, obs_df):
 
     merged_df['AB'] = merged_df['A'].astype(
         str) + ' ' + merged_df['B'].astype(str)
-    merged_df.to_csv('map_data.csv', index=False)
+    merged_df.to_csv(output, index=False)
     return merged_df
 
 
@@ -52,17 +52,20 @@ def process_geospatial_data(merged_df, freeflow_path, output_path):
     Returns:
         None
     """
-    df_freeflow = gpd.read_file(freeflow_path)
-    df_freeflow.crs = 'epsg:2227'
-    df_freeflow = df_freeflow.to_crs(epsg=4236)
-    df_freeflow['AB'] = df_freeflow['A'].astype(
-        str) + ' ' + df_freeflow['B'].astype(str)
-
-    me_df = pd.merge(
-        merged_df, df_freeflow[['A', 'B', 'AB', 'geometry']], on=['A', 'B', 'AB'])
-    me_df = gpd.GeoDataFrame(me_df, geometry='geometry')
-    me_df.to_file(output_path, index=False)
-
+    # Read the shapefile into a GeoDataFrame
+    gdf_freeflow = gpd.read_file(freeflow_path)
+    gdf_freeflow.crs = 'epsg:2227'  # Set the coordinate reference system
+    gdf_freeflow = gdf_freeflow.to_crs(epsg=4236)  # Convert to the desired CRS
+    
+    # Create the 'AB' column for merging
+    gdf_freeflow['AB'] = gdf_freeflow['A'].astype(str) + ' ' + gdf_freeflow['B'].astype(str)
+    
+    # Merge the GeoDataFrame with the processed DataFrame
+    merged_gdf = gdf_freeflow[['A', 'B', 'AB', 'geometry']].merge(merged_df, on=['A', 'B', 'AB'])
+    
+    # Ensure the result is a GeoDataFrame and save it as a new shapefile
+    merged_gdf = gpd.GeoDataFrame(merged_gdf, geometry='geometry')
+    merged_gdf.to_file(output_path, index=False)
 
 def create_yaml_file(
         center,
@@ -72,12 +75,12 @@ def create_yaml_file(
         line_width_col,
         line_color_col,
         breakpoints,
-        dashboard_num):
+        yaml_file_path):
 
     yaml_content = {
         'header': {
-            'title':
-            'description'
+            'title': '',
+            'description': ''
         },
         'layout': {
             'row1': [
@@ -87,7 +90,8 @@ def create_yaml_file(
                     'description': '',
                     'height': 15,
                     'center': center,
-                    'zoom': 10, 'shapes': shapes_file,
+                    'zoom': 10, 
+                    'shapes': shapes_file,
                     'datasets': {
                         'data': {
                             'file': data_file,
@@ -115,6 +119,6 @@ def create_yaml_file(
         }
     }
 
-    yaml_file_path = f"dashboard{dashboard_num}-map.yaml"
     with open(yaml_file_path, 'w') as file:
         yaml.dump(yaml_content, file, default_flow_style=False)
+

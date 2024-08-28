@@ -1,0 +1,85 @@
+[LOADED_NETWORK]
+loaded_network_directory = "Q:/Model Development/Simwrapper Validation/notebooks/roads/Data"
+
+# The dbf file name is LOAD[TOD].dbf by default
+loaded_network_time = ["AM", "MD", "PM", "EV", "EA"]
+
+# The needed CHAMP output columns
+loaded_network_col_names = ["A", "B", "AT", "FT", "V_1"]
+
+[OBSERVED]
+# The observed data file path
+obs_filepath = "Q:/Data/Observed/Validation/2019_old/observed_counts.csv"
+
+# The columns used for calculation, usually are 'A,B, and Counts'
+obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
+
+# The columns we want to include from the observed data, DONT CHANGE A, B!
+obs_extra_columns = ["A", "B", "Loc Type", "Source", "Source ID", "Location", "Dir"]
+
+[SCATTER_INPUT]
+# The time period we want to display in the scatter plot
+chosen_period = "Daily"
+
+# Change the variables to show different group_by result
+classification_col = "Loc Type"
+
+# cols displayed and information we want in our generated csv
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+
+# YAML filename
+yaml_path = "dashboard{dashboard_num1}-Scatter.yaml"
+
+[EST_SCATTER_PLOT]
+xfield = "Observed Volume"
+yfield = "Estimated Volume"
+
+# Information we want to display in the hover over
+fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Road", "Dir"]
+
+# Be careful to state all nominal fields from the above fields
+nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+name = "Estimation Volume"
+est_output_template = "{classification_col_types}_{name}_est.vega.json"
+
+[PERCENT_SCATTER_PLOT]
+xfield = "Observed Volume"
+yfield = "Percent Errors"
+fields = ["Observed Volume", "Percent Errors", "Loc Type", "A", "B", "Location", "Road", "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+name = "Percent Errors"
+diffpercent_output_template = "{classification_col_types}_{name}_diffpercent.vega.json"
+
+[SCATTER_YAML]
+# YAML filename
+yaml_path = "dashboard{dashboard_num1}-Scatter.yaml"
+
+dashboard_number = 1
+
+[STATS_INPUT]
+# cols displayed
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+# The output csv file name
+output_file_name = 'scatter.csv'
+
+[MAP_INPUT]
+freeflow_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"
+shp_out_dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads/map"
+output_filename = 'map.csv'
+
+[MAP_YAML]
+center = [-122.43, 37.73]
+csv_file = "map_data.csv"
+join = "AB"
+shape_file = "road.shp"
+line_wid_col = "Daily_diff"
+line_color_col = "Daily_absdiff"
+breakpoints = [-20000, -10000, -5000, -1000, -500, 500, 2000, 5000, 7000, 15000]
+dashboard_number = 3
+yaml_path = "dashboard{dashboard_num1}-Map.yaml"
+
+[AT]
+values = ["Core/CBD", "Core/CBD", "UrbBiz", "Urb", "Sub", "Sub"]
+
+[FT]
+values = ["Fwy/Ramp", "Fwy/Ramp", "Fwy/Ramp", "Col", "Fwy/Ramp", "", "Art", "", "Loc", "", "Loc", "Art", "", "", "Art"]

@@ -7,7 +7,7 @@ def generate_loaded_network_file_names(loaded_network_time_periods):
     return [f"LOAD{tod}_FINAL.dbf" for tod in loaded_network_time_periods]
 
 def filter_and_aggregate(
-        csv_file,
+        obs_file,
         loaded_network_directory,
         loaded_network_files,
         column_names,
@@ -18,7 +18,7 @@ def filter_and_aggregate(
     loaded_network_files = generate_loaded_network_file_names(time_periods)
 
     # Read and process the Excel file    
-    base_df = pd.read(csv_file, usecol = extra_columns)
+    base_df = pd.read(obs_file, usecol = extra_columns)
 
     # Initialize columns for time periods and daily total
     for col in time_periods + ['Daily']:

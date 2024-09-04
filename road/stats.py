@@ -3,15 +3,12 @@ import pandas as pd
 import numpy as np
 import json
 import yaml
-from validation_road_utils import compute_errors, combine_dataframes
+from validation_road_utils import compute_and_combine
 
 
-def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
-    # Compute errors using the utility function
-    error_df, error_squared_df, error_percent_df = compute_errors(est_df, obs_df, times)
-
-    # Combine dataframes using the utility function
-    combined_df = combine_dataframes(est_df, obs_df[times], error_df, error_squared_df, error_percent_df, combined_df_cols, chosen_timeperiod=None)
+def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols, chosen_timeperiod=None):
+    # Call the compute_and_combine function to get the combined dataframe
+    combined_df = compute_and_combine(est_df, obs_df, times, combined_df_cols, chosen_timeperiod)
     
     # Remove duplicates
     combined_df = combined_df.drop_duplicates(subset=['A', 'B'], keep='first')
@@ -65,27 +62,23 @@ def reset_index_and_rename(df, group_var):
 
 # Define function to reorder DataFrame based on group_var
 def reorder_dataframe(df, group_var):
-    area_type_order = ['Core/CBD', 'UrbBiz', 'Urb', 'Sub', 'All Locations']
-    facility_type_order = ['Fwy/Ramp', 'Art', 'Col', 'Loc', 'All Locations']
-    volume_classification_order = [
-        '<10k',
-        '10-20k',
-        '20-50k',
-        '>=50k',
-        'All Locations']
-
+    # Define the default order as None
+    order = None
+    
+    # Determine the correct order based on group_var
     if group_var == 'AT Group':
-        order = area_type_order
+        order = ['Core/CBD', 'UrbBiz', 'Urb', 'Sub', 'All Locations']
     elif group_var == 'FT Group':
-        order = facility_type_order
+        order = ['Fwy/Ramp', 'Art', 'Col', 'Loc', 'All Locations']
     elif group_var == 'Observed Volume':
-        order = volume_classification_order
-    else:
-        return df  # No reordering needed for other group_var values
+        order = ['<10k', '10-20k', '20-50k', '>=50k', 'All Locations']
 
-    df = df.set_index(group_var)
-    df = df.reindex(order)
-    df = df.reset_index()
+    # Reorder the DataFrame if a valid order is found
+    if order is not None:
+        df = df.set_index(group_var)
+        df = df.reindex(order)
+        df = df.reset_index()
+
     return df
 
 
@@ -253,11 +246,6 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
             metrics, metric_fields, file_suffixes):
         file_path = os.path.join(output_dir, f"{file_prefix}{file_suffix}")
 
-        # Check if file exists
-        if not os.path.exists(file_path):
-            print(f"File not found: {file_path}")
-            continue
-
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": {
@@ -301,6 +289,3 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
             with open(config_file_path, 'w') as f:
                 json.dump(config, f, indent=4)
             print(f"Configuration for {metric} saved to: {config_file_path}")
-        except Exception as e:
-            print(
-                f"Failed to save configuration for {metric} to {config_file_path}: {e}")

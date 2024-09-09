@@ -1,32 +1,10 @@
 import os
-import tomllib
+import tomli as tomllib
 from pathlib import Path
-
 import geopandas as gpd
 import pandas as pd
 from shapely.geometry import LineString, Point
-
-# we should be importing functions in this file into transit.py instead
-# HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
-
-# MUNI
-with open("transit.toml", "rb") as f:
-    config = tomllib.load(f)
-
-model_run_dir = config["directories"]["model_run"]
-
-WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
-OUTPUT_FOLDER = Path(config["directories"]["transit_output_dir"])
-MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
-BART_output_dir = Path(config["directories"]["BART_output_dir"])
-Base_model_dir = Path(config["directories"]["Base_model_dir"])
-SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
-observed_BART = WORKING_FOLDER / config["transit"]["observed_BART"]
-FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
-
-for d in [OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, SHP_file_dir]:
-    d.mkdir(exist_ok=True)
+from transit_function import read_dbf_and_groupby_sum, format_dataframe
 
 
 def sort_dataframe_by_mixed_column(df, column_name):
@@ -89,53 +67,6 @@ def map_name_to_direction(name):
     else:
         return None  # Return None for other cases
 
-
-def format_dataframe(df, numeric_columns, percentage_columns=None):
-    """
-    Format a DataFrame for readable display.
-    - Fills NA values with '-'.
-    - Formats specified numeric columns with commas and no decimal places.
-    - Formats specified columns as percentages.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to format.
-    numeric_columns (list): List of numeric column names to format.
-    percentage_columns (list): List of column names to format as percentages.
-
-    Returns:
-    pd.DataFrame: The formatted DataFrame.
-    """
-    if percentage_columns is None:
-        percentage_columns = []
-
-    # Fill NA values
-    formatted_df = df.fillna("-")
-
-    # Format specified numeric columns
-    for col in numeric_columns:
-        formatted_df[col] = formatted_df[col].apply(lambda x: format_numeric(x))
-
-    # Format percentage columns
-    for col in percentage_columns:
-        formatted_df[col] = formatted_df[col].apply(lambda x: format_percentage(x))
-
-    return formatted_df
-
-
-def format_numeric(x):
-    """Format a numeric value with commas and no decimal places."""
-    try:
-        return f"{float(x):,.0f}" if x not in ["-", ""] else x
-    except ValueError:
-        return x
-
-
-def format_percentage(x):
-    """Format a value as a percentage."""
-    try:
-        return f"{float(x):.0f}%" if x not in ["-", ""] else x
-    except ValueError:
-        return x
 
 
 # Function to concatenate ordered geometries
@@ -304,10 +235,6 @@ station_name = {
         15203,
     ],
 }
-df_station_name = pd.DataFrame(station_name)
-df_station_name["Station_name"] = df_station_name["Station"].apply(
-    lambda x: abbr_to_full[x]
-)
 
 station_name = {
     "Station": [
@@ -417,205 +344,195 @@ station_name = {
     ],
 }
 
-
-# Convert the geometry list of tuples into a list of Shapely Point objects
-station_name["geometry"] = [Point(xy) for xy in station_name["geometry"]]
-# Create a GeoDataFrame
-station = gpd.GeoDataFrame(station_name, geometry="geometry")
-station = station.merge(df_station_name, on="Station", how="left")
-
-
-# MUNI
-MUNI = []
-for period, path in transit_assignment_filepaths(model_run_dir=model_run_dir).items():
-    df = read_dbf_and_groupby_sum(
-        path, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
+def create_station_df(station_name):
+    df_station_name = pd.DataFrame(station_name)
+    df_station_name["Station_name"] = df_station_name["Station"].apply(
+        lambda x: abbr_to_full[x]
     )
-    df = sort_dataframe_by_mixed_column(df, "FULLNAME")
-    df["Direction"] = df["NAME"].apply(map_name_to_direction)
-    df["TOD"] = period
-    MUNI.append(df)
+    # Convert the geometry list of tuples into a list of Shapely Point objects
+    station_name["geometry"] = [Point(xy) for xy in station_name["geometry"]]
+    # Create a GeoDataFrame
+    station = gpd.GeoDataFrame(station_name, geometry="geometry")
+    station = station.merge(df_station_name, on="Station", how="left")
+    return station
 
-MUNI_day = pd.concat(MUNI)
-MUNI_day = MUNI_day.groupby(
-    ["FULLNAME", "NAME", "AB", "SEQ", "Direction"], as_index=False
-)["AB_BRDA"].sum()
-MUNI_day = MUNI_day.rename(columns={"NAME": "Name"})
-model_MUNI_line = pd.read_csv(os.path.join(OUTPUT_FOLDER, "model_MUNI_line.csv"))
-MUNI_map = model_MUNI_line.merge(MUNI_day, on="Name", how="left")
-MUNI_map = MUNI_map[["Name", "Line", "AB", "SEQ"]]
-MUNI_map["Direction"] = MUNI_map["Name"].apply(map_name_to_direction)
+def process_muni_map(file_name,OUTPUT_FOLDER, MUNI_output_dir,SHP_file_dir, FREEFLOW_SHP):
+    MUNI = read_dbf_and_groupby_sum(
+           file_name, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
+        )
+    MUNI = sort_dataframe_by_mixed_column(MUNI, "FULLNAME")
+    MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
+    MUNI_day = MUNI.groupby(
+        ["FULLNAME", "NAME", "AB", "SEQ", "Direction"], as_index=False
+    )["AB_BRDA"].sum()
+    MUNI_day = MUNI_day.rename(columns={"NAME": "Name"})
+    model_MUNI_line = pd.read_csv(os.path.join(OUTPUT_FOLDER, "model_MUNI_line.csv"))
+    MUNI_map = model_MUNI_line.merge(MUNI_day, on="Name", how="left")
+    MUNI_map = MUNI_map[["Name", "Line", "AB", "SEQ"]]
+    MUNI_map["Direction"] = MUNI_map["Name"].apply(map_name_to_direction)
 
-MUNI_IB = pd.read_csv(os.path.join(MUNI_output_dir, "MUNI_IB.csv"))
-MUNI_map_IN = MUNI_map[MUNI_map["Direction"] == "IB"]
-MUNI_map_IN = MUNI_map_IN.rename(columns={"Line": "Route"})
-MUNI_IB = MUNI_IB.merge(MUNI_map_IN, on="Route", how="left")
+    MUNI_IB = pd.read_csv(os.path.join(MUNI_output_dir, "MUNI_IB.csv"))
+    MUNI_map_IN = MUNI_map[MUNI_map["Direction"] == "IB"]
+    MUNI_map_IN = MUNI_map_IN.rename(columns={"Line": "Route"})
+    MUNI_IB = MUNI_IB.merge(MUNI_map_IN, on="Route", how="left")
 
-MUNI_map_OUT = MUNI_map[MUNI_map["Direction"] == "OB"]
-MUNI_map_OUT = MUNI_map_OUT.rename(columns={"Line": "Route"})
-MUNI_OB = pd.read_csv(os.path.join(MUNI_output_dir, "MUNI_OB.csv"))
-MUNI_OB = MUNI_OB.merge(MUNI_map_OUT, on="Route", how="left")
-
-# GEO info
-freeflow = gpd.read_file(FREEFLOW_SHP)
-freeflow.crs = "epsg:2227"
-freeflow = freeflow.to_crs(epsg=4236)
-node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
-MUNI_IB = MUNI_IB[
-    [
-        "Route",
-        "Name",
-        "Observed",
-        "Modeled",
-        "Diff",
-        "Percentage Diff",
-        "AB",
-        "SEQ",
-        "Direction",
+    MUNI_map_OUT = MUNI_map[MUNI_map["Direction"] == "OB"]
+    MUNI_map_OUT = MUNI_map_OUT.rename(columns={"Line": "Route"})
+    MUNI_OB = pd.read_csv(os.path.join(MUNI_output_dir, "MUNI_OB.csv"))
+    MUNI_OB = MUNI_OB.merge(MUNI_map_OUT, on="Route", how="left")
+    # GEO info
+    freeflow = gpd.read_file(FREEFLOW_SHP)
+    freeflow.crs = "epsg:2227"
+    freeflow = freeflow.to_crs(epsg=4236)
+    node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
+    MUNI_IB = MUNI_IB[
+        [
+            "Route",
+            "Name",
+            "Observed",
+            "Modeled",
+            "Diff",
+            "Percentage Diff",
+            "AB",
+            "SEQ",
+            "Direction",
+        ]
     ]
-]
-muni_ib = MUNI_IB.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-muni_ib_geo = gpd.GeoDataFrame(muni_ib, geometry="geometry")
-# Apply aggregation function using `apply` instead of `agg`
-aggregated_muni_ib = (
-    muni_ib_geo.groupby("Name")
-    .apply(
-        lambda x: pd.Series(
-            {
-                "Route": x["Route"].iloc[0],
-                "Observed": x["Observed"].iloc[0],
-                "Modeled": x["Modeled"].iloc[0],
-                "Diff": x["Diff"].iloc[0],
-                "Percentage Diff": x["Percentage Diff"].iloc[0],
-                "AB": x["AB"].iloc[0],
-                "Direction": x["Direction"].iloc[0],
-                "geometry": concat_ordered_geometries(x),
-            }
+    muni_ib = MUNI_IB.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    muni_ib_geo = gpd.GeoDataFrame(muni_ib, geometry="geometry")
+    # Apply aggregation function using `apply` instead of `agg`
+    aggregated_muni_ib = (
+        muni_ib_geo.groupby("Name")
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "Route": x["Route"].iloc[0],
+                    "Observed": x["Observed"].iloc[0],
+                    "Modeled": x["Modeled"].iloc[0],
+                    "Diff": x["Diff"].iloc[0],
+                    "Percentage Diff": x["Percentage Diff"].iloc[0],
+                    "AB": x["AB"].iloc[0],
+                    "Direction": x["Direction"].iloc[0],
+                    "geometry": concat_ordered_geometries(x),
+                }
+            )
         )
+        .reset_index()
     )
-    .reset_index()
-)
 
-aggregated_muni_ib = (
-    aggregated_muni_ib.groupby("Route")
-    .apply(
-        lambda x: pd.Series(
-            {
-                "Observed": x["Observed"].iloc[0],
-                "Modeled": x["Modeled"].iloc[0],
-                "Diff": x["Diff"].iloc[0],
-                "Percentage Diff": x["Percentage Diff"].iloc[0],
-                "AB": x["AB"].iloc[0],
-                "Direction": x["Direction"].iloc[0],
-                "geometry": x["geometry"].iloc[0],
-            }
+    aggregated_muni_ib = (
+        aggregated_muni_ib.groupby("Route")
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "Observed": x["Observed"].iloc[0],
+                    "Modeled": x["Modeled"].iloc[0],
+                    "Diff": x["Diff"].iloc[0],
+                    "Percentage Diff": x["Percentage Diff"].iloc[0],
+                    "AB": x["AB"].iloc[0],
+                    "Direction": x["Direction"].iloc[0],
+                    "geometry": x["geometry"].iloc[0],
+                }
+            )
         )
+        .reset_index()
     )
-    .reset_index()
-)
 
-# Convert to GeoDataFrame
-aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry="geometry")
-aggregated_muni_ib.to_file(os.path.join(SHP_file_dir, "muni_ib.shp"))
-MUNI_map_IB = aggregated_muni_ib[
-    ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
-].copy()
-MUNI_map_IB["Percentage Diff"] = pd.to_numeric(
-    MUNI_map_IB["Percentage Diff"].str.replace("%", "").str.strip(), errors="coerce"
-)
-MUNI_map_IB["Percentage Diff"] = MUNI_map_IB["Percentage Diff"] / 100
-# List of columns to convert
-columns_to_convert = ["Observed", "Diff", "Modeled"]
-for column in columns_to_convert:
-    MUNI_map_IB[column] = pd.to_numeric(
-        MUNI_map_IB[column].str.replace(",", "").str.strip(), errors="coerce"
+    # Convert to GeoDataFrame
+    aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry="geometry")
+    aggregated_muni_ib.to_file(os.path.join(SHP_file_dir, "muni_ib.shp"))
+    MUNI_map_IB = aggregated_muni_ib[
+        ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
+    ].copy()
+    MUNI_map_IB["Percentage Diff"] = pd.to_numeric(
+        MUNI_map_IB["Percentage Diff"].str.replace("%", "").str.strip(), errors="coerce"
     )
-MUNI_map_IB_ = MUNI_map_IB[
-    ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
-]
-MUNI_map_IB = MUNI_map_IB.drop_duplicates()
-MUNI_map_IB.to_csv(os.path.join(MUNI_output_dir, "MUNI_map_IB.csv"), index=False)
-
-MUNI_OB = MUNI_OB[
-    [
-        "Route",
-        "Name",
-        "Observed",
-        "Modeled",
-        "Diff",
-        "Percentage Diff",
-        "AB",
-        "SEQ",
-        "Direction",
+    MUNI_map_IB["Percentage Diff"] = MUNI_map_IB["Percentage Diff"] / 100
+    # List of columns to convert
+    columns_to_convert = ["Observed", "Diff", "Modeled"]
+    for column in columns_to_convert:
+        MUNI_map_IB[column] = pd.to_numeric(
+            MUNI_map_IB[column].str.replace(",", "").str.strip(), errors="coerce"
+        )
+    MUNI_map_IB = MUNI_map_IB[
+        ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ]
-]
-muni_ob = MUNI_OB.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-muni_ob_geo = gpd.GeoDataFrame(muni_ob, geometry="geometry")
-# Apply aggregation function using `apply` instead of `agg`
-aggregated_muni_ob = (
-    muni_ob_geo.groupby("Name")
-    .apply(
-        lambda x: pd.Series(
-            {
-                "Route": x["Route"].iloc[0],
-                "Observed": x["Observed"].iloc[0],
-                "Modeled": x["Modeled"].iloc[0],
-                "Diff": x["Diff"].iloc[0],
-                "Percentage Diff": x["Percentage Diff"].iloc[0],
-                "AB": x["AB"].iloc[0],
-                "Direction": x["Direction"].iloc[0],
-                "geometry": concat_ordered_geometries(x),
-            }
+    MUNI_map_IB = MUNI_map_IB.drop_duplicates()
+    MUNI_map_IB.to_csv(os.path.join(MUNI_output_dir, "MUNI_map_IB.csv"), index=False)
+
+    MUNI_OB = MUNI_OB[
+        [
+            "Route",
+            "Name",
+            "Observed",
+            "Modeled",
+            "Diff",
+            "Percentage Diff",
+            "AB",
+            "SEQ",
+            "Direction",
+        ]
+    ]
+    muni_ob = MUNI_OB.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    muni_ob_geo = gpd.GeoDataFrame(muni_ob, geometry="geometry")
+    # Apply aggregation function using `apply` instead of `agg`
+    aggregated_muni_ob = (
+        muni_ob_geo.groupby("Name")
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "Route": x["Route"].iloc[0],
+                    "Observed": x["Observed"].iloc[0],
+                    "Modeled": x["Modeled"].iloc[0],
+                    "Diff": x["Diff"].iloc[0],
+                    "Percentage Diff": x["Percentage Diff"].iloc[0],
+                    "AB": x["AB"].iloc[0],
+                    "Direction": x["Direction"].iloc[0],
+                    "geometry": concat_ordered_geometries(x),
+                }
+            )
         )
+        .reset_index()
     )
-    .reset_index()
-)
 
-aggregated_muni_ob = (
-    aggregated_muni_ob.groupby("Route")
-    .apply(
-        lambda x: pd.Series(
-            {
-                "Observed": x["Observed"].iloc[0],
-                "Modeled": x["Modeled"].iloc[0],
-                "Diff": x["Diff"].iloc[0],
-                "Percentage Diff": x["Percentage Diff"].iloc[0],
-                "AB": x["AB"].iloc[0],
-                "Direction": x["Direction"].iloc[0],
-                "geometry": x["geometry"].iloc[0],
-            }
+    aggregated_muni_ob = (
+        aggregated_muni_ob.groupby("Route")
+        .apply(
+            lambda x: pd.Series(
+                {
+                    "Observed": x["Observed"].iloc[0],
+                    "Modeled": x["Modeled"].iloc[0],
+                    "Diff": x["Diff"].iloc[0],
+                    "Percentage Diff": x["Percentage Diff"].iloc[0],
+                    "AB": x["AB"].iloc[0],
+                    "Direction": x["Direction"].iloc[0],
+                    "geometry": x["geometry"].iloc[0],
+                }
+            )
         )
+        .reset_index()
     )
-    .reset_index()
-)
 
-aggregated_muni_ob.to_file(os.path.join(SHP_file_dir, "muni_ob.shp"))
-MUNI_map_OB = aggregated_muni_ob[
-    ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
-].copy()
-MUNI_map_OB["Percentage Diff"] = pd.to_numeric(
-    MUNI_map_OB["Percentage Diff"].str.replace("%", "").str.strip(), errors="coerce"
-)
-MUNI_map_OB["Percentage Diff"] = MUNI_map_OB["Percentage Diff"] / 100
-for column in columns_to_convert:
-    MUNI_map_OB[column] = pd.to_numeric(
-        MUNI_map_OB[column].str.replace(",", "").str.strip(), errors="coerce"
+    aggregated_muni_ob.to_file(os.path.join(SHP_file_dir, "muni_ob.shp"))
+    MUNI_map_OB = aggregated_muni_ob[
+        ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
+    ].copy()
+    MUNI_map_OB["Percentage Diff"] = pd.to_numeric(
+        MUNI_map_OB["Percentage Diff"].str.replace("%", "").str.strip(), errors="coerce"
     )
-MUNI_map_OB = MUNI_map_OB[
-    ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
-]
-MUNI_map_OB = MUNI_map_OB.drop_duplicates()
-MUNI_map_OB.to_csv(os.path.join(MUNI_output_dir, "MUNI_map_OB.csv"), index=False)
+    MUNI_map_OB["Percentage Diff"] = MUNI_map_OB["Percentage Diff"] / 100
+    for column in columns_to_convert:
+        MUNI_map_OB[column] = pd.to_numeric(
+            MUNI_map_OB[column].str.replace(",", "").str.strip(), errors="coerce"
+        )
+    MUNI_map_OB = MUNI_map_OB[
+        ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
+    ]
+    MUNI_map_OB = MUNI_map_OB.drop_duplicates()
+    MUNI_map_OB.to_csv(os.path.join(MUNI_output_dir, "MUNI_map_OB.csv"), index=False)
+    
 
-# BART
-BART_boarding_allday = pd.read_csv(
-    os.path.join(BART_output_dir, "BART_boarding_allday.csv")
-)
-obs_BART_line = pd.read_csv(observed_BART)
-model_BART_line = pd.read_csv(os.path.join(OUTPUT_FOLDER, "model_BART.csv"))
-
-
-def BART_map(type, group_by, TOD, obs_BART_line, model_BART_line, csv, shp):
+def BART_map(type, group_by, TOD, obs_BART_line, model_BART_line, csv, shp, station, BART_output_dir, SHP_file_dir):
     obs_condition = pd.Series([True] * len(obs_BART_line))
     model_condition = pd.Series([True] * len(model_BART_line))
     # Processing observed data
@@ -642,7 +559,7 @@ def BART_map(type, group_by, TOD, obs_BART_line, model_BART_line, csv, shp):
     BART_map = format_dataframe(
         BART_2, numeric_columns=numeric_cols, percentage_columns=["Percentage Diff"]
     )
-    BART_map = BART_map.merge(station, on="Station", how="right")
+    BART_map = BART_map.merge(station, on='Station', how="right")
     BART_map = gpd.GeoDataFrame(BART_map, geometry="geometry")
     BART_map.crs = "epsg:2227"
     BART_map = BART_map.to_crs(epsg=4236)
@@ -650,57 +567,90 @@ def BART_map(type, group_by, TOD, obs_BART_line, model_BART_line, csv, shp):
     return BART, BART_map
 
 
-BART_br, BART_br_map = BART_map(
-    "Boardings",
-    ["Station"],
-    None,
-    obs_BART_line,
-    model_BART_line,
-    "BART_br.csv",
-    "BART_br_map.shp",
-)
-BART_br_am, BART_br_map_am = BART_map(
-    "Boardings",
-    ["Station", "TOD"],
-    "AM",
-    obs_BART_line,
-    model_BART_line,
-    "BART_br_am.csv",
-    "BART_br_map_am.shp",
-)
-BART_br_pm, BART_br_map_pm = BART_map(
-    "Boardings",
-    ["Station", "TOD"],
-    "PM",
-    obs_BART_line,
-    model_BART_line,
-    "BART_br_pm.csv",
-    "BART_br_map_pm.shp",
-)
-BART_at, BART_at_map = BART_map(
-    "Alightings",
-    ["Station"],
-    None,
-    obs_BART_line,
-    model_BART_line,
-    "BART_at.csv",
-    "BART_at_map.shp",
-)
-BART_at_am, BART_at_map_am = BART_map(
-    "Alightings",
-    ["Station", "TOD"],
-    "AM",
-    obs_BART_line,
-    model_BART_line,
-    "BART_at_am.csv",
-    "BART_at_map_am.shp",
-)
-BART_at_pm, BART_at_map_pm = BART_map(
-    "Alightings",
-    ["Station", "TOD"],
-    "PM",
-    obs_BART_line,
-    model_BART_line,
-    "BART_at_pm.csv",
-    "BART_at_map_pm.shp",
-)
+def process_bart_map(BART_output_dir, OUTPUT_FOLDER, observed_BART,):
+    df_station_name = pd.DataFrame(station_name)
+    df_station_name['Station_name'] = df_station_name['Station'].apply(lambda x : abbr_to_full[x])
+    # Convert the geometry list of tuples into a list of Shapely Point objects
+    station_name['geometry'] = [Point(xy) for xy in station_name['geometry']]
+    # Create a GeoDataFrame
+    station = gpd.GeoDataFrame(station_name, geometry='geometry')
+    station = station.merge(df_station_name,  on=['Station','geometry'], how='left')
+    # BART
+    BART_boarding_allday = pd.read_csv(
+        os.path.join(BART_output_dir, "BART_boarding_allday.csv")
+    )
+    obs_BART_line = pd.read_csv(observed_BART)
+    model_BART_line = pd.read_csv(os.path.join(OUTPUT_FOLDER, "model_BART.csv"))
+
+
+    BART_br, BART_br_map = BART_map(
+        "Boardings",
+        ["Station"],
+        None,
+        obs_BART_line,
+        model_BART_line,
+        "BART_br.csv",
+        "BART_br_map.shp",
+    )
+    BART_br_am, BART_br_map_am = BART_map(
+        "Boardings",
+        ["Station", "TOD"],
+        "AM",
+        obs_BART_line,
+        model_BART_line,
+        "BART_br_am.csv",
+        "BART_br_map_am.shp",
+    )
+    BART_br_pm, BART_br_map_pm = BART_map(
+        "Boardings",
+        ["Station", "TOD"],
+        "PM",
+        obs_BART_line,
+        model_BART_line,
+        "BART_br_pm.csv",
+        "BART_br_map_pm.shp",
+    )
+    BART_at, BART_at_map = BART_map(
+        "Alightings",
+        ["Station"],
+        None,
+        obs_BART_line,
+        model_BART_line,
+        "BART_at.csv",
+        "BART_at_map.shp",
+    )
+    BART_at_am, BART_at_map_am = BART_map(
+        "Alightings",
+        ["Station", "TOD"],
+        "AM",
+        obs_BART_line,
+        model_BART_line,
+        "BART_at_am.csv",
+        "BART_at_map_am.shp",
+    )
+    BART_at_pm, BART_at_map_pm = BART_map(
+        "Alightings",
+        ["Station", "TOD"],
+        "PM",
+        obs_BART_line,
+        model_BART_line,
+        "BART_at_pm.csv",
+        "BART_at_map_pm.shp",
+    )
+       
+    
+
+# if __name__ == "__main__":
+    # with open("transit.toml", "rb") as f:
+    #     config = tomllib.load(f)
+        
+    # model_run_dir = config["directories"]["model_run"]
+    # OUTPUT_FOLDER = output_transit_dir
+    # WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
+    # MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
+    # BART_output_dir = Path(config["directories"]["BART_output_dir"])
+    # Base_model_dir = Path(config["directories"]["Base_model_dir"])
+    # SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
+    # observed_BART = WORKING_FOLDER / config["transit"]["observed_BART"]
+    # FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
+    

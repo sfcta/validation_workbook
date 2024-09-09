@@ -2,115 +2,7 @@ import os
 import tomli as tomllib
 from pathlib import Path
 import pandas as pd
-from transit import output_transit_dir
-
-def dataframe_to_markdown(
-    df,
-    file_name="dataframe_table.md",
-    highlight_rows=None,
-    center_align_columns=None,
-    column_widths=100,
-):
-    """
-    Convert a Pandas DataFrame to a custom Markdown table, highlight specific rows,
-    right align specified columns, and save it to a file, with the first column always
-    left-aligned in both header and data.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to convert.
-    file_name (str): Name of the file to save the Markdown table.
-    highlight_rows (list): List of row indices to highlight.
-    right_align_columns (list): List of column names to right align.
-    """
-    if highlight_rows is None:
-        highlight_rows = []
-    if center_align_columns is None:
-        center_align_columns = []
-
-    # Start the Markdown table with the header
-    md_output = "<table>\n<thead>\n<tr>\n"
-    for i, col in enumerate(df.columns):
-        # Left align for the first column header, center align for others
-        header_align = "left" if i == 0 else "center"
-        md_output += f'<th style="text-align:{header_align}; width: {column_widths}px;"><strong>{col}</strong></th>\n'
-    md_output += "</tr>\n</thead>\n<tbody>\n"
-
-    # Add the table rows
-    for index, row in df.iterrows():
-        md_output += "<tr>\n"
-        for i, col in enumerate(df.columns):
-            cell_value = "" if pd.isna(row[col]) else row[col]
-
-            # Determine the alignment based on the column name and index
-            if i == 0:
-                align = "left"  # Left align for the first column
-            elif col in center_align_columns:
-                align = "center"  # Right align for specified columns
-            else:
-                align = "right"  # Center align for other columns
-
-            # Apply highlight if the row index is in the highlight_rows list
-            if index in highlight_rows:
-                md_output += f'<td style="text-align:{align}"><strong>{cell_value}</strong></td>\n'
-            else:
-                md_output += f'<td style="text-align:{align}">{cell_value}</td>\n'
-        md_output += "</tr>\n"
-
-    md_output += "</tbody>\n</table>"
-
-    # Save to a Markdown file
-    with open(file_name, "w") as file:
-        file.write(md_output)
-
-    print(f"Markdown table saved to '{file_name}'")
-
-
-def format_dataframe(df, numeric_columns, percentage_columns=None):
-    """
-    Format a DataFrame for readable display.
-    - Fills NA values with '-'.
-    - Formats specified numeric columns with commas and no decimal places.
-    - Formats specified columns as percentages.
-
-    Parameters:
-    df (pd.DataFrame): The DataFrame to format.
-    numeric_columns (list): List of numeric column names to format.
-    percentage_columns (list): List of column names to format as percentages.
-
-    Returns:
-    pd.DataFrame: The formatted DataFrame.
-    """
-    if percentage_columns is None:
-        percentage_columns = []
-
-    # Fill NA values
-    formatted_df = df.fillna("-")
-
-    # Format specified numeric columns
-    for col in numeric_columns:
-        formatted_df[col] = formatted_df[col].apply(lambda x: format_numeric(x))
-
-    # Format percentage columns
-    for col in percentage_columns:
-        formatted_df[col] = formatted_df[col].apply(lambda x: format_percentage(x))
-
-    return formatted_df
-
-
-def format_numeric(x):
-    """Format a numeric value with commas and no decimal places."""
-    try:
-        return f"{float(x):,.0f}" if x not in ["-", ""] else x
-    except ValueError:
-        return x
-
-
-def format_percentage(x):
-    """Format a value as a percentage."""
-    try:
-        return f"{float(x):.0f}%" if x not in ["-", ""] else x
-    except ValueError:
-        return x
+from transit import output_transit_dir, dataframe_to_markdown, format_dataframe
 
 
 def convert_to_integer(value):
@@ -718,7 +610,7 @@ if __name__ == "__main__":
 
     obs_BART_county = pd.read_csv(observed_BART_county)
     model_BART_county = pd.read_csv(model_BART_county)
-    county_order = ["San Francisco", "San Mateo", "Contra Costa", "Alameda", "Total"]
+    county_order = ["San Francisco", "San Mateo", "Santa Clara", "Contra Costa", "Alameda", "Total"]
     county_br_day = process_data(
         obs_BART_county,
         model_BART_county,
@@ -735,7 +627,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_br_day,
         file_name=os.path.join(OUTPUT_FOLDER, "county_br_day.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -755,7 +647,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_br_am,
         file_name=os.path.join(OUTPUT_FOLDER, "county_br_am.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -775,7 +667,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_br_pm,
         file_name=os.path.join(OUTPUT_FOLDER, "county_br_pm.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -800,7 +692,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_at_day,
         file_name=os.path.join(OUTPUT_FOLDER, "county_at_day.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -820,7 +712,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_at_am,
         file_name=os.path.join(OUTPUT_FOLDER, "county_at_am.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -840,7 +732,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         county_at_pm,
         file_name=os.path.join(OUTPUT_FOLDER, "county_at_pm.md"),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=90,
     )
@@ -1000,12 +892,12 @@ if __name__ == "__main__":
 
     # Valdiation for Screenlines
     obs_SL = pd.read_csv(observed_SL)
-    obs_SL["Ridership"] = (
-        obs_SL["Ridership"]
-        .replace({"-": "0", " -   ": "0"})
-        .str.replace(",", "")
-        .astype(float)
-    )
+    # obs_SL["Ridership"] = (
+    #     obs_SL["Ridership"]
+    #     .replace({"-": "0", " -   ": "0"})
+    #     .str.replace(",", "")
+    #     .astype(float)
+    # )
     model_SL = pd.read_csv(model_SL)
     transbay_AC_IB = process_data(
         obs_SL,
@@ -1083,7 +975,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         transbay_overall_OB,
         file_name=os.path.join(OUTPUT_FOLDER, "transbay_overall_OB.md"),
-        highlight_rows=[5],
+        highlight_rows=[-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1115,7 +1007,7 @@ if __name__ == "__main__":
     dataframe_to_markdown(
         Countyline_CalTrain_IB,
         file_name=os.path.join(OUTPUT_FOLDER, "Countyline_CalTrain_IB.md"),
-        highlight_rows=[5],
+        highlight_rows=[-1],
         center_align_columns=None,
         column_widths=70,
     )

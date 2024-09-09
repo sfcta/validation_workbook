@@ -1,9 +1,8 @@
 import os
-import tomllib
+import tomli as tomllib
 from pathlib import Path
-
 import pandas as pd
-
+from transit import output_transit_dir
 
 def dataframe_to_markdown(
     df,
@@ -350,7 +349,7 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    WORKING_FOLDER = Path(config["directories"]["transit_output_dir"])
+    WORKING_FOLDER = output_transit_dir
     OUTPUT_FOLDER = Path(config["directories"]["markdown_output_dir"])
     INPUT_FOLDER = Path(config["directories"]["transit_input_dir"])
     MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
@@ -364,7 +363,7 @@ if __name__ == "__main__":
     model_BART = WORKING_FOLDER / config["output"]["model_BART"]
     model_BART_county = WORKING_FOLDER / config["output"]["model_BART_county"]
     model_BART_SL = WORKING_FOLDER / config["output"]["model_BART_SL"]
-    model_MUNI_Line = WORKING_FOLDER / config["output"]["model_MUNI_line"]
+    model_MUNI_Line = WORKING_FOLDER / config["output"]["model_MUNI_Line"]
     model_SL = WORKING_FOLDER / config["output"]["model_SL"]
 
     for d in [OUTPUT_FOLDER, MUNI_output_dir, BART_output_dir, Screenline_output_dir]:

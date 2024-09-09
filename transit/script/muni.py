@@ -1,19 +1,7 @@
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
-
-# we should be importing functions in this file into transit.py instead
-# HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import (
-    model_run_dir,
-    output_transit_dir,
-    read_dbf_and_groupby_sum,
-    transit_assignment_filepaths,
-    transit_line_rename_filepath,
-    transit_validation_2019_alfaro_filepath,
-)
-
+from transit_function import read_dbf_and_groupby_sum
 
 def read_transit_lines(model_run_dir, transit_line_rename_filepath):
     line_names = pd.read_csv(
@@ -80,29 +68,16 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-def muni(
-    model_run_dir,
-    transit_line_rename_filepath,
-    transit_validation_2019_alfaro_filepath,
-    output_transit_dir,
-):
+def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir):
     line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
-    MUNI = []  # List to collect DataFrames
+    MUNI = read_dbf_and_groupby_sum(file_name, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
+    MUNI['Direction'] = MUNI['NAME'].apply(map_name_to_direction)
 
-    for period, path in transit_assignment_filepaths(
-        model_run_dir=model_run_dir
-    ).items():
-        df = read_dbf_and_groupby_sum(path, "SF MUNI", ["FULLNAME", "NAME"], "AB_BRDA")
-        df["Direction"] = df["NAME"].apply(map_name_to_direction)
-        df["TOD"] = period
-        MUNI.append(df)
+    MUNI = MUNI.sort_values(by="FULLNAME").reset_index(drop=True)
+    MUNI = MUNI.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
 
-    MUNI_Day = pd.concat(MUNI)
-    MUNI_Day = MUNI_Day.sort_values(by="FULLNAME").reset_index(drop=True)
-    MUNI_Day = MUNI_Day.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
-
-    MUNI_full = pd.merge(MUNI_Day, line_names, on="Name", how="left")
+    MUNI_full = pd.merge(MUNI, line_names, on="Name", how="left")
 
     # Apply the transformation function to the 'Line' column
     MUNI_full["Line"] = MUNI_full["Line"].apply(transform_line)
@@ -139,10 +114,11 @@ def muni(
     MUNI_full.to_csv(output_transit_dir / "model_MUNI_Line.csv", index=False)
 
 
-if __name__ == "__main__":
-    muni(
-        model_run_dir,
-        transit_line_rename_filepath,
-        transit_validation_2019_alfaro_filepath,
-        output_transit_dir,
-    )
+
+# if __name__ == "__main__":
+#     muni(
+#         model_run_dir,
+#         transit_line_rename_filepath,
+#         transit_validation_2019_alfaro_filepath,
+#         output_transit_dir,
+#     )

@@ -1,21 +1,5 @@
-import os
-import tomllib
-
 import pandas as pd
-
-# we should be importing functions in this file into transit.py instead
-# HOTFIX TODO pass results of read_transit_assignments() directly as arg
-from transit import read_dbf_and_groupby_sum, transit_assignment_filepaths
-
-with open("transit.toml", "rb") as f:
-    config = tomllib.load(f)
-
-model_run_dir = config["directories"]["model_run"]
-
-WORKING_FOLDER = config["directories"]["transit_input_dir"]
-OUTPUT_FOLDER = config["directories"]["transit_output_dir"]
-model_BART_SL = os.path.join(OUTPUT_FOLDER, config["output"]["model_BART_SL"])
-
+from transit_function import read_dbf_and_groupby_sum
 
 HWY_SCREENS = {
     "SamTrans": [
@@ -46,87 +30,64 @@ HWY_SCREENS = {
 }
 
 
-def process_data(file_name, system, TOD, A, B, Screenline, Operator, Mode):
-    # ST_IB, ST_OB: HOTFIX commented out for now; TODO remove if unused
-    # # Create DataFrames for IB and OB
-    # ST_IB = pd.DataFrame({"A": A, "B": B})
-    # ST_OB = pd.DataFrame({"A": B, "B": A})
-
+def process_data(file_name, system, A, B, Screenline, Operator, Mode):
     # Read the DBF file and group by 'A' and 'B' while summing 'AB_VOL'
-    ST_TOD = read_dbf_and_groupby_sum(file_name, system, ["A", "B"], "AB_VOL")
+    ST_TOD = read_dbf_and_groupby_sum(file_name, system, ["A", "B", "TOD"], "AB_VOL")
 
-    # Filter rows for IB and calculate the sum of 'AB_VOL'
+    # Filter rows for IB and calculate the sum of 'AB_VOL"
     ST_TOD_IB = ST_TOD[(ST_TOD["A"].isin(A)) & (ST_TOD["B"].isin(B))]
-    IB_sum = ST_TOD_IB["AB_VOL"].sum()
+    IB_sum = ST_TOD_IB.groupby("TOD")["AB_VOL"].sum().reset_index()
+    IB_sum["Screenline"] = Screenline
+    IB_sum["Direction"] = "IB"
+    IB_sum["Operator"] = Operator
+    IB_sum["Mode"] = Mode
 
     # Filter rows for OB and calculate the sum of 'AB_VOL'
     ST_TOD_OB = ST_TOD[(ST_TOD["A"].isin(B)) & (ST_TOD["B"].isin(A))]
-    OB_sum = ST_TOD_OB["AB_VOL"].sum()
-
-    # Create DataFrames for IB and OB results
-    data_IB = {
-        "Screenline": [Screenline],
-        "Direction": ["IB"],
-        "TOD": [TOD],
-        "Ridership": [IB_sum],
-        "Operator": [Operator],
-        "Mode": [Mode],
-    }
-    data_OB = {
-        "Screenline": [Screenline],
-        "Direction": ["OB"],
-        "TOD": [TOD],
-        "Ridership": [OB_sum],
-        "Operator": [Operator],
-        "Mode": [Mode],
-    }
-    ST_TOD_IB1 = pd.DataFrame(data_IB)
-    ST_TOD_OB1 = pd.DataFrame(data_OB)
-
-    # Concatenate IB and OB DataFrames
-    ST_TOD1 = pd.concat([ST_TOD_IB1, ST_TOD_OB1])
-
-    return ST_TOD1
+    OB_sum = ST_TOD_OB.groupby("TOD")["AB_VOL"].sum().reset_index()
+    OB_sum["Screenline"] = Screenline
+    OB_sum["Direction"] = "OB"
+    OB_sum["Operator"] = Operator
+    OB_sum["Mode"] = Mode
 
 
-def screen_df(transit_assignment_filepaths, HWY_SCREENS):
-    df_total = []
+    ST_TOD = pd.concat([IB_sum, OB_sum])
+    ST_TOD = ST_TOD.rename(columns={"AB_VOL":"Ridership"})
+
+    return ST_TOD
+
+
+def screen_df(file_name, HWY_SCREENS):
+    screenline_total = []
     for i in HWY_SCREENS.keys():
-        df_i = []
-        for period, path in transit_assignment_filepaths.itmes():
-            df = process_data(
-                path,
+        screenline = process_data(
+                file_name,
                 HWY_SCREENS[i][2][0],
-                period,
                 HWY_SCREENS[i][0],
                 HWY_SCREENS[i][1],
                 HWY_SCREENS[i][2][1],
                 HWY_SCREENS[i][2][2],
                 HWY_SCREENS[i][2][3],
             )
-            df_i.append(df)
-        SC = pd.concat(df_i)
-        SC["Key"] = SC["Screenline"] + SC["Operator"] + SC["TOD"] + SC["Direction"]
-        SC = SC[
+        screenline["Key"] = screenline["Screenline"] + screenline["Operator"] + screenline["TOD"] + screenline["Direction"]
+        screenline = screenline[
             ["Screenline", "Direction", "TOD", "Key", "Ridership", "Operator", "Mode"]
         ]
-        SC = SC.sort_values(by="Direction").reset_index(drop=True)
-        df_total.append(SC)
-    model_Screenlines = pd.concat(df_total)
+        screenline = screenline.sort_values(by="Direction").reset_index(drop=True)
+        screenline_total.append(screenline)
+    model_Screenlines = pd.concat(screenline_total)
     return model_Screenlines
 
-
-model_Screenlines = screen_df(
-    transit_assignment_filepaths(model_run_dir=model_run_dir), HWY_SCREENS
-)
-BART_Screenlines = pd.read_csv(model_BART_SL)
-BART_Screenlines["Operator"] = "BART"
-BART_Screenlines["Mode"] = "BART"
-BART_Screenlines["Key"] = (
-    BART_Screenlines["Screenline"]
-    + BART_Screenlines["Operator"]
-    + BART_Screenlines["TOD"]
-    + BART_Screenlines["Direction"]
-)
-model_SL = pd.concat([BART_Screenlines, model_Screenlines])
-model_SL.to_csv(os.path.join(OUTPUT_FOLDER, "model_SL.csv"), index=False)
+def concat_final_SL(file_name, output_dir):
+    model_Screenlines = screen_df(file_name,HWY_SCREENS)
+    BART_Screenlines = pd.read_csv(output_dir / "model_BART_SL.csv")
+    BART_Screenlines["Operator"] = "BART"
+    BART_Screenlines["Mode"] = "BART"
+    BART_Screenlines["Key"] = (
+        BART_Screenlines["Screenline"]
+        + BART_Screenlines["Operator"]
+        + BART_Screenlines["TOD"]
+        + BART_Screenlines["Direction"]
+    )
+    model_SL = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(drop=True)
+    model_SL.to_csv(output_dir / "model_SL.csv", index=False)

@@ -1,7 +1,8 @@
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from transit_function import read_dbf_and_groupby_sum
+import tomli as tomllib
+from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 def read_transit_lines(model_run_dir, transit_line_rename_filepath):
     line_names = pd.read_csv(
@@ -68,7 +69,7 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir):
+def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir, model_MUNI_Line):
     line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
     MUNI = read_dbf_and_groupby_sum(file_name, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
@@ -111,14 +112,32 @@ def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit
     MUNI_full = MUNI_full.sort_values(by=["Line", "Direction", "TOD"]).reset_index(
         drop=True
     )
-    MUNI_full.to_csv(output_transit_dir / "model_MUNI_Line.csv", index=False)
+    MUNI_full.to_csv(output_transit_dir / model_MUNI_Line, index=False)
 
 
 
-# if __name__ == "__main__":
-#     muni(
-#         model_run_dir,
-#         transit_line_rename_filepath,
-#         transit_validation_2019_alfaro_filepath,
-#         output_transit_dir,
-#     )
+if __name__ == "__main__":
+    with open("transit.toml", "rb") as f:
+        config = tomllib.load(f)
+        
+    transit_line_rename_filepath = (
+        Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
+    ) 
+    transit_validation_2019_alfaro_filepath = config["transit"][
+        "transit_validation_2019_alfaro_filepath"
+    ]
+    model_run_dir = config["directories"]["model_run"]
+    model_MUNI_Line = config["output"]["model_MUNI_Line"]
+    output_dir = model_run_dir / "validation_workbook" / "output"
+    output_transit_dir = output_dir / "transit"
+    output_transit_dir.mkdir(parents=True, exist_ok=True)
+    time_periods = ["EA", "AM", "MD", "PM", "EV"]
+    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    
+    process_muni(
+        model_run_dir,
+        transit_line_rename_filepath,
+        transit_validation_2019_alfaro_filepath,
+        output_transit_dir,
+        model_MUNI_Line
+    )

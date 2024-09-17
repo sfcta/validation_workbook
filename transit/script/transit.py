@@ -1,13 +1,15 @@
-import subprocess
 from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 import tomli as tomllib
+from transit_function import read_transit_assignments
 from bart import process_BART_data, process_BART_county, process_BART_SL
 from muni import process_muni
 from screen import concat_final_SL
 from map_data import process_muni_map, process_bart_map
 from obs import process_obs_data
+from total_val import process_valTotal_Operator, process_valTotal_Submode
+from simwrapper_table import process_mkd_muni, process_mkd_bart, process_mkd_screenline
 
 script_dir = Path(__file__).parent
 toml_path = script_dir / "transit.toml"
@@ -18,120 +20,187 @@ with open(toml_path, "rb") as f:
 transit_line_rename_filepath = (
     Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
 )
-
 transit_validation_2019_alfaro_filepath = config["transit"][
     "transit_validation_2019_alfaro_filepath"
 ]
 model_run_dir = Path(config["directories"]["model_run"])
+transit_input_dir = Path(config["directories"]["transit_input_dir"])
 MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
+markdown_output_dir = Path(config["directories"]["markdown_output_dir"])
+Screenline_output_dir = Path(config["directories"]["Screenline_output_dir"])
+total_output_dir = Path(config["directories"]["total_output_dir"])
 SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
 Base_model_dir = Path(config["directories"]["Base_model_dir"])
-WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
 FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
 BART_output_dir = Path(config["directories"]["BART_output_dir"])
-observed_BART = WORKING_FOLDER / config["transit"]["observed_BART"]
+observed_BART = Path(config["transit"]["observed_BART"])
 observed_BART_county = Path(config["transit"]["observed_BART_county"])
 observed_BART_SL = Path(config["transit"]["observed_BART_SL"])
 observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
 observed_SL = Path(config["transit"]["observed_SL"])
 observed_NTD = Path(config["transit"]["observed_NTD"])
+model_BART = Path(config["output"]["model_BART"])
+model_BART_county = Path(config["output"]["model_BART_county"])
+model_BART_SL = Path(config["output"]["model_BART_SL"])
+model_MUNI_Line = Path(config["output"]["model_MUNI_Line"]) 
+model_SL = Path(config["output"]["model_SL"])
+BART_br_map = Path(config["shp"]["BART_br_map"])
+BART_br_map_pm = Path(config["shp"]["BART_br_map_pm"])
+BART_br_map_am = Path(config["shp"]["BART_br_map_am"])
+BART_at_map = Path(config["shp"]["BART_at_map"])
+BART_at_map_am = Path(config["shp"]["BART_at_map_am"])
+BART_at_map_pm = Path(config["shp"]["BART_at_map_pm"])
+muni_ib = Path(config["shp"]["muni_ib"])
+muni_ob = Path(config["shp"]["muni_ob"])
+obs_MUNI_line_md = Path(config["output"]["obs_MUNI_line_md"])
+obs_BART_station_md = Path(config["output"]["obs_BART_station_md"])
+obs_BART_county_md = Path(config["output"]["obs_BART_county_md"])
+obs_BART_SL_md = Path(config["output"]["obs_BART_SL_md"])
+obs_Screenlines_md = Path(config["output"]["obs_Screenlines_md"])
+obs_NTD_md = Path(config["output"]["obs_NTD_md"])
+valTotal_Service = Path(config["output"]["valTotal_Service"])
+valTotal_Operator = Path(config["output"]["valTotal_Operator"])
+valTotal_Submode = Path(config["output"]["valTotal_Submode"])
+BART_br = Path(config["bart"]["BART_br"])
+BART_br_am = Path(config["bart"]["BART_br_am"])
+BART_br_pm = Path(config["bart"]["BART_br_pm"])
+BART_at = Path(config["bart"]["BART_at"])
+BART_at_am = Path(config["bart"]["BART_at_am"])
+BART_at_pm = Path(config["bart"]["BART_at_pm"])
+BART_boarding_allday_csv = Path(config["bart"]["BART_boarding_allday_csv"])
+BART_at_allday_csv = Path(config["bart"]["BART_at_allday_csv"])
+county_br_day_csv = Path(config["bart"]["county_br_day_csv"])
+county_br_am_csv = Path(config["bart"]["county_br_am_csv"])
+county_br_pm_csv = Path(config["bart"]["county_br_pm_csv"])
+county_at_day_csv = Path(config["bart"]["county_at_day_csv"])
+county_at_am_csv = Path(config["bart"]["county_at_am_csv"])
+county_at_pm_csv = Path(config["bart"]["county_at_pm_csv"])
+MUNI_OB = Path(config["muni"]["MUNI_OB"])
+MUNI_IB = Path(config["muni"]["MUNI_IB"])
+MUNI_map_IB = Path(config["muni"]["MUNI_map_IB"])
+MUNI_map_OB = Path(config["muni"]["MUNI_map_OB"])
+MUNI_mode = Path(config["muni"]["MUNI_mode"])
+MUNI_mode_am = Path(config["muni"]["MUNI_mode_am"])
+MUNI_mode_pm = Path(config["muni"]["MUNI_mode_pm"])
+MUNI_tod = Path(config["muni"]["MUNI_tod"])
+MUNI_EB = Path(config["muni"]["MUNI_EB"])
+MUNI_LB = Path(config["muni"]["MUNI_LB"])
+MUNI_Rail = Path(config["muni"]["MUNI_Rail"])
+transbay_BART_IB_csv = Path(config["screenline"]["transbay_BART_IB_csv"])
+transbay_BART_OB_csv = Path(config["screenline"]["transbay_BART_OB_csv"])
+Countyline_BART_IB_csv = Path(config["screenline"]["Countyline_BART_IB_csv"])
+Countyline_BART_OB_csv = Path(config["screenline"]["Countyline_BART_OB_csv"])
+Intra_SF_BART_IB_csv = Path(config["screenline"]["Intra_SF_BART_IB_csv"])
+Intra_SF_BART_OB_csv = Path(config["screenline"]["Intra_SF_BART_OB_csv"])
+transbay_AC_IB_csv = Path(config["screenline"]["transbay_AC_IB_csv"])
+transbay_AC_OB_csv = Path(config["screenline"]["transbay_AC_OB_csv"])
+transbay_overall_IB_csv = Path(config["screenline"]["transbay_overall_IB_csv"])
+transbay_overall_OB_csv = Path(config["screenline"]["transbay_overall_OB_csv"])
+Countyline_CalTrain_IB_csv = Path(config["screenline"]["Countyline_CalTrain_IB_csv"])
+Countyline_CalTrain_OB_csv = Path(config["screenline"]["Countyline_CalTrain_OB_csv"])
+Countyline_SamTrans_IB_csv = Path(config["screenline"]["Countyline_SamTrans_IB_csv"])
+Countyline_SamTrans_OB_csv = Path(config["screenline"]["Countyline_SamTrans_OB_csv"])
+Countyline_overall_IB_csv = Path(config["screenline"]["Countyline_overall_IB_csv"])
+Countyline_overall_OB_csv = Path(config["screenline"]["Countyline_overall_OB_csv"])
+GG_Transit_IB_csv = Path(config["screenline"]["GG_Transit_IB_csv"])
+GG_Transit_OB_csv = Path(config["screenline"]["GG_Transit_OB_csv"])
+GG_Ferry_IB_csv = Path(config["screenline"]["GG_Ferry_IB_csv"])
+GG_Ferry_OB_csv = Path(config["screenline"]["GG_Ferry_OB_csv"])
+GG_overall_IB_csv = Path(config["screenline"]["GG_overall_IB_csv"])
+GG_overall_OB_csv = Path(config["screenline"]["GG_overall_OB_csv"])
+MUNI_ib_day = Path(config["markdown"]["MUNI_ib_day"])
+MUNI_ob_day = Path(config["markdown"]["MUNI_ob_day"])
+MUNI_ib_am = Path(config["markdown"]["MUNI_ib_am"])
+MUNI_ib_pm = Path(config["markdown"]["MUNI_ib_pm"])
+MUNI_ob_am = Path(config["markdown"]["MUNI_ob_am"])
+MUNI_ob_pm = Path(config["markdown"]["MUNI_ob_pm"])
+MUNI_mode_day = Path(config["markdown"]["MUNI_mode_day"])
+MUNI_mode_am_md = Path(config["markdown"]["MUNI_mode_am_md"])
+MUNI_mode_pm_md = Path(config["markdown"]["MUNI_mode_pm_md"])
+MUNI_tod_md = Path(config["markdown"]["MUNI_tod_md"])
+MUNI_EB_md = Path(config["markdown"]["MUNI_EB_md"])
+MUNI_LB_md = Path(config["markdown"]["MUNI_LB_md"])
+MUNI_Rail_md = Path(config["markdown"]["MUNI_Rail_md"])
+BART_boarding_allday_md = Path(config["markdown"]["BART_boarding_allday_md"])
+BART_boarding_am_md = Path(config["markdown"]["BART_boarding_am_md"])
+BART_boarding_pm_md = Path(config["markdown"]["BART_boarding_pm_md"])
+BART_at_allday_md = Path(config["markdown"]["BART_at_allday_md"])
+BART_at_am_md = Path(config["markdown"]["BART_at_am_md"])
+BART_at_pm_md = Path(config["markdown"]["BART_at_pm_md"])
+county_br_day_md = Path(config["markdown"]["county_br_day_md"])
+county_br_am_md = Path(config["markdown"]["county_br_am_md"])
+county_br_pm_md = Path(config["markdown"]["county_br_pm_md"])
+county_at_day_md = Path(config["markdown"]["county_at_day_md"])
+county_at_am_md = Path(config["markdown"]["county_at_am_md"])
+county_at_pm_md = Path(config["markdown"]["county_at_pm_md"])
+transbay_BART_IB_md = Path(config["markdown"]["transbay_BART_IB_md"])
+transbay_BART_OB_md = Path(config["markdown"]["transbay_BART_OB_md"])
+Countyline_BART_OB_md = Path(config["markdown"]["Countyline_BART_OB_md"])
+Countyline_BART_IB_md = Path(config["markdown"]["Countyline_BART_IB_md"])
+SF_out_md = Path(config["markdown"]["SF_out_md"])
+SF_in_md = Path(config["markdown"]["SF_in_md"])
+transbay_AC_IB_md = Path(config["markdown"]["transbay_AC_IB_md"])
+transbay_AC_OB_md = Path(config["markdown"]["transbay_AC_OB_md"])
+transbay_overall_IB_md = Path(config["markdown"]["transbay_overall_IB_md"])
+transbay_overall_OB_md = Path(config["markdown"]["transbay_overall_OB_md"])
+Countyline_CalTrain_IB_md = Path(config["markdown"]["Countyline_CalTrain_IB_md"])
+Countyline_CalTrain_OB_md = Path(config["markdown"]["Countyline_CalTrain_OB_md"])
+Countyline_SamTrans_IB_md = Path(config["markdown"]["Countyline_SamTrans_IB_md"])
+Countyline_SamTrans_OB_md = Path(config["markdown"]["Countyline_SamTrans_OB_md"])
+Countyline_overall_IB_md = Path(config["markdown"]["Countyline_overall_IB_md"])
+Countyline_overall_OB_md = Path(config["markdown"]["Countyline_overall_OB_md"])
+GG_Transit_IB_md = Path(config["markdown"]["GG_Transit_IB_md"])
+GG_Transit_OB_md = Path(config["markdown"]["GG_Transit_OB_md"])
+GG_Ferry_IB_md = Path(config["markdown"]["GG_Ferry_IB_md"])
+GG_Ferry_OB_md = Path(config["markdown"]["GG_Ferry_OB_md"])
+GG_overall_IB_md = Path(config["markdown"]["GG_overall_IB_md"])
+GG_overall_OB_md = Path(config["markdown"]["GG_overall_OB_md"])
+valTotal_Submode_md = Path(config["markdown"]["valTotal_Submode_md"])
+valTotal_Service_md = Path(config["markdown"]["valTotal_Service_md"])
+valTotal_Operator_md = Path(config["markdown"]["valTotal_Operator_md"])
 output_dir = model_run_dir / "validation_workbook" / "output"
 output_transit_dir = output_dir / "transit"
 output_transit_dir.mkdir(parents=True, exist_ok=True)
 
 time_periods = ["EA", "AM", "MD", "PM", "EV"]
-
-
-def transit_assignment_filepaths(
-    model_run_dir=model_run_dir, time_periods=time_periods
-):
-    return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}
-
-def read_transit_assignments(model_run_dir, time_periods):
-    """Reads the DBF files for each time period using Geopandas and concatenates them."""
-    filepaths = transit_assignment_filepaths(model_run_dir, time_periods)
-    
-    # List to store all GeoDataFrames
-    gdf_list = []
-    
-    for period, filepath in filepaths.items():
-        try:
-            # Read the DBF file using geopandas
-            gdf = gpd.read_file(str(filepath))
-            
-            # Add a new column 'TOD' to represent the time period
-            gdf['TOD'] = period
-            
-            # Append to the list
-            gdf_list.append(gdf)
-            
-            print(f"Successfully read and added 'TOD' to: {filepath}")
-        except Exception as e:
-            print(f"Error reading {filepath}: {e}")
-            raise NotImplementedError(f"Could not read or extract data from {filepath}")
-    
-    # Concatenate all GeoDataFrames in the list into a single DataFrame
-    combined_gdf = gpd.pd.concat(gdf_list, ignore_index=True)
-    
-    return combined_gdf
-
-
-# def read_dbf_and_groupby_sum(dbf_file, system_filter, groupby_columns, sum_column):
-#     """
-#     Reads a DBF file, filters by SYSTEM, group by specified columns,
-#     and calculates sum of a specified column.
-
-#     Parameters:
-#     dbf_file_path (str): The path to the DBF file.
-#     system_filter (str): The value to filter by on the 'SYSTEM' column.
-#     groupby_columns (list): The list of columns to group by.
-#     sum_column (str): The column on which to calculate the sum.
-
-#     Returns:
-#     DataFrame: Pandas DataFrame with the groupby and sum applied.
-#     """
-#     filtered_df = dbf_file[dbf_file["SYSTEM"] == system_filter]  # filter on SYSTEM columns
-#     # group by `groupby_columns` and sum `sum_column`
-#     grouped_sum = filtered_df.groupby(groupby_columns)[sum_column].sum()
-#     # reset index to convert it back to a DataFrame
-#     grouped_sum_df = grouped_sum.reset_index()
-#     return grouped_sum_df
+tod_order = ['EA', 'AM', 'MD', 'PM', 'EV', 'Total']
         
 
-def out_put_data():
+
+
+if __name__ == "__main__":
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
-    process_BART_data(combined_gdf, model_run_dir, output_transit_dir)
-    process_BART_county(combined_gdf, model_run_dir, output_transit_dir)
-    process_BART_SL(combined_gdf, model_run_dir, output_transit_dir)
-    process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir)
-    concat_final_SL(combined_gdf, output_transit_dir)
-    process_muni_map(combined_gdf,output_transit_dir, MUNI_output_dir,SHP_file_dir,FREEFLOW_SHP)
-    process_bart_map(BART_output_dir, output_transit_dir, observed_BART)
-    process_obs_data(observed_MUNI_Line, output_transit_dir, observed_BART, observed_BART_county, observed_BART_SL, observed_SL, observed_NTD)
-    
-    
-out_put_data()
-
-
-
-
-# if __name__ == "__main__":
-#     # TODO call functions from each script directly rather than use subprocess
-#     # make sure that there are no circular imports by passing data structures directly
-#     # rather than importing the shared read functions from here to the scripts
-#     scripts = [
-#         "bart.py",
-#         "muni.py",
-#         "screen.py",
-#         "simwrapper_table.py",
-#         "map_data.py",
-#         "obs.py",
-#         "total_val.py",
-#     ]
-#     for script_name in scripts:
-#         print(f"Running {script_name}")
-#         result = subprocess.run(["python", script_name], capture_output=True, text=True)
-#         if result.returncode == 0:
-#             print(f"Successfully ran {script_name}")
-#         else:
-#             print(f"Error running {script_name}: {result.stderr}")
+    process_BART_data(combined_gdf, model_run_dir, output_transit_dir, model_BART)
+    process_BART_county(combined_gdf, model_run_dir, output_transit_dir, model_BART_county, model_BART)
+    process_BART_SL(combined_gdf, model_run_dir, output_transit_dir,  model_BART_SL)
+    process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir, model_MUNI_Line)
+    concat_final_SL(combined_gdf, output_transit_dir, model_BART_SL, model_SL)
+    process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
+                     MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
+                     MUNI_mode_pm_md, MUNI_mode_pm, MUNI_tod_md,  MUNI_tod, MUNI_EB_md, MUNI_EB, MUNI_LB_md, MUNI_LB, MUNI_Rail_md, MUNI_Rail, MUNI_IB, MUNI_OB)
+    process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model_BART, markdown_output_dir, BART_output_dir, observed_BART_county, model_BART_county,
+                     observed_BART_SL, Screenline_output_dir, tod_order, BART_boarding_allday_md, BART_boarding_am_md, BART_boarding_pm_md, BART_at_allday_md, 
+                     BART_at_am_md, BART_at_pm_md, BART_boarding_allday_csv, BART_at_allday_csv, county_br_day_csv, county_br_am_csv, 
+                     county_br_pm_csv, county_at_day_csv, county_at_am_csv, county_at_pm_csv, model_BART_SL, 
+                     county_br_day_md, county_br_am_md, county_br_pm_md, county_at_day_md, county_at_am_md, county_at_pm_md, 
+                     transbay_BART_IB_md, transbay_BART_OB_md, Countyline_BART_OB_md, Countyline_BART_IB_md, SF_out_md, SF_in_md, transbay_BART_IB_csv, 
+                     transbay_BART_OB_csv, Countyline_BART_IB_csv, Countyline_BART_OB_csv, Intra_SF_BART_IB_csv, Intra_SF_BART_OB_csv)
+    process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, model_SL, markdown_output_dir, tod_order, Screenline_output_dir,
+                            transbay_AC_IB_md, transbay_AC_OB_md, transbay_overall_IB_md, transbay_overall_OB_md, 
+                            Countyline_CalTrain_IB_md, Countyline_CalTrain_OB_md, Countyline_SamTrans_IB_md, 
+                            Countyline_SamTrans_OB_md, Countyline_overall_IB_md, Countyline_overall_OB_md, 
+                            GG_Transit_IB_md, GG_Transit_OB_md, GG_Ferry_IB_md, GG_Ferry_OB_md, GG_overall_IB_md, 
+                            GG_overall_OB_md, transbay_AC_IB_csv, transbay_AC_OB_csv, transbay_overall_IB_csv, 
+                            transbay_overall_OB_csv, Countyline_CalTrain_IB_csv, Countyline_CalTrain_OB_csv, 
+                            Countyline_SamTrans_IB_csv, Countyline_SamTrans_OB_csv, Countyline_overall_IB_csv, 
+                            Countyline_overall_OB_csv, GG_Transit_IB_csv, GG_Transit_OB_csv, GG_Ferry_IB_csv, 
+                            GG_Ferry_OB_csv, GG_overall_IB_csv, GG_overall_OB_csv)
+    process_muni_map(combined_gdf, output_transit_dir, MUNI_output_dir,SHP_file_dir,FREEFLOW_SHP, model_MUNI_Line, muni_ib, muni_ob, MUNI_OB, MUNI_IB, MUNI_map_IB, MUNI_map_OB)
+    process_bart_map(BART_output_dir, transit_input_dir, output_transit_dir, observed_BART, model_BART, SHP_file_dir, 
+                     BART_br, BART_br_map, BART_br_pm, BART_br_map_pm, BART_br_am, BART_br_map_am, 
+                     BART_at, BART_at_map, BART_at_am,BART_at_map_am, BART_at_pm, BART_at_map_pm)
+    process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
+                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
+                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md)
+    process_valTotal_Operator(combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Operator_md, valTotal_Operator)
+    process_valTotal_Submode(transit_validation_2019_alfaro_filepath, combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)

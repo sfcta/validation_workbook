@@ -1,5 +1,6 @@
 import pandas as pd
-from transit_function import read_dbf_and_groupby_sum
+import tomli as tomllib
+from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 HWY_SCREENS = {
     "SamTrans": [
@@ -78,9 +79,9 @@ def screen_df(file_name, HWY_SCREENS):
     model_Screenlines = pd.concat(screenline_total)
     return model_Screenlines
 
-def concat_final_SL(file_name, output_dir):
+def concat_final_SL(file_name, output_transit_dir, model_BART_SL, model_SL):
     model_Screenlines = screen_df(file_name,HWY_SCREENS)
-    BART_Screenlines = pd.read_csv(output_dir / "model_BART_SL.csv")
+    BART_Screenlines = pd.read_csv(output_transit_dir / model_BART_SL)
     BART_Screenlines["Operator"] = "BART"
     BART_Screenlines["Mode"] = "BART"
     BART_Screenlines["Key"] = (
@@ -89,5 +90,26 @@ def concat_final_SL(file_name, output_dir):
         + BART_Screenlines["TOD"]
         + BART_Screenlines["Direction"]
     )
-    model_SL = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(drop=True)
-    model_SL.to_csv(output_dir / "model_SL.csv", index=False)
+    model_SL_df = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(drop=True)
+    model_SL_df.to_csv(output_transit_dir / model_SL, index=False)
+    
+if __name__ == "__main__":
+    with open("transit.toml", "rb") as f:
+        config = tomllib.load(f)
+        
+    transit_line_rename_filepath = (
+        config["directories"]["resources"] / config["transit"]["line_rename_filename"]
+    ) 
+    transit_validation_2019_alfaro_filepath = config["transit"][
+        "transit_validation_2019_alfaro_filepath"
+    ]
+    model_run_dir = config["directories"]["model_run"]
+    model_BART_SL = config["output"]["model_BART_SL"]
+    model_SL = config["output"]["model_SL"]
+    output_dir = model_run_dir / "validation_workbook" / "output"
+    output_transit_dir = output_dir / "transit"
+    output_transit_dir.mkdir(parents=True, exist_ok=True)
+    time_periods = ["EA", "AM", "MD", "PM", "EV"]
+    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    
+    concat_final_SL(dbf_file, output_transit_dir, model_BART_SL, model_SL)

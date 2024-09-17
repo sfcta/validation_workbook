@@ -1,23 +1,11 @@
 import os
 import pandas as pd
-from transit_function import dataframe_to_markdown, format_numeric
+import tomli as tomllib
+from transit_function import dataframe_to_markdown, format_numeric, read_transit_assignments
 
-# with open("transit.toml", "rb") as f:
-#     config = tomllib.load(f)
-# WORKING_FOLDER = config["directories"]["transit_output_dir"]
-# OUTPUT_FOLDER = config["directories"]["markdown_output_dir"]
-# INPUT_FOLDER = config["directories"]["transit_input_dir"]
-# observed_BART = os.path.join(INPUT_FOLDER, config["transit"]["observed_BART"])
-# observed_BART_county = os.path.join(
-#     INPUT_FOLDER, config["transit"]["observed_BART_county"]
-# )
-# observed_BART_SL = os.path.join(INPUT_FOLDER, config["transit"]["observed_BART_SL"])
-# observed_MUNI_Line = os.path.join(INPUT_FOLDER, config["transit"]["observed_MUNI_Line"])
-# observed_SL = os.path.join(INPUT_FOLDER, config["transit"]["observed_SL"])
-# observed_NTD = os.path.join(INPUT_FOLDER, config["transit"]["observed_NTD"])
-def NTD_to_df(observed_NTD):
+def NTD_to_df(transit_input_dir, observed_NTD):
     df = pd.read_excel(
-        observed_NTD,
+        transit_input_dir / observed_NTD,
         usecols="B:D",
         skiprows=list(range(4)),
         header=None,
@@ -80,15 +68,17 @@ def df_to_markdown_html(df, table_title):
 
     return html
 
-def process_obs_data(observed_MUNI_Line, OUTPUT_FOLDER, observed_BART, observed_BART_county, observed_BART_SL, observed_SL, observed_NTD):
+def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
+                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
+                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md):
         
-    obs_MUNI_line = pd.read_csv(observed_MUNI_Line)
+    obs_MUNI_line = pd.read_csv(transit_input_dir / observed_MUNI_Line)
     obs_MUNI_line["Ridership"] = obs_MUNI_line["Ridership"].apply(
         lambda x: format_numeric(x)
     )
     dataframe_to_markdown(
         obs_MUNI_line,
-        os.path.join(OUTPUT_FOLDER, "obs_MUNI_line.md"),
+        os.path.join(markdown_output_dir, obs_MUNI_line_md),
         highlight_rows=None,
         center_align_columns=[
             "Mode",
@@ -100,7 +90,7 @@ def process_obs_data(observed_MUNI_Line, OUTPUT_FOLDER, observed_BART, observed_
         column_widths=100,
     )
 
-    obs_BART_line = pd.read_csv(observed_BART)
+    obs_BART_line = pd.read_csv(transit_input_dir / observed_BART)
     obs_BART_line["Boardings"] = obs_BART_line["Boardings"].apply(
         lambda x: format_numeric(x)
     )
@@ -109,13 +99,13 @@ def process_obs_data(observed_MUNI_Line, OUTPUT_FOLDER, observed_BART, observed_
     )
     dataframe_to_markdown(
         obs_BART_line,
-        os.path.join(OUTPUT_FOLDER, "obs_BART_station.md"),
+        os.path.join(markdown_output_dir, obs_BART_station_md),
         highlight_rows=None,
         center_align_columns=["TOD", "Key"],
         column_widths=100,
     )
 
-    obs_BART_county = pd.read_csv(observed_BART_county)
+    obs_BART_county = pd.read_csv(transit_input_dir / observed_BART_county)
     obs_BART_county["Boardings"] = obs_BART_county["Boardings"].apply(
         lambda x: format_numeric(x)
     )
@@ -124,36 +114,36 @@ def process_obs_data(observed_MUNI_Line, OUTPUT_FOLDER, observed_BART, observed_
     )
     dataframe_to_markdown(
         obs_BART_county,
-        os.path.join(OUTPUT_FOLDER, "obs_BART_county.md"),
+        os.path.join(markdown_output_dir, obs_BART_county_md),
         highlight_rows=None,
         center_align_columns=["TOD", "Key"],
         column_widths=100,
     )
 
-    obs_BART_SL = pd.read_csv(observed_BART_SL)
+    obs_BART_SL = pd.read_csv(transit_input_dir / observed_BART_SL)
     obs_BART_SL["Ridership"] = obs_BART_SL["Ridership"].apply(lambda x: format_numeric(x))
     dataframe_to_markdown(
         obs_BART_SL,
-        os.path.join(OUTPUT_FOLDER, "obs_BART_SL.md"),
+        os.path.join(markdown_output_dir, obs_BART_SL_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key"],
         column_widths=100,
     )
 
-    obs_SL = pd.read_csv(observed_SL)
+    obs_SL = pd.read_csv(transit_input_dir / observed_SL)
     obs_SL["Ridership"] = obs_SL["Ridership"].apply(lambda x: format_numeric(x))
     dataframe_to_markdown(
         obs_SL,
-        os.path.join(OUTPUT_FOLDER, "obs_Screenlines.md"),
+        os.path.join(markdown_output_dir, obs_Screenlines_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key", "Operator", "Mode"],
         column_widths=100,
     )
 
-    tables = NTD_to_df(observed_NTD)
+    tables = NTD_to_df(transit_input_dir, observed_NTD)
 
     # Assuming 'tables' is your list of DataFrames and each DataFrame has a proper header
-    with open(os.path.join(OUTPUT_FOLDER, "obs_NTD.md"), "w") as md_file:
+    with open(os.path.join(markdown_output_dir, obs_NTD_md), "w") as md_file:
         for i, df in enumerate(tables):
             # You might need to adjust how you get 'table_title'
             table_title = df.columns[
@@ -161,3 +151,36 @@ def process_obs_data(observed_MUNI_Line, OUTPUT_FOLDER, observed_BART, observed_
             ]  # if i == 0 else df.iloc[0,0]  # Example way to derive a title
             html_table = df_to_markdown_html(df, table_title)
             md_file.write(html_table + "\n\n")
+
+if __name__ == "__main__":
+    with open("transit.toml", "rb") as f:
+        config = tomllib.load(f)
+        
+    transit_input_dir = config["directories"]["transit_input_dir"]
+    markdown_output_dir = config["directories"]["markdown_output_dir"]
+    model_run_dir = config["directories"]["model_run"]
+    observed_BART = config["transit"]["observed_BART"]
+    observed_MUNI_Line = config["transit"]["observed_MUNI_Line"]
+    observed_BART_county = config["transit"]["observed_BART_county"]
+    observed_BART_SL = config["transit"]["observed_BART_SL"]
+    observed_MUNI_Line = config["transit"]["observed_MUNI_Line"]
+    observed_SL = config["transit"]["observed_SL"]
+    observed_NTD = config["transit"]["observed_NTD"]
+    model_BART = config["output"]["model_BART"]
+    model_BART_county = config["output"]["model_BART_county"]
+    model_BART_SL = config["output"]["model_BART_SL"]
+    obs_MUNI_line_md = config["output"]["obs_MUNI_line_md"]
+    obs_BART_station_md = config["output"]["obs_BART_station_md"]
+    obs_BART_county_md = config["output"]["obs_BART_county_md"]
+    obs_BART_SL_md = config["output"]["obs_BART_SL_md"]
+    obs_Screenlines_md = config["output"]["obs_Screenlines_md"]
+    obs_NTD_md = config["output"]["obs_NTD_md"]
+    output_dir = model_run_dir / "validation_workbook" / "output"
+    output_transit_dir = output_dir / "transit"
+    output_transit_dir.mkdir(parents=True, exist_ok=True)
+    time_periods = ["EA", "AM", "MD", "PM", "EV"]
+    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    
+    process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
+                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
+                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md)

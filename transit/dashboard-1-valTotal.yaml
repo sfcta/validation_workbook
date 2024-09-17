@@ -55,14 +55,14 @@ layout:
       title: '2019 Transit Ridership by Operator and Submode'
       description: >
         Source: NTD 2019 Annual Agency Profile
-      file: "./table/valTotal_Operator.md"
+      file: "./table/valTotal_Submode.md"
 
     - type: plotly
       #height: 10
       title: 2019 Transit Ridership by Operator and Submode
       description: 
       datasets:
-        dataset: "./val_Total/valTotal_Operator.csv"
+        dataset: "./val_Total/valTotal_Submode.csv"
       traces:
         - type: bar
           x: $dataset.Observed
@@ -93,17 +93,17 @@ layout:
   table2:
     - type: text
       height: 14
-      title: '2019 Transit Ridership by Operato'
+      title: '2019 Transit Ridership by Operator'
       description: >
         Source: NTD 2019 Annual Agency Profile
-      file: "./table/valTotal_Operator2.md"
+      file: "./table/valTotal_Operator.md"
 
     - type: plotly
       #height: 10
       title: 2019 Transit Ridership by Operato
       description: 
       datasets:
-        dataset: "./val_Total/valTotal_Operator2.csv"
+        dataset: "./val_Total/valTotal_Operator.csv"
       traces:
         - type: bar
           x: $dataset.Observed

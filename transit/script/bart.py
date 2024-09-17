@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
-from transit_function import read_dbf_and_groupby_sum
+import tomli as tomllib
+from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 def read_nodes(model_run_dir):
     filepath = Path(model_run_dir) / "nodes.xls"
@@ -114,7 +115,7 @@ def station_name():
     df_station_name = pd.DataFrame(station_name)
     return df_station_name
 
-def process_BART_data(file_name, model_run_dir, output_dir):
+def process_BART_data(file_name, model_run_dir, output_dir, model_BART):
     # Process BART data for different routes and columns
     nodes = read_nodes(model_run_dir)
     station = station_name()
@@ -162,7 +163,7 @@ def process_BART_data(file_name, model_run_dir, output_dir):
     # Sort and reset index
     BART = BART[["Station", "TOD", "Key", "Boardings", "Alightings"]]
     BART = BART.sort_values(by="Key").reset_index(drop=True)
-    BART.to_csv(output_dir / "model_BART.csv", index=False)
+    BART.to_csv(output_dir / model_BART, index=False)
     return BART
 
 # Function to map 'Station' to 'County'
@@ -215,8 +216,8 @@ def map_station_to_county(station):
             return county
     return None 
 
-def process_BART_county(file_name, model_run_dir, output_dir):
-    BART_county = process_BART_data(file_name, model_run_dir, output_dir)
+def process_BART_county(file_name, model_run_dir, output_dir, model_BART_county, model_BART):
+    BART_county = process_BART_data(file_name, model_run_dir, output_dir, model_BART )
     
     # Add the 'County' column to the DataFrame
     BART_county["County"] = BART_county["Station"].apply(lambda x: map_station_to_county(x))
@@ -225,7 +226,7 @@ def process_BART_county(file_name, model_run_dir, output_dir):
         .sum()
         .reset_index()
     )
-    BART_county.to_csv(output_dir / "model_BART_county.csv", index=False)
+    BART_county.to_csv(output_dir / model_BART_county, index=False)
 
 
 # BART Screenline
@@ -333,7 +334,8 @@ def process_BART_SF(filename, model_run_dir):
 
     # Set time of day and select final columns
     intra = intra[["Direction", "TOD", "AB_VOL"]]
-    intra['Screenline'] = 'Intra-SF'
+    # 2019 validation uses 'Intra-SF'
+    intra['Screenline'] = 'SF-San Mateo'
     intra['Key'] = intra['Screenline'] + intra['Direction'] + intra['TOD']
     intra.columns = ['Direction', 'TOD', 'Ridership', 'Screenline', 'Key']
     intra = intra[['Screenline', 'Direction', 'TOD', 'Key', 'Ridership']]
@@ -341,11 +343,29 @@ def process_BART_SF(filename, model_run_dir):
     
     return intra
 
-def process_BART_SL(file_name, model_run_dir, output_dir):
+def process_BART_SL(file_name, model_run_dir, output_dir, model_BART_SL):
     transbay_node = [16510, 16511]  # 16510 in, 16511 out
     BART_sl_tb = BART_SL_Concat(file_name, transbay_node[0], transbay_node[1], 'Transbay')
     countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
     BART_sl_ct = BART_SL_Concat(file_name, countyline_node[0], countyline_node[1], "Countyline")
     BART_sf = process_BART_SF(file_name, model_run_dir)
     BART_SL = pd.concat([BART_sl_tb, BART_sl_ct, BART_sf], ignore_index=True)
-    BART_SL.to_csv(output_dir / "model_BART_SL.csv", index=False)
+    BART_SL.to_csv(output_dir / model_BART_SL, index=False)
+    
+if __name__ == "__main__":
+    with open("transit.toml", "rb") as f:
+        config = tomllib.load(f)
+        
+    model_run_dir = config["directories"]["model_run"]
+    model_BART = config["output"]["model_BART"]
+    model_BART_county = config["output"]["model_BART_county"]
+    model_BART_SL = config["output"]["model_BART_SL"]
+    output_dir = model_run_dir / "validation_workbook" / "output"
+    output_transit_dir = output_dir / "transit"
+    output_transit_dir.mkdir(parents=True, exist_ok=True)
+    time_periods = ["EA", "AM", "MD", "PM", "EV"]
+    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    
+    process_BART_SL(dbf_file, model_run_dir, output_dir, model_BART_SL)
+    process_BART_county(dbf_file, model_run_dir, output_dir, model_BART_county)
+    process_BART_data(dbf_file, model_run_dir, output_dir, model_BART)

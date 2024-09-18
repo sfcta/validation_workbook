@@ -69,7 +69,7 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir, model_MUNI_Line):
+def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line):
     line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
     MUNI = read_dbf_and_groupby_sum(file_name, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
@@ -82,14 +82,7 @@ def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit
 
     # Apply the transformation function to the 'Line' column
     MUNI_full["Line"] = MUNI_full["Line"].apply(transform_line)
-    # TODO make a standard format for MUNI observed data instead of having the code
-    # read from the bespoke "Transit_Validation_2019 - MA.xlsx" file
-    obs_MUNI_line = pd.read_excel(
-        transit_validation_2019_alfaro_filepath,
-        usecols="B:H",
-        sheet_name="obs_MUNI_line",
-        skiprows=list(range(9)),
-    )
+    obs_MUNI_line = pd.read_csv(transit_input_dir / observed_MUNI_Line)
     mode = obs_MUNI_line[["Line", "Mode"]].drop_duplicates().reset_index(drop=True)
     mode_dict = mode.set_index("Line")["Mode"].to_dict()
     MUNI_full["Mode"] = MUNI_full["Line"].map(mode_dict)
@@ -123,11 +116,10 @@ if __name__ == "__main__":
     transit_line_rename_filepath = (
         Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
     ) 
-    transit_validation_2019_alfaro_filepath = config["transit"][
-        "transit_validation_2019_alfaro_filepath"
-    ]
     model_run_dir = config["directories"]["model_run"]
     model_MUNI_Line = config["output"]["model_MUNI_Line"]
+    observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
+    transit_input_dir = Path(config["directories"]["transit_input_dir"])
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
@@ -137,7 +129,8 @@ if __name__ == "__main__":
     process_muni(
         model_run_dir,
         transit_line_rename_filepath,
-        transit_validation_2019_alfaro_filepath,
+        transit_input_dir,
+        observed_MUNI_Line,
         output_transit_dir,
         model_MUNI_Line
     )

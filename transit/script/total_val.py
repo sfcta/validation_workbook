@@ -6,96 +6,46 @@ from transit_function import dataframe_to_markdown, format_dataframe, read_dbf_a
 
 # Get Observed data from NTD
 def obs_NTD_table(transit_input_dir, observed_NTD):
-    
-    # Read the Excel file, assuming headers are not in the first row
-    df = pd.read_excel(
-        transit_input_dir / observed_NTD, usecols="B:D", skiprows=list(range(4)), header=None, engine="openpyxl"
+    obs_NTD_df = pd.read_csv(transit_input_dir / observed_NTD)
+    obs_NTD_df = obs_NTD_df[["operator", 'annual_upt', 'average weekday_upt']]
+    obs_NTD_df['average weekday_upt'] = obs_NTD_df.apply(
+        lambda row: round(row['annual_upt'] / 260) if pd.isna(row['average weekday_upt']) else row['average weekday_upt'], axis=1
     )
-
-    # A list to hold all the tables as DataFrames
-    tables = []
-
-    # A variable to keep track of the start of the current table
-    current_table_start = None
-
-    # Identifying header rows based on specific column content
-    for index, row in df.iterrows():
-        # Check if the row contains 'Annual UPT' and '% of total ridership', which indicates a header
-        if "Annual UPT" in row.values and "% of total ridership" in row.values:
-            # If we have a current table being built, add it to the tables list
-            if current_table_start is not None:
-                tables.append(df.iloc[current_table_start:index].reset_index(drop=True))
-            # Set the start of the new table
-            current_table_start = index
-
-    if current_table_start is not None:
-        tables.append(df.iloc[current_table_start:].reset_index(drop=True))
-
-    for i, table in enumerate(tables):
-        table.columns = table.iloc[0]
-        table = table.drop(table.index[0])
-        table = table.dropna(how="all", axis=0).reset_index(drop=True)
-        # table['Annual UPT'] = table['Annual UPT'].apply(lambda x: format_numeric(x))
-        table["% of total ridership"] = table["% of total ridership"].apply(
-            lambda x: f"{x:.2%}" if not pd.isna(x) else x
-        )
-        table = table.reset_index(drop=True)
-        tables[i] = table
-        
-    # Assuming 'tables' is a list of DataFrames
-    new_df_data = []  # Prepare an empty list to store the data
-
-    for df in tables:
-        # Extract operator name - assuming it's the first cell of the first column in each table
-        operator = df.columns[0]
-
-        # Find 'Average Weekday UPT' if it exists, otherwise use 'Total Annual UPT'/260
-        if "Average Weekday UPT" in df.iloc[:, 0].values:
-            average_upt = df[df.iloc[:, 0] == "Average Weekday UPT"].iloc[0, 1]
-        else:
-            total_annual_upt = df[df.iloc[:, 0] == "Total Annual UPT"].iloc[0, 1]
-            average_upt = (
-                total_annual_upt / 260
-            )  # Fallback if 'Average Weekday UPT' is not found
-
-        # Append the result
-        new_df_data.append([operator, average_upt])
-
-    # Convert the list to a DataFrame
-    new_df = pd.DataFrame(new_df_data, columns=["Operator", "Average Weekday UPT"])
-    new_df = new_df.rename(columns={"Average Weekday UPT": "Observed"})
-    return tables, new_df
+    obs_NTD_avgupt = obs_NTD_df[['operator', 'average weekday_upt']]
+    obs_NTD_avgupt = obs_NTD_avgupt.rename(columns={'operator': 'Operator', 'average weekday_upt': 'Observed'})
+    return obs_NTD_avgupt
 
 
 def calcualte_weekday_UPT(transit_input_dir, observed_NTD):
-    tables, obs_operator = obs_NTD_table(transit_input_dir, observed_NTD)
-    AC_Transbay = tables[0][tables[0]["AC-Transit"] == "Commuter Bus"]["Annual UPT"] / 261
-    AC_Eastbay = tables[0][tables[0]["AC-Transit"] == "Bus"]["Annual UPT"] / 261
+    obs_NTD_df = pd.read_csv(transit_input_dir / observed_NTD)
+    obs_NTD_avgupt = obs_NTD_table(transit_input_dir, observed_NTD)
+    AC_Transbay = obs_NTD_df[obs_NTD_df['operator'] == 'AC-Transit']['commuter_bus_total'] / 261
+    AC_Eastbay = obs_NTD_df[obs_NTD_df['operator'] == 'AC-Transit']['bus_total'] / 261
     AC = {
         "Operator": ["AC Transbay", "AC Eastbay"],
         "Observed": [AC_Transbay.mean(), AC_Eastbay.mean()],
     }
     df_AC = pd.DataFrame(AC)
 
-    GGT_bus = tables[6][tables[6]["GG Transit"] == "Bus"]["Annual UPT"] / 261
-    GGT_Ferry = tables[6][tables[6]["GG Transit"] == "Ferryboat"]["Annual UPT"] / 261
+    GGT_bus = obs_NTD_df[obs_NTD_df['operator'] == 'GG Transit']['bus_total'] / 261
+    GGT_Ferry = obs_NTD_df[obs_NTD_df['operator'] == 'GG Transit']['ferry_total'] / 261
     GG = {
         "Operator": ["GGT-Bus", "GGT-Ferry"],
         "Observed": [GGT_bus.mean(), GGT_Ferry.mean()],
     }
     GG_Transit = pd.DataFrame(GG)
 
-    MUNI_Bus = tables[8][tables[8]["MUNI"] == "Bus"]["Annual UPT"] / 261
-    MUNI_Rail = tables[8][tables[8]["MUNI"] == "Light Rail"]["Annual UPT"] / 261
-    MUNI_Cable = tables[8][tables[8]["MUNI"] == "Cable Car"]["Annual UPT"] / 261
+    MUNI_Bus = obs_NTD_df[obs_NTD_df['operator'] == 'MUNI']['bus_total'] / 261
+    MUNI_Rail = obs_NTD_df[obs_NTD_df['operator'] == 'MUNI']['light_rail_total']  / 261
+    MUNI_Cable = obs_NTD_df[obs_NTD_df['operator'] == 'MUNI']['cable_car_total']  / 261
     MUNI = {
         "Operator": ["MUNI-Bus", "MUNI-Rail", "MUNI_Cable"],
         "Observed": [MUNI_Bus.mean(), MUNI_Rail.mean(), MUNI_Cable.mean()],
     }
     MUNI = pd.DataFrame(MUNI)
 
-    SCVTA_bus = tables[14][tables[14]["SCVTA"] == "Bus"]["Annual UPT"] / 261
-    SCVTA_rail = tables[14][tables[14]["SCVTA"] == "Light Rail"]["Annual UPT"] / 261
+    SCVTA_bus = obs_NTD_df[obs_NTD_df['operator'] == 'SCVTA']['bus_total'] / 261
+    SCVTA_rail = obs_NTD_df[obs_NTD_df['operator'] == 'SCVTA']['light_rail_total'] / 261
     SCVTA = {
         "Operator": ["SCVTA-Bus", "SCVTA-LRT"],
         "Observed": [SCVTA_bus.mean(), SCVTA_rail.mean()],
@@ -103,80 +53,48 @@ def calcualte_weekday_UPT(transit_input_dir, observed_NTD):
     SCVTA = pd.DataFrame(SCVTA)
 
     # All observed data
-    total = pd.concat([obs_operator, df_AC, GG_Transit, MUNI, SCVTA], ignore_index=True)
+    total = pd.concat([obs_NTD_avgupt, df_AC, GG_Transit, MUNI, SCVTA], ignore_index=True)
     df_filtered = total.loc[~total["Operator"].isin(["MUNI", "GG Transit", "SCVTA"])]
     df_filtered = df_filtered.sort_values(by="Operator", ascending=True)
     return df_filtered
 
 name_mapping = {
-    "AC Eastbay": "AC Eastbay",
-    "AC Transbay": "AC Transbay",
-    "AC-Transit": "AC-Transit",
-    "ACE": "ACE",
-    "BART": "BART",
-    "CCCTA": "CCCTA",
-    "CalTrain": "CalTrain",
+    "AC Transit": "AC-Transit",
+    "Caltrain": "CalTrain",
     "FAST": "FAST",
-    "GGT-Bus": "GGT-Bus",
-    "GGT-Ferry": "GGT-Ferry",
     "LAVTA-Wheels": "LAVTA",
-    "MUNI-Bus": "Muni - Bus",
-    "MUNI-Rail": "Muni - Rail",
-    "MUNI_Cable": "Muni - Cable",
+    "SF MUNI": "MUNI",
+    "MUNI_Cable": "MUNI-Cable",
+    "Golden Gate Transit": "GG Transit",
     "Napa Vine": "VINE",
     "Petaluma Transit": "Petaluma",
-    "Rio Vista Delta Breeze": "Rio Vista Delta Breeze ",
-    "SCVTA-Bus": "SCVTA-Bus",
-    "SCVTA-LRT": "SCVTA-LRT",
     "SF Bay Ferry": "SF Bay Ferry (WETA)",
-    "SMART": "SMART",
-    "SamTrans": "SamTrans",
     "Santa Rosa CityBus": "Santa Rosa",
-    "SolTrans": "SolTrans",
-    "Sonoma County Transit": "Sonoma County Transit",
     "Tri-Delta": "Tri Delta Transit",
     "Union City": "Union City Transit",
     "Vacaville City Coach": "Vacaville City Coach",
-    "WestCat": "WestCat",
-}
-
-name_mapping2 = {
-    "AC Eastbay": "AC Eastbay",
-    "AC Transbay": "AC Transbay",
-    "AC Transit": "AC-Transit",
-    "ACE": "ACE",
-    "BART": "BART",
-    "CCCTA": "CCCTA",
-    "Caltrain": "CalTrain",
-    "FAST": "FAST",
-    "GGT-Bus": "GGT-Bus",
-    "GGT-Ferry": "GGT-Ferry",
-    "LAVTA": "LAVTA",
-    "Muni-Bus": "Muni - Bus",
-    "Muni-rail": "Muni - Rail",
-    "Muni-Cable": "Muni - Cable",
-    "VINE": "VINE",
-    "Petaluma": "Petaluma",
-    "SCVTA-Bus": "SCVTA-Bus",
-    "SCVTA-LRT": "SCVTA-LRT",
-    "SF Bay Ferry (WETA)": "SF Bay Ferry (WETA)",
-    "SMART": "SMART",
-    "SamTrans": "SamTrans",
-    "Santa Rosa CityBus": "Santa Rosa",
-    "SolTrans": "SolTrans",
-    "Shuttle": "Standford Shuttles",
-    "Sonoma County Transit": "Sonoma County Transit",
-    "Tri Delta Transit": "Tri Delta Transit",
-    "Union City Transit": "Union City Transit",
-    "Vacaville": "Vacaville City Coach",
     "WestCAT": "WestCat",
+    "Vacaville": "Vacaville City Coach",
+    "Shuttle": "Standford Shuttles",
+    "Muni-Bus": "MUNI-Bus",
+	"Muni-rail": "MUNI-Rail",
+	"Muni-Cable": "MUNI-Cable",
 }
 
-name_mapping3 = {
-    "Golden Gate Transit": "GG Transit",
-    "SF MUNI": "MUNI",
+service_operator_dict = {
+    "Premium": ["AC Transbay", "ACE", "Amtrak", "CalTrain", "GGT-Bus", "SMART"],
+    "Local Bus": [
+        "AC Eastbay", "CCCTA", "EmeryGoRound", "FAST", "LAVTA", "MUNI-Bus", 
+        "Petaluma", "Rio Vista Delta Breeze", "SamTrans", "Santa Rosa", 
+        "SCVTA-Bus", "SolTrans", "Sonoma County Transit", "Standford Shuttles", 
+        "Tri Delta Transit", "Union City Transit", "Vacaville City Coach", 
+        "VINE", "WestCat"
+    ],
+    "BART": ["BART"],
+    "Light Rail": ["MUNI-Rail", "MUNI-Cable", "SCVTA-LRT"],
+    "Ferry": ["GGT-Ferry", "SF Bay Ferry (WETA)"],
+    None: ["AC-Transit"]
 }
-
 
 # Get Ferry data
 def assign_ferry_name(name):
@@ -286,12 +204,12 @@ def process_total_val(dbf_file):
         {"Operator": ["SF Bay Ferry (WETA)"], "Modeled": [model_SF_Bay]})
     model_operator = pd.concat([model_operator, df_sf_ferry])
     model_operator["Operator"] = (
-        model_operator["Operator"].map(name_mapping3).fillna(model_operator["Operator"])
+        model_operator["Operator"].map(name_mapping).fillna(model_operator["Operator"])
     )
     return df_modeled, model_operator
 
 def process_valTotal_Operator(dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Operator_md, valTotal_Operator):
-    _, observal_operator = obs_NTD_table(transit_input_dir, observed_NTD)
+    observal_operator = obs_NTD_table(transit_input_dir, observed_NTD)
     observal_operator["Operator"] = (
         observal_operator["Operator"]
         .map(name_mapping)
@@ -316,29 +234,22 @@ def process_valTotal_Operator(dbf_file, transit_input_dir, markdown_output_dir, 
     )
     total_operator[:-1].to_csv(total_output_dir / valTotal_Operator, index=False)
     
-def process_valTotal_Submode(transit_validation_2019_alfaro_filepath, dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service):
-    # TODO do NOT use "Transit_Validation_2019 - MA.xlsx" file for just line names etc
-    # put the info/data into a CSV and put it into the resources dir or commit to repo
-    df = pd.read_excel(
-        transit_validation_2019_alfaro_filepath,
-        usecols="C:D",
-        sheet_name="val_Tot",
-        skiprows=list(range(4)) + list(range(37, 51)),
-    )
+def process_valTotal_Submode(dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service):
+    df = pd.DataFrame([(key, value) for key, values in service_operator_dict.items() for value in values], columns=["Service Type", "Operator"])
     
     df_filtered = calcualte_weekday_UPT(transit_input_dir, observed_NTD)
     df_modeled, model_operator = process_total_val(dbf_file)
-    
     
     df_filtered["Operator"] = (
         df_filtered["Operator"].map(name_mapping).fillna(df_filtered["Operator"])
     )
     df_modeled["Operator"] = (
-        df_modeled["Operator"].map(name_mapping2).fillna(df_modeled["Operator"])
+        df_modeled["Operator"].map(name_mapping).fillna(df_modeled["Operator"])
     )
     # Now perform the join, assuming you want to merge df1 and df2 based on the 'Operator' column
     result_df = pd.merge(df, df_filtered, on="Operator", how="left")
     result_df = pd.merge(result_df, df_modeled, on="Operator", how="left")
+    result_df = result_df.sort_values(by="Operator")
     total_row = pd.Series(result_df[["Observed", "Modeled"]].sum(), name="Total")
     result_df = pd.concat([result_df, total_row.to_frame().T], ignore_index=True)
     result_df["Diff"] = result_df["Modeled"] - result_df["Observed"]
@@ -393,9 +304,6 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    transit_validation_2019_alfaro_filepath = config["transit"][
-        "transit_validation_2019_alfaro_filepath"
-    ]
     model_run_dir = config["directories"]["model_run"]
     transit_input_dir = config["directories"]["transit_input_dir"]
     markdown_output_dir = config["directories"]["markdown_output_dir"]
@@ -414,4 +322,4 @@ if __name__ == "__main__":
     dbf_file = read_transit_assignments(model_run_dir, time_periods)
     
     process_valTotal_Operator(dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Operator_md, valTotal_Operator)
-    process_valTotal_Submode(transit_validation_2019_alfaro_filepath, dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)
+    process_valTotal_Submode(dbf_file, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)

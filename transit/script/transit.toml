@@ -24,12 +24,12 @@ line_rename_filename = "transit_line_rename.csv"
 # MA refers to Max Alfaro
 transit_validation_2019_alfaro_filepath = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed/Transit_Validation_2019 - MA.xlsx"
 FREEFLOW_SHP = "freeflow.shp"
-observed_BART = "BART_station_ridership_2023.csv"
-observed_BART_county = "BART_county_ridership_2023.csv"
-observed_BART_SL = "BART_screenline_ridership_2023.csv"
-observed_MUNI_Line = "MUNI_ridership_2023.csv"
-observed_SL = "Screenlines_ridership_2023.csv"
-observed_NTD = "2023_NTD.xlsx"
+observed_BART = "observed_bart_station.csv"
+observed_BART_county = "observed_bart_county.csv"
+observed_BART_SL = "observed_bart_screenline.csv"
+observed_MUNI_Line = "observed_muni_line.csv"
+observed_SL = "observed_screenlines.csv"
+observed_NTD = "observed_ntd.csv"
 
 # Output
 [output]

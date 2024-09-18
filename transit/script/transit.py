@@ -20,9 +20,6 @@ with open(toml_path, "rb") as f:
 transit_line_rename_filepath = (
     Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
 )
-transit_validation_2019_alfaro_filepath = config["transit"][
-    "transit_validation_2019_alfaro_filepath"
-]
 model_run_dir = Path(config["directories"]["model_run"])
 transit_input_dir = Path(config["directories"]["transit_input_dir"])
 MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
@@ -173,7 +170,7 @@ if __name__ == "__main__":
     process_BART_data(combined_gdf, model_run_dir, output_transit_dir, model_BART)
     process_BART_county(combined_gdf, model_run_dir, output_transit_dir, model_BART_county, model_BART)
     process_BART_SL(combined_gdf, model_run_dir, output_transit_dir,  model_BART_SL)
-    process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_validation_2019_alfaro_filepath, output_transit_dir, model_MUNI_Line)
+    process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line)
     concat_final_SL(combined_gdf, output_transit_dir, model_BART_SL, model_SL)
     process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
                      MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
@@ -203,4 +200,4 @@ if __name__ == "__main__":
                      observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
                      obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md)
     process_valTotal_Operator(combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Operator_md, valTotal_Operator)
-    process_valTotal_Submode(transit_validation_2019_alfaro_filepath, combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)
+    process_valTotal_Submode(combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)

@@ -90,9 +90,9 @@ def scatter_plot(est_df, obs_df, chosen_timeperiod, combined_df_cols, classifica
 
 def validation_road(config):
     # Extract the CHAMP input file names
-    loaded_network_directory = config['LOADED_NETWORK']['loaded_network_directory']
-    loaded_network_files_time = config['LOADED_NETWORK']['loaded_network_time']
-    loaded_network_column_names = config['LOADED_NETWORK']['loaded_network_col_names']
+    loaded_network_directory = config['LOADED_NETWORK']['path']
+    loaded_network_files_time = config['LOADED_NETWORK']['timeperiods']
+    loaded_network_column_names = config['LOADED_NETWORK']['columns']
     
     # Generate loaded_network file names
     loaded_network_files = generate_loaded_network_file_names(loaded_network_files_time)
@@ -102,11 +102,11 @@ def validation_road(config):
     ft_mapping = config['FT']['values']
 
     # Extract the observed file name and tab
-    obs_filepath = config['OBSERVED']['obs_filepath']
-    extra_columns = config['OBSERVED']['obs_extra_columns']
+    obs_filepath = config['OBSERVED_COUNTS']['obs_filepath']
+    extra_columns = config['OBSERVED_COUNTS']['obs_extra_columns']
 
     # Convert column letters to numerical indices
-    obs_usecols = [csv_col_letter_to_num(col) for col in config['OBSERVED']['obs_usecols']]
+    obs_usecols = [csv_col_letter_to_num(col) for col in config['OBSERVED_COUNTS']['obs_usecols']]
 
     # Read the Obs data and the CHAMP estimation data
     obs_df = pd.read_csv(

@@ -1,94 +1,68 @@
-[DBF]
-DBF_Directory = "Q:/Model Development/Simwrapper Validation/notebooks/roads/Data"
+[LOADED_NETWORK]
+path = "Q:/Model Development/Simwrapper Validation/notebooks/roads/Data"
 
 # The dbf file name is LOAD[TOD].dbf by default
-DBF_Files_TIME = ["AM", "MD", "PM", "EV", "EA"]
+timeperiods = ["AM", "MD", "PM", "EV", "EA"]
 
 # The needed CHAMP output columns
-DBF_Column_Names = ["A", "B", "AT", "FT", "V_1"]
+columns = ["A", "B", "AT", "FT", "V_1"]
 
-[OBSERVED]
+[OBSERVED_COUNTS]
 # The observed data file path
-Csv_File_Path = "Q:/Data/Observed/Validation/2019_old/observed_counts.csv"
+obs_filepath = "Q:/Data/Observed/Validation/2019_old/observed_counts.csv"
 
 # The columns used for calculation, usually are 'A,B, and Counts'
-Obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
+obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
 
 # The columns we want to include from the observed data, DONT CHANGE A, B!
-Csv_Extra_Columns = ["A", "B", "Loc Type", "Source", "Source ID", "Location", "Dir"]
+obs_extra_columns = ["A", "B", "Loc Type", "Source", "Source ID", "Location", "Dir"]
 
 [SCATTER_INPUT]
 # The time period we want to display in the scatter plot
-Chosen_period = "Daily"
+chosen_period = "Daily"
 
 # Change the variables to show different group_by result
-Classification_col = "Loc Type"
+classification_col = "Loc Type"
 
 # cols displayed and information we want in our generated csv
-Combined_DF_Cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
 
 [EST_SCATTER_PLOT]
-XField = "Observed Volume"
-YField = "Estimated Volume"
+xfield = "Observed Volume"
+yfield = "Estimated Volume"
 
 # Information we want to display in the hover over
-Fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Road", "Dir"]
+fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Road", "Dir"]
 
 # Be careful to state all nominal fields from the above fields
-NominalFields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
-Name = "Estimation Volume"
+nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+name = "Estimation Volume"
+est_output_template = "{classification_col_types}_{name}_est.vega.json"
 
 [PERCENT_SCATTER_PLOT]
-XField = "Observed Volume"
-YField = "Percent Errors"
-Fields = ["Observed Volume", "Percent Errors", "Loc Type", "A", "B", "Location", "Road", "Dir"]
-NominalFields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
-Name = "Percent Errors"
+xfield = "Observed Volume"
+yfield = "Percent Errors"
+fields = ["Observed Volume", "Percent Errors", "Loc Type", "A", "B", "Location", "Road", "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+name = "Percent Errors"
+diffpercent_output_template = "{classification_col_types}_{name}_diffpercent.vega.json"
 
-[SCATTER_YAML]
-Dashboard_number = 1
+dashboard_number = 1
 
 [STATS_INPUT]
 # cols displayed
-Combined_DF_Cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
 # The output csv file name
-Output_File_Name = scatter.csv
+output_file_name = 'scatter.csv'
 
 [MAP_INPUT]
-Freeflow_Dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"
-Shp_out_Dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads/map"
+freeflow_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"
+shp_out_dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads/map"
+output_filename = 'map.csv'
 
-[MAP_YAML]
-Center = [-122.43, 37.73]
-Csv_file = "map_data.csv"
-Join = "AB"
-Shape_file = "road.shp"
-Line_wid_col = "Daily_diff"
-Line_color_col = "Daily_absdiff"
-breakpoints = [-20000, -10000, -5000, -1000, -500, 500, 2000, 5000, 7000, 15000]
-Dashboard_number = 3
 
 [AT]
-0 = "Core/CBD"
-1 = "Core/CBD"
-2 = "UrbBiz"
-3 = "Urb"
-4 = "Sub"
-5 = "Sub"
+values = ["Core/CBD", "Core/CBD", "UrbBiz", "Urb", "Sub", "Sub"]
 
 [FT]
-1 = "Fwy/Ramp"
-2 = "Fwy/Ramp"
-3 = "Fwy/Ramp"
-4 = "Col"
-5 = "Fwy/Ramp"
-6 = ""
-7 = "Art"
-8 = ""
-9 = "Loc"
-10 = ""
-11 = "Loc"
-12 = "Art"
-13 = ""
-14 = ""
-15 = "Art"
+values = ["Fwy/Ramp", "Fwy/Ramp", "Fwy/Ramp", "Col", "Fwy/Ramp", "", "Art", "", "Loc", "", "Loc", "Art", "", "", "Art"]

@@ -889,12 +889,6 @@ def process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, m
                             GG_Ferry_OB_csv, GG_overall_IB_csv, GG_overall_OB_csv):
     # Valdiation for Screenlines
     obs_SL = pd.read_csv(transit_input_dir / observed_SL)
-    # obs_SL["Ridership"] = (
-    #     obs_SL["Ridership"]
-    #     .replace({"-": "0", " -   ": "0"})
-    #     .str.replace(",", "")
-    #     .astype(float)
-    # )
     model_SL_df = pd.read_csv(output_transit_dir / model_SL)
     transbay_AC_IB = process_data(
         obs_SL,

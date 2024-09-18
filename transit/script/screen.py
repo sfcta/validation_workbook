@@ -1,5 +1,5 @@
 import pandas as pd
-import tomli as tomllib
+import tomllib
 from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 HWY_SCREENS = {

@@ -1,5 +1,5 @@
 import os
-import tomli as tomllib
+import tomllib
 from pathlib import Path
 import pandas as pd
 from transit_function import dataframe_to_markdown, format_dataframe

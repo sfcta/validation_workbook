@@ -1,5 +1,5 @@
 import os
-import tomli as tomllib
+import tomllib
 from pathlib import Path
 import geopandas as gpd
 import pandas as pd

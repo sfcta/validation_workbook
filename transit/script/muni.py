@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 import pandas as pd
-import tomli as tomllib
+import tomllib
 from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 def read_transit_lines(model_run_dir, transit_line_rename_filepath):

@@ -1,7 +1,5 @@
 from pathlib import Path
-import geopandas as gpd
-import pandas as pd
-import tomli as tomllib
+import tomllib
 from transit_function import read_transit_assignments
 from bart import process_BART_data, process_BART_county, process_BART_SL
 from muni import process_muni

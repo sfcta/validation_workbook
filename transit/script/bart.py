@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-import tomli as tomllib
+import tomllib
 from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
 
 def read_nodes(model_run_dir):

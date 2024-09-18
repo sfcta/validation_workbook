@@ -1,6 +1,4 @@
-import os
-import geopandas as gpd
-import tomli as tomllib
+import tomllib
 import pandas as pd
 from transit_function import dataframe_to_markdown, format_dataframe, read_dbf_and_groupby_sum, read_transit_assignments
 

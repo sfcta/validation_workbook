@@ -1,8 +1,7 @@
 import os
 import pandas as pd
-import tomli as tomllib
+import tomllib
 from transit_function import dataframe_to_markdown, format_numeric, read_transit_assignments
-from total_val import obs_NTD_table
 
 def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
                      observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 

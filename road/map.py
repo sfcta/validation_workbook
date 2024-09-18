@@ -1,4 +1,3 @@
-import yaml
 import json
 import pandas as pd
 import geopandas as gpd
@@ -67,58 +66,4 @@ def process_geospatial_data(merged_df, freeflow_path, output_path):
     merged_gdf = gpd.GeoDataFrame(merged_gdf, geometry='geometry')
     merged_gdf.to_file(output_path, index=False)
 
-def create_yaml_file(
-        center,
-        shapes_file,
-        data_file,
-        join_field,
-        line_width_col,
-        line_color_col,
-        breakpoints,
-        yaml_file_path):
-
-    yaml_content = {
-        'header': {
-            'title': '',
-            'description': ''
-        },
-        'layout': {
-            'row1': [
-                {
-                    'type': 'map',
-                    'title': 'Vis_map',
-                    'description': '',
-                    'height': 15,
-                    'center': center,
-                    'zoom': 10, 
-                    'shapes': shapes_file,
-                    'datasets': {
-                        'data': {
-                            'file': data_file,
-                            'join': join_field
-                        }
-                    },
-                    'display': {
-                        'lineWidth': {
-                            'dataset': 'data',
-                            'columnName': line_width_col,
-                            'scaleFactor': 200
-                        },
-                        'lineColor': {
-                            'dataset': 'data',
-                            'columnName': line_color_col,
-                            'colorRamp': {
-                                'ramp': 'PRGn',
-                                'steps': len(breakpoints) + 1,
-                                'breakpoints': breakpoints
-                            }
-                        }
-                    }
-                }
-            ]
-        }
-    }
-
-    with open(yaml_file_path, 'w') as file:
-        yaml.dump(yaml_content, file, default_flow_style=False)
 

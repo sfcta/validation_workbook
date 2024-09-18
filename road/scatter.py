@@ -1,5 +1,4 @@
 import json
-import yaml
 import pandas as pd
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
@@ -182,25 +181,3 @@ def generate_vega_lite_json_diffpercent(
     file_path = Path(output_template.format(classification_col_types=classification_col_types, name=name))
     with open(file_path, 'w') as file:
         json.dump(vega_lite_config, file, indent=4)
-
-def generate_yaml_config(
-        classification_col_type,
-        name1,
-        name2,
-        include_all_data=False):
-    suffix = 'all' if include_all_data else classification_col_type
-
-    return [
-        {
-            "title": f"{suffix} - {name1}",
-            "type": "vega",
-            "description": "",
-            "config": f"{suffix}_{name1}.vega.json"
-        },
-        {
-            "title": f"{suffix} - {name2}",
-            "type": "vega",
-            "description": "",
-            "config": f"{suffix}_{name2}.vega.json"
-        }
-    ]

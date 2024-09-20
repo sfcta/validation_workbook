@@ -51,9 +51,8 @@ def process_data(file_name, system, A, B, Screenline, Operator, Mode):
     OB_sum["Operator"] = Operator
     OB_sum["Mode"] = Mode
 
-
     ST_TOD = pd.concat([IB_sum, OB_sum])
-    ST_TOD = ST_TOD.rename(columns={"AB_VOL":"Ridership"})
+    ST_TOD = ST_TOD.rename(columns={"AB_VOL": "Ridership"})
 
     return ST_TOD
 
@@ -62,15 +61,20 @@ def screen_df(file_name, HWY_SCREENS):
     screenline_total = []
     for i in HWY_SCREENS.keys():
         screenline = process_data(
-                file_name,
-                HWY_SCREENS[i][2][0],
-                HWY_SCREENS[i][0],
-                HWY_SCREENS[i][1],
-                HWY_SCREENS[i][2][1],
-                HWY_SCREENS[i][2][2],
-                HWY_SCREENS[i][2][3],
-            )
-        screenline["Key"] = screenline["Screenline"] + screenline["Operator"] + screenline["TOD"] + screenline["Direction"]
+            file_name,
+            HWY_SCREENS[i][2][0],
+            HWY_SCREENS[i][0],
+            HWY_SCREENS[i][1],
+            HWY_SCREENS[i][2][1],
+            HWY_SCREENS[i][2][2],
+            HWY_SCREENS[i][2][3],
+        )
+        screenline["Key"] = (
+            screenline["Screenline"]
+            + screenline["Operator"]
+            + screenline["TOD"]
+            + screenline["Direction"]
+        )
         screenline = screenline[
             ["Screenline", "Direction", "TOD", "Key", "Ridership", "Operator", "Mode"]
         ]
@@ -79,8 +83,9 @@ def screen_df(file_name, HWY_SCREENS):
     model_Screenlines = pd.concat(screenline_total)
     return model_Screenlines
 
+
 def concat_final_SL(file_name, output_transit_dir, model_BART_SL, model_SL):
-    model_Screenlines = screen_df(file_name,HWY_SCREENS)
+    model_Screenlines = screen_df(file_name, HWY_SCREENS)
     BART_Screenlines = pd.read_csv(output_transit_dir / model_BART_SL)
     BART_Screenlines["Operator"] = "BART"
     BART_Screenlines["Mode"] = "BART"
@@ -90,16 +95,19 @@ def concat_final_SL(file_name, output_transit_dir, model_BART_SL, model_SL):
         + BART_Screenlines["TOD"]
         + BART_Screenlines["Direction"]
     )
-    model_SL_df = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(drop=True)
+    model_SL_df = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(
+        drop=True
+    )
     model_SL_df.to_csv(output_transit_dir / model_SL, index=False)
-    
+
+
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-        
+
     transit_line_rename_filepath = (
         config["directories"]["resources"] / config["transit"]["line_rename_filename"]
-    ) 
+    )
     transit_validation_2019_alfaro_filepath = config["transit"][
         "transit_validation_2019_alfaro_filepath"
     ]
@@ -111,5 +119,5 @@ if __name__ == "__main__":
     output_transit_dir.mkdir(parents=True, exist_ok=True)
     time_periods = ["EA", "AM", "MD", "PM", "EV"]
     dbf_file = read_transit_assignments(model_run_dir, time_periods)
-    
+
     concat_final_SL(dbf_file, output_transit_dir, model_BART_SL, model_SL)

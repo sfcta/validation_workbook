@@ -1,7 +1,8 @@
 import os
-import tomllib
 from pathlib import Path
+
 import pandas as pd
+import tomllib
 from transit_function import dataframe_to_markdown, format_dataframe
 
 
@@ -236,9 +237,37 @@ def sort_dataframe_by_custom_order(df, order_column, custom_order):
 
     return df
 
-def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
-                     MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
-                     MUNI_mode_pm_md, MUNI_mode_pm, MUNI_tod_md,  MUNI_tod, MUNI_EB_md, MUNI_EB, MUNI_LB_md, MUNI_LB, MUNI_Rail_md, MUNI_Rail, MUNI_IB, MUNI_OB):
+
+def process_mkd_muni(
+    transit_input_dir,
+    observed_MUNI_Line,
+    output_transit_dir,
+    model_MUNI_Line,
+    markdown_output_dir,
+    MUNI_output_dir,
+    MUNI_ib_day,
+    MUNI_ob_day,
+    MUNI_ib_am,
+    MUNI_ib_pm,
+    MUNI_ob_am,
+    MUNI_ob_pm,
+    MUNI_mode_day,
+    MUNI_mode,
+    MUNI_mode_am_md,
+    MUNI_mode_am,
+    MUNI_mode_pm_md,
+    MUNI_mode_pm,
+    MUNI_tod_md,
+    MUNI_tod,
+    MUNI_EB_md,
+    MUNI_EB,
+    MUNI_LB_md,
+    MUNI_LB,
+    MUNI_Rail_md,
+    MUNI_Rail,
+    MUNI_IB,
+    MUNI_OB,
+):
     obs_MUNI_line_df = pd.read_csv(transit_input_dir / observed_MUNI_Line)
     model_MUNI_line_df = pd.read_csv(output_transit_dir / model_MUNI_Line)
     tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
@@ -286,7 +315,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "Route",
         "left",
     )
-    MUNI_IB_AM_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="left")
+    MUNI_IB_AM_df = pd.merge(
+        MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="left"
+    )
     MUNI_IB_AM_df = MUNI_IB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_AM_df,
@@ -304,7 +335,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "Route",
         "left",
     )
-    MUNI_IB_PM_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="left")
+    MUNI_IB_PM_df = pd.merge(
+        MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="left"
+    )
     MUNI_IB_PM_df = MUNI_IB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_PM_df,
@@ -322,7 +355,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "Route",
         "left",
     )
-    MUNI_OB_AM_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="left")
+    MUNI_OB_AM_df = pd.merge(
+        MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="left"
+    )
     MUNI_OB_AM_df = MUNI_OB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_AM_df,
@@ -340,7 +375,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "Route",
         "left",
     )
-    MUNI_OB_PM_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="left")
+    MUNI_OB_PM_df = pd.merge(
+        MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="left"
+    )
     MUNI_OB_PM_df = MUNI_OB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_PM_df,
@@ -426,7 +463,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "TOD",
         "left",
     )
-    MUNI_EB_df["TOD"] = pd.Categorical(MUNI_EB_df["TOD"], categories=tod_order, ordered=True)
+    MUNI_EB_df["TOD"] = pd.Categorical(
+        MUNI_EB_df["TOD"], categories=tod_order, ordered=True
+    )
     MUNI_EB_df = MUNI_EB_df.sort_values("TOD")
     dataframe_to_markdown(
         MUNI_EB_df,
@@ -447,7 +486,9 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
         "TOD",
         "left",
     )
-    MUNI_LB_df["TOD"] = pd.Categorical(MUNI_LB_df["TOD"], categories=tod_order, ordered=True)
+    MUNI_LB_df["TOD"] = pd.Categorical(
+        MUNI_LB_df["TOD"], categories=tod_order, ordered=True
+    )
     MUNI_LB_df = MUNI_LB_df.sort_values("TOD")
     dataframe_to_markdown(
         MUNI_LB_df,
@@ -482,15 +523,53 @@ def process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, 
     MUNI_Rail_df[~MUNI_Rail_df["TOD"].isin(["Total"])].to_csv(
         os.path.join(MUNI_output_dir, MUNI_Rail), index=False
     )
-    
-def process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model_BART, markdown_output_dir, BART_output_dir, observed_BART_county,model_BART_county,
-                     observed_BART_SL, Screenline_output_dir, tod_order, BART_boarding_allday_md, BART_boarding_am_md, BART_boarding_pm_md, BART_at_allday_md, 
-                     BART_at_am_md, BART_at_pm_md, BART_boarding_allday_csv, BART_at_allday_csv, county_br_day_csv, county_br_am_csv, 
-                     county_br_pm_csv, county_at_day_csv, county_at_am_csv, county_at_pm_csv, model_BART_SL, 
-                     county_br_day_md, county_br_am_md, county_br_pm_md, county_at_day_md, county_at_am_md, county_at_pm_md, 
-                     transbay_BART_IB_md, transbay_BART_OB_md, Countyline_BART_OB_md, Countyline_BART_IB_md, SF_out_md, SF_in_md, transbay_BART_IB_csv, 
-                     transbay_BART_OB_csv, Countyline_BART_IB_csv, Countyline_BART_OB_csv, Intra_SF_BART_IB_csv, Intra_SF_BART_OB_csv
 
+
+def process_mkd_bart(
+    transit_input_dir,
+    observed_BART,
+    output_transit_dir,
+    model_BART,
+    markdown_output_dir,
+    BART_output_dir,
+    observed_BART_county,
+    model_BART_county,
+    observed_BART_SL,
+    Screenline_output_dir,
+    tod_order,
+    BART_boarding_allday_md,
+    BART_boarding_am_md,
+    BART_boarding_pm_md,
+    BART_at_allday_md,
+    BART_at_am_md,
+    BART_at_pm_md,
+    BART_boarding_allday_csv,
+    BART_at_allday_csv,
+    county_br_day_csv,
+    county_br_am_csv,
+    county_br_pm_csv,
+    county_at_day_csv,
+    county_at_am_csv,
+    county_at_pm_csv,
+    model_BART_SL,
+    county_br_day_md,
+    county_br_am_md,
+    county_br_pm_md,
+    county_at_day_md,
+    county_at_am_md,
+    county_at_pm_md,
+    transbay_BART_IB_md,
+    transbay_BART_OB_md,
+    Countyline_BART_OB_md,
+    Countyline_BART_IB_md,
+    SF_out_md,
+    SF_in_md,
+    transbay_BART_IB_csv,
+    transbay_BART_OB_csv,
+    Countyline_BART_IB_csv,
+    Countyline_BART_OB_csv,
+    Intra_SF_BART_IB_csv,
+    Intra_SF_BART_OB_csv,
 ):
     # Custom order based on the provided list
     custom_order = [
@@ -597,7 +676,14 @@ def process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model
 
     obs_BART_county = pd.read_csv(transit_input_dir / observed_BART_county)
     model_BART_county_df = pd.read_csv(output_transit_dir / model_BART_county)
-    county_order = ["San Francisco", "San Mateo", "Santa Clara", "Contra Costa", "Alameda", "Total"]
+    county_order = [
+        "San Francisco",
+        "San Mateo",
+        "Santa Clara",
+        "Contra Costa",
+        "Alameda",
+        "Total",
+    ]
     county_br_day = process_data(
         obs_BART_county,
         model_BART_county_df,
@@ -658,9 +744,7 @@ def process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model
         center_align_columns=None,
         column_widths=90,
     )
-    county_br_day.to_csv(
-        os.path.join(BART_output_dir, county_br_day_csv), index=False
-    )
+    county_br_day.to_csv(os.path.join(BART_output_dir, county_br_day_csv), index=False)
     county_br_am.to_csv(os.path.join(BART_output_dir, county_br_am_csv), index=False)
     county_br_pm.to_csv(os.path.join(BART_output_dir, county_br_pm_csv), index=False)
     county_at_day = process_data(
@@ -723,9 +807,7 @@ def process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model
         center_align_columns=None,
         column_widths=90,
     )
-    county_at_day.to_csv(
-        os.path.join(BART_output_dir, county_at_day_csv), index=False
-    )
+    county_at_day.to_csv(os.path.join(BART_output_dir, county_at_day_csv), index=False)
     county_at_am.to_csv(os.path.join(BART_output_dir, county_at_am_csv), index=False)
     county_at_pm.to_csv(os.path.join(BART_output_dir, county_at_pm_csv), index=False)
 
@@ -877,16 +959,48 @@ def process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model
         os.path.join(BART_output_dir, Intra_SF_BART_OB_csv), index=False
     )
 
-def process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, model_SL, markdown_output_dir, tod_order, Screenline_output_dir,
-                            transbay_AC_IB_md, transbay_AC_OB_md, transbay_overall_IB_md, transbay_overall_OB_md, 
-                            Countyline_CalTrain_IB_md, Countyline_CalTrain_OB_md, Countyline_SamTrans_IB_md, 
-                            Countyline_SamTrans_OB_md, Countyline_overall_IB_md, Countyline_overall_OB_md, 
-                            GG_Transit_IB_md, GG_Transit_OB_md, GG_Ferry_IB_md, GG_Ferry_OB_md, GG_overall_IB_md, 
-                            GG_overall_OB_md, transbay_AC_IB_csv, transbay_AC_OB_csv, transbay_overall_IB_csv, 
-                            transbay_overall_OB_csv, Countyline_CalTrain_IB_csv, Countyline_CalTrain_OB_csv, 
-                            Countyline_SamTrans_IB_csv, Countyline_SamTrans_OB_csv, Countyline_overall_IB_csv, 
-                            Countyline_overall_OB_csv, GG_Transit_IB_csv, GG_Transit_OB_csv, GG_Ferry_IB_csv, 
-                            GG_Ferry_OB_csv, GG_overall_IB_csv, GG_overall_OB_csv):
+
+def process_mkd_screenline(
+    transit_input_dir,
+    observed_SL,
+    output_transit_dir,
+    model_SL,
+    markdown_output_dir,
+    tod_order,
+    Screenline_output_dir,
+    transbay_AC_IB_md,
+    transbay_AC_OB_md,
+    transbay_overall_IB_md,
+    transbay_overall_OB_md,
+    Countyline_CalTrain_IB_md,
+    Countyline_CalTrain_OB_md,
+    Countyline_SamTrans_IB_md,
+    Countyline_SamTrans_OB_md,
+    Countyline_overall_IB_md,
+    Countyline_overall_OB_md,
+    GG_Transit_IB_md,
+    GG_Transit_OB_md,
+    GG_Ferry_IB_md,
+    GG_Ferry_OB_md,
+    GG_overall_IB_md,
+    GG_overall_OB_md,
+    transbay_AC_IB_csv,
+    transbay_AC_OB_csv,
+    transbay_overall_IB_csv,
+    transbay_overall_OB_csv,
+    Countyline_CalTrain_IB_csv,
+    Countyline_CalTrain_OB_csv,
+    Countyline_SamTrans_IB_csv,
+    Countyline_SamTrans_OB_csv,
+    Countyline_overall_IB_csv,
+    Countyline_overall_OB_csv,
+    GG_Transit_IB_csv,
+    GG_Transit_OB_csv,
+    GG_Ferry_IB_csv,
+    GG_Ferry_OB_csv,
+    GG_overall_IB_csv,
+    GG_overall_OB_csv,
+):
     # Valdiation for Screenlines
     obs_SL = pd.read_csv(transit_input_dir / observed_SL)
     model_SL_df = pd.read_csv(output_transit_dir / model_SL)
@@ -1276,7 +1390,6 @@ def process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, m
     )
 
 
-
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
@@ -1296,7 +1409,7 @@ if __name__ == "__main__":
     model_BART = Path(config["output"]["model_BART"])
     model_BART_county = Path(config["output"]["model_BART_county"])
     model_BART_SL = Path(config["output"]["model_BART_SL"])
-    model_MUNI_Line = Path(config["output"]["model_MUNI_Line"]) 
+    model_MUNI_Line = Path(config["output"]["model_MUNI_Line"])
     model_SL = Path(config["output"]["model_SL"])
     transbay_BART_IB_csv = Path(config["screenline"]["transbay_BART_IB_csv"])
     transbay_BART_OB_csv = Path(config["screenline"]["transbay_BART_OB_csv"])
@@ -1308,10 +1421,18 @@ if __name__ == "__main__":
     transbay_AC_OB_csv = Path(config["screenline"]["transbay_AC_OB_csv"])
     transbay_overall_IB_csv = Path(config["screenline"]["transbay_overall_IB_csv"])
     transbay_overall_OB_csv = Path(config["screenline"]["transbay_overall_OB_csv"])
-    Countyline_CalTrain_IB_csv = Path(config["screenline"]["Countyline_CalTrain_IB_csv"])
-    Countyline_CalTrain_OB_csv = Path(config["screenline"]["Countyline_CalTrain_OB_csv"])
-    Countyline_SamTrans_IB_csv = Path(config["screenline"]["Countyline_SamTrans_IB_csv"])
-    Countyline_SamTrans_OB_csv = Path(config["screenline"]["Countyline_SamTrans_OB_csv"])
+    Countyline_CalTrain_IB_csv = Path(
+        config["screenline"]["Countyline_CalTrain_IB_csv"]
+    )
+    Countyline_CalTrain_OB_csv = Path(
+        config["screenline"]["Countyline_CalTrain_OB_csv"]
+    )
+    Countyline_SamTrans_IB_csv = Path(
+        config["screenline"]["Countyline_SamTrans_IB_csv"]
+    )
+    Countyline_SamTrans_OB_csv = Path(
+        config["screenline"]["Countyline_SamTrans_OB_csv"]
+    )
     Countyline_overall_IB_csv = Path(config["screenline"]["Countyline_overall_IB_csv"])
     Countyline_overall_OB_csv = Path(config["screenline"]["Countyline_overall_OB_csv"])
     GG_Transit_IB_csv = Path(config["screenline"]["GG_Transit_IB_csv"])
@@ -1397,26 +1518,122 @@ if __name__ == "__main__":
     county_at_pm_csv = Path(config["bart"]["county_at_pm_csv"])
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
-    tod_order = ['EA', 'AM', 'MD', 'PM', 'EV', 'Total']
-    
-    process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
-                     MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
-                     MUNI_mode_pm_md, MUNI_mode_pm, MUNI_tod_md,  MUNI_tod, MUNI_EB_md, MUNI_EB, MUNI_LB_md, MUNI_LB, MUNI_Rail_md, MUNI_Rail, MUNI_IB, MUNI_OB)
-    process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model_BART, markdown_output_dir, BART_output_dir, observed_BART_county, model_BART_county,
-                     observed_BART_SL, Screenline_output_dir, tod_order, BART_boarding_allday_md, BART_boarding_am_md, BART_boarding_pm_md, BART_at_allday_md, 
-                     BART_at_am_md, BART_at_pm_md, BART_boarding_allday_csv, BART_at_allday_csv, county_br_day_csv, county_br_am_csv, 
-                     county_br_pm_csv, county_at_day_csv, county_at_am_csv, county_at_pm_csv, model_BART_SL, 
-                     county_br_day_md, county_br_am_md, county_br_pm_md, county_at_day_md, county_at_am_md, county_at_pm_md, 
-                     transbay_BART_IB_md, transbay_BART_OB_md, Countyline_BART_OB_md, Countyline_BART_IB_md, SF_out_md, SF_in_md, transbay_BART_IB_csv, 
-                     transbay_BART_OB_csv, Countyline_BART_IB_csv, Countyline_BART_OB_csv, Intra_SF_BART_IB_csv, Intra_SF_BART_OB_csv)
-    process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, model_SL, markdown_output_dir, tod_order, Screenline_output_dir,
-                            transbay_AC_IB_md, transbay_AC_OB_md, transbay_overall_IB_md, transbay_overall_OB_md, 
-                            Countyline_CalTrain_IB_md, Countyline_CalTrain_OB_md, Countyline_SamTrans_IB_md, 
-                            Countyline_SamTrans_OB_md, Countyline_overall_IB_md, Countyline_overall_OB_md, 
-                            GG_Transit_IB_md, GG_Transit_OB_md, GG_Ferry_IB_md, GG_Ferry_OB_md, GG_overall_IB_md, 
-                            GG_overall_OB_md, transbay_AC_IB_csv, transbay_AC_OB_csv, transbay_overall_IB_csv, 
-                            transbay_overall_OB_csv, Countyline_CalTrain_IB_csv, Countyline_CalTrain_OB_csv, 
-                            Countyline_SamTrans_IB_csv, Countyline_SamTrans_OB_csv, Countyline_overall_IB_csv, 
-                            Countyline_overall_OB_csv, GG_Transit_IB_csv, GG_Transit_OB_csv, GG_Ferry_IB_csv, 
-                            GG_Ferry_OB_csv, GG_overall_IB_csv, GG_overall_OB_csv)
+    tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
 
+    process_mkd_muni(
+        transit_input_dir,
+        observed_MUNI_Line,
+        output_transit_dir,
+        model_MUNI_Line,
+        markdown_output_dir,
+        MUNI_output_dir,
+        MUNI_ib_day,
+        MUNI_ob_day,
+        MUNI_ib_am,
+        MUNI_ib_pm,
+        MUNI_ob_am,
+        MUNI_ob_pm,
+        MUNI_mode_day,
+        MUNI_mode,
+        MUNI_mode_am_md,
+        MUNI_mode_am,
+        MUNI_mode_pm_md,
+        MUNI_mode_pm,
+        MUNI_tod_md,
+        MUNI_tod,
+        MUNI_EB_md,
+        MUNI_EB,
+        MUNI_LB_md,
+        MUNI_LB,
+        MUNI_Rail_md,
+        MUNI_Rail,
+        MUNI_IB,
+        MUNI_OB,
+    )
+    process_mkd_bart(
+        transit_input_dir,
+        observed_BART,
+        output_transit_dir,
+        model_BART,
+        markdown_output_dir,
+        BART_output_dir,
+        observed_BART_county,
+        model_BART_county,
+        observed_BART_SL,
+        Screenline_output_dir,
+        tod_order,
+        BART_boarding_allday_md,
+        BART_boarding_am_md,
+        BART_boarding_pm_md,
+        BART_at_allday_md,
+        BART_at_am_md,
+        BART_at_pm_md,
+        BART_boarding_allday_csv,
+        BART_at_allday_csv,
+        county_br_day_csv,
+        county_br_am_csv,
+        county_br_pm_csv,
+        county_at_day_csv,
+        county_at_am_csv,
+        county_at_pm_csv,
+        model_BART_SL,
+        county_br_day_md,
+        county_br_am_md,
+        county_br_pm_md,
+        county_at_day_md,
+        county_at_am_md,
+        county_at_pm_md,
+        transbay_BART_IB_md,
+        transbay_BART_OB_md,
+        Countyline_BART_OB_md,
+        Countyline_BART_IB_md,
+        SF_out_md,
+        SF_in_md,
+        transbay_BART_IB_csv,
+        transbay_BART_OB_csv,
+        Countyline_BART_IB_csv,
+        Countyline_BART_OB_csv,
+        Intra_SF_BART_IB_csv,
+        Intra_SF_BART_OB_csv,
+    )
+    process_mkd_screenline(
+        transit_input_dir,
+        observed_SL,
+        output_transit_dir,
+        model_SL,
+        markdown_output_dir,
+        tod_order,
+        Screenline_output_dir,
+        transbay_AC_IB_md,
+        transbay_AC_OB_md,
+        transbay_overall_IB_md,
+        transbay_overall_OB_md,
+        Countyline_CalTrain_IB_md,
+        Countyline_CalTrain_OB_md,
+        Countyline_SamTrans_IB_md,
+        Countyline_SamTrans_OB_md,
+        Countyline_overall_IB_md,
+        Countyline_overall_OB_md,
+        GG_Transit_IB_md,
+        GG_Transit_OB_md,
+        GG_Ferry_IB_md,
+        GG_Ferry_OB_md,
+        GG_overall_IB_md,
+        GG_overall_OB_md,
+        transbay_AC_IB_csv,
+        transbay_AC_OB_csv,
+        transbay_overall_IB_csv,
+        transbay_overall_OB_csv,
+        Countyline_CalTrain_IB_csv,
+        Countyline_CalTrain_OB_csv,
+        Countyline_SamTrans_IB_csv,
+        Countyline_SamTrans_OB_csv,
+        Countyline_overall_IB_csv,
+        Countyline_overall_OB_csv,
+        GG_Transit_IB_csv,
+        GG_Transit_OB_csv,
+        GG_Ferry_IB_csv,
+        GG_Ferry_OB_csv,
+        GG_overall_IB_csv,
+        GG_overall_OB_csv,
+    )

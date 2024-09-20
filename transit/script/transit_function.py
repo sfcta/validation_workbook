@@ -1,39 +1,41 @@
 from pathlib import Path
+
 import geopandas as gpd
 import pandas as pd
 
-def transit_assignment_filepaths(
-    model_run_dir, time_periods
-):
+
+def transit_assignment_filepaths(model_run_dir, time_periods):
     return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}
+
 
 def read_transit_assignments(model_run_dir, time_periods):
     """Reads the DBF files for each time period using Geopandas and concatenates them."""
     filepaths = transit_assignment_filepaths(model_run_dir, time_periods)
-    
+
     # List to store all GeoDataFrames
     gdf_list = []
-    
+
     for period, filepath in filepaths.items():
         try:
             # Read the DBF file using geopandas
             gdf = gpd.read_file(str(filepath))
-            
+
             # Add a new column 'TOD' to represent the time period
-            gdf['TOD'] = period
-            
+            gdf["TOD"] = period
+
             # Append to the list
             gdf_list.append(gdf)
-            
+
             print(f"Successfully read and added 'TOD' to: {filepath}")
         except Exception as e:
             print(f"Error reading {filepath}: {e}")
             raise NotImplementedError(f"Could not read or extract data from {filepath}")
-    
+
     # Concatenate all GeoDataFrames in the list into a single DataFrame
     combined_gdf = gpd.pd.concat(gdf_list, ignore_index=True)
-    
+
     return combined_gdf
+
 
 def read_dbf_and_groupby_sum(dbf_file, system_filter, groupby_columns, sum_column):
     """
@@ -50,13 +52,16 @@ def read_dbf_and_groupby_sum(dbf_file, system_filter, groupby_columns, sum_colum
     DataFrame: Pandas DataFrame with the groupby and sum applied.
     """
     if system_filter != None:
-        dbf_file = dbf_file[dbf_file["SYSTEM"] == system_filter]  # filter on SYSTEM columns
+        dbf_file = dbf_file[
+            dbf_file["SYSTEM"] == system_filter
+        ]  # filter on SYSTEM columns
     # group by `groupby_columns` and sum `sum_column`
-    grouped_sum =  dbf_file.groupby(groupby_columns)[sum_column].sum()
+    grouped_sum = dbf_file.groupby(groupby_columns)[sum_column].sum()
     # reset index to convert it back to a DataFrame
     grouped_sum_df = grouped_sum.reset_index()
     return grouped_sum_df
 
+
 def dataframe_to_markdown(
     df,
     file_name="dataframe_table.md",
@@ -116,7 +121,8 @@ def dataframe_to_markdown(
         file.write(md_output)
 
     print(f"Markdown table saved to '{file_name}'")
-    
+
+
 def dataframe_to_markdown(
     df,
     file_name="dataframe_table.md",
@@ -176,7 +182,8 @@ def dataframe_to_markdown(
         file.write(md_output)
 
     print(f"Markdown table saved to '{file_name}'")
-    
+
+
 def format_dataframe(df, numeric_columns, percentage_columns=None):
     """
     Format a DataFrame for readable display.

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import pandas as pd
 import tomllib
 from transit_function import dataframe_to_markdown, format_numeric, read_transit_assignments
@@ -13,7 +13,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     )
     dataframe_to_markdown(
         obs_MUNI_line,
-        os.path.join(markdown_output_dir, obs_MUNI_line_md),
+        Path(markdown_output_dir / obs_MUNI_line_md),
         highlight_rows=None,
         center_align_columns=[
             "Mode",
@@ -34,7 +34,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     )
     dataframe_to_markdown(
         obs_BART_line,
-        os.path.join(markdown_output_dir, obs_BART_station_md),
+        Path(markdown_output_dir / obs_BART_station_md),
         highlight_rows=None,
         center_align_columns=["TOD", "Key"],
         column_widths=100,
@@ -49,7 +49,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     )
     dataframe_to_markdown(
         obs_BART_county,
-        os.path.join(markdown_output_dir, obs_BART_county_md),
+        Path(markdown_output_dir / obs_BART_county_md),
         highlight_rows=None,
         center_align_columns=["TOD", "Key"],
         column_widths=100,
@@ -59,7 +59,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     obs_BART_SL["Ridership"] = obs_BART_SL["Ridership"].apply(lambda x: format_numeric(x))
     dataframe_to_markdown(
         obs_BART_SL,
-        os.path.join(markdown_output_dir, obs_BART_SL_md),
+        Path(markdown_output_dir / obs_BART_SL_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key"],
         column_widths=100,
@@ -69,7 +69,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     obs_SL["Ridership"] = obs_SL["Ridership"].apply(lambda x: format_numeric(x))
     dataframe_to_markdown(
         obs_SL,
-        os.path.join(markdown_output_dir, obs_Screenlines_md),
+        Path(markdown_output_dir / obs_Screenlines_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key", "Operator", "Mode"],
         column_widths=100,
@@ -78,7 +78,7 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     obs_NTD_df = pd.read_csv(transit_input_dir / observed_NTD)
     dataframe_to_markdown(
         obs_NTD_df,
-        os.path.join(markdown_output_dir, obs_NTD_md),
+        Path(markdown_output_dir / obs_NTD_md),
         highlight_rows=None,
         center_align_columns=None,
         column_widths=100,

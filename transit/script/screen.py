@@ -31,38 +31,41 @@ HWY_SCREENS = {
 }
 
 
-def process_data(file_name, system, A, B, Screenline, Operator, Mode):
+def group_screenline_ridership(combined_gdf, system, A, B, Screenline, Operator, Mode):
     # Read the DBF file and group by 'A' and 'B' while summing 'AB_VOL'
-    ST_TOD = read_dbf_and_groupby_sum(file_name, system, ["A", "B", "TOD"], "AB_VOL")
+    sl_total_tod = read_dbf_and_groupby_sum(combined_gdf, system, ["A", "B", "TOD"], "AB_VOL")
 
     # Filter rows for IB and calculate the sum of 'AB_VOL"
-    ST_TOD_IB = ST_TOD[(ST_TOD["A"].isin(A)) & (ST_TOD["B"].isin(B))]
-    IB_sum = ST_TOD_IB.groupby("TOD")["AB_VOL"].sum().reset_index()
+    sl_total_tod_ib = sl_total_tod[(sl_total_tod["A"].isin(A)) & (sl_total_tod["B"].isin(B))]
+    IB_sum = sl_total_tod_ib.groupby("TOD")["AB_VOL"].sum().reset_index()
     IB_sum["Screenline"] = Screenline
     IB_sum["Direction"] = "IB"
     IB_sum["Operator"] = Operator
     IB_sum["Mode"] = Mode
 
     # Filter rows for OB and calculate the sum of 'AB_VOL'
-    ST_TOD_OB = ST_TOD[(ST_TOD["A"].isin(B)) & (ST_TOD["B"].isin(A))]
-    OB_sum = ST_TOD_OB.groupby("TOD")["AB_VOL"].sum().reset_index()
+    sl_total_tod_ob = sl_total_tod[(sl_total_tod["A"].isin(B)) & (sl_total_tod["B"].isin(A))]
+    OB_sum = sl_total_tod_ob.groupby("TOD")["AB_VOL"].sum().reset_index()
     OB_sum["Screenline"] = Screenline
     OB_sum["Direction"] = "OB"
     OB_sum["Operator"] = Operator
     OB_sum["Mode"] = Mode
 
 
-    ST_TOD = pd.concat([IB_sum, OB_sum])
-    ST_TOD = ST_TOD.rename(columns={"AB_VOL":"Ridership"})
+    sl_total = pd.concat([IB_sum, OB_sum])
+    sl_total = sl_total.rename(columns={"AB_VOL":"Ridership"})
 
-    return ST_TOD
+    return sl_total
 
 
-def screen_df(file_name, HWY_SCREENS):
+def process_screenline_data(combined_gdf, HWY_SCREENS):
+    """
+    Processes the screenline data by concat grouping ridership data of each screenline.
+    """
     screenline_total = []
     for i in HWY_SCREENS.keys():
-        screenline = process_data(
-                file_name,
+        screenline = group_screenline_ridership(
+                combined_gdf,
                 HWY_SCREENS[i][2][0],
                 HWY_SCREENS[i][0],
                 HWY_SCREENS[i][1],
@@ -79,8 +82,8 @@ def screen_df(file_name, HWY_SCREENS):
     model_Screenlines = pd.concat(screenline_total)
     return model_Screenlines
 
-def concat_final_SL(file_name, output_transit_dir, model_BART_SL, model_SL):
-    model_Screenlines = screen_df(file_name,HWY_SCREENS)
+def save_final_screenline_data(combined_gdf, output_transit_dir, model_BART_SL, model_SL):
+    model_Screenlines = process_screenline_data(combined_gdf,HWY_SCREENS)
     BART_Screenlines = pd.read_csv(output_transit_dir / model_BART_SL)
     BART_Screenlines["Operator"] = "BART"
     BART_Screenlines["Mode"] = "BART"
@@ -110,6 +113,6 @@ if __name__ == "__main__":
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
     time_periods = ["EA", "AM", "MD", "PM", "EV"]
-    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
     
-    concat_final_SL(dbf_file, output_transit_dir, model_BART_SL, model_SL)
+    save_final_screenline_data(combined_gdf, output_transit_dir, model_BART_SL, model_SL)

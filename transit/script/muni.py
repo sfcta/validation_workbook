@@ -69,10 +69,10 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-def process_muni(file_name, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line):
+def process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line):
     line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
-    MUNI = read_dbf_and_groupby_sum(file_name, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
+    MUNI = read_dbf_and_groupby_sum(combined_gdf, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
     MUNI['Direction'] = MUNI['NAME'].apply(map_name_to_direction)
 
     MUNI = MUNI.sort_values(by="FULLNAME").reset_index(drop=True)

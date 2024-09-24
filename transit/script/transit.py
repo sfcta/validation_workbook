@@ -1,9 +1,9 @@
 from pathlib import Path
 import tomllib
 from transit_function import read_transit_assignments
-from bart import process_BART_data, process_BART_county, process_BART_SL
+from bart import process_BART_data, process_BART_county, process_BART_Screenline
 from muni import process_muni
-from screen import concat_final_SL
+from screen import save_final_screenline_data
 from map_data import process_muni_map, process_bart_map
 from obs import process_obs_data
 from total_val import process_valTotal_Operator, process_valTotal_Submode
@@ -167,9 +167,9 @@ if __name__ == "__main__":
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
     process_BART_data(combined_gdf, model_run_dir, output_transit_dir, model_BART)
     process_BART_county(combined_gdf, model_run_dir, output_transit_dir, model_BART_county, model_BART)
-    process_BART_SL(combined_gdf, model_run_dir, output_transit_dir,  model_BART_SL)
+    process_BART_Screenline(combined_gdf, model_run_dir, output_transit_dir,  model_BART_SL)
     process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line)
-    concat_final_SL(combined_gdf, output_transit_dir, model_BART_SL, model_SL)
+    save_final_screenline_data(combined_gdf, output_transit_dir, model_BART_SL, model_SL)
     process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
                      MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
                      MUNI_mode_pm_md, MUNI_mode_pm, MUNI_tod_md,  MUNI_tod, MUNI_EB_md, MUNI_EB, MUNI_LB_md, MUNI_LB, MUNI_Rail_md, MUNI_Rail, MUNI_IB, MUNI_OB)

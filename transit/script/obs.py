@@ -1,12 +1,30 @@
 from pathlib import Path
+
 import pandas as pd
 import tomllib
-from transit_function import dataframe_to_markdown, format_numeric, read_transit_assignments
+from transit_function import (
+    dataframe_to_markdown,
+    format_numeric,
+    read_transit_assignments,
+)
 
-def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
-                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
-                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md):
-        
+
+def process_obs_data(
+    transit_input_dir,
+    markdown_output_dir,
+    observed_MUNI_Line,
+    observed_BART,
+    observed_BART_county,
+    observed_BART_SL,
+    observed_SL,
+    observed_NTD,
+    obs_MUNI_line_md,
+    obs_BART_station_md,
+    obs_BART_county_md,
+    obs_BART_SL_md,
+    obs_Screenlines_md,
+    obs_NTD_md,
+):
     obs_MUNI_line = pd.read_csv(transit_input_dir / observed_MUNI_Line)
     obs_MUNI_line["Ridership"] = obs_MUNI_line["Ridership"].apply(
         lambda x: format_numeric(x)
@@ -56,7 +74,9 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
     )
 
     obs_BART_SL = pd.read_csv(transit_input_dir / observed_BART_SL)
-    obs_BART_SL["Ridership"] = obs_BART_SL["Ridership"].apply(lambda x: format_numeric(x))
+    obs_BART_SL["Ridership"] = obs_BART_SL["Ridership"].apply(
+        lambda x: format_numeric(x)
+    )
     dataframe_to_markdown(
         obs_BART_SL,
         Path(markdown_output_dir / obs_BART_SL_md),
@@ -84,10 +104,11 @@ def process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line,
         column_widths=100,
     )
 
+
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-        
+
     transit_input_dir = config["directories"]["transit_input_dir"]
     markdown_output_dir = config["directories"]["markdown_output_dir"]
     model_run_dir = config["directories"]["model_run"]
@@ -112,7 +133,20 @@ if __name__ == "__main__":
     output_transit_dir.mkdir(parents=True, exist_ok=True)
     time_periods = ["EA", "AM", "MD", "PM", "EV"]
     dbf_file = read_transit_assignments(model_run_dir, time_periods)
-    
-    process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
-                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
-                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md)
+
+    process_obs_data(
+        transit_input_dir,
+        markdown_output_dir,
+        observed_MUNI_Line,
+        observed_BART,
+        observed_BART_county,
+        observed_BART_SL,
+        observed_SL,
+        observed_NTD,
+        obs_MUNI_line_md,
+        obs_BART_station_md,
+        obs_BART_county_md,
+        obs_BART_SL_md,
+        obs_Screenlines_md,
+        obs_NTD_md,
+    )

@@ -1,13 +1,14 @@
 from pathlib import Path
+
 import tomllib
-from transit_function import read_transit_assignments
-from bart import process_BART_data, process_BART_county, process_BART_Screenline
+from bart import process_BART_county, process_BART_data, process_BART_Screenline
+from map_data import process_bart_map, process_muni_map
 from muni import process_muni
-from screen import save_final_screenline_data
-from map_data import process_muni_map, process_bart_map
 from obs import process_obs_data
+from screen import save_final_screenline_data
+from simwrapper_table import process_mkd_bart, process_mkd_muni, process_mkd_screenline
 from total_val import process_valTotal_Operator, process_valTotal_Submode
-from simwrapper_table import process_mkd_muni, process_mkd_bart, process_mkd_screenline
+from transit_function import read_transit_assignments
 
 script_dir = Path(__file__).parent
 toml_path = script_dir / "transit.toml"
@@ -37,7 +38,7 @@ observed_NTD = Path(config["transit"]["observed_NTD"])
 model_BART = Path(config["output"]["model_BART"])
 model_BART_county = Path(config["output"]["model_BART_county"])
 model_BART_SL = Path(config["output"]["model_BART_SL"])
-model_MUNI_Line = Path(config["output"]["model_MUNI_Line"]) 
+model_MUNI_Line = Path(config["output"]["model_MUNI_Line"])
 model_SL = Path(config["output"]["model_SL"])
 BART_br_map = Path(config["shp"]["BART_br_map"])
 BART_br_map_pm = Path(config["shp"]["BART_br_map_pm"])
@@ -158,44 +159,214 @@ output_transit_dir = output_dir / "transit"
 output_transit_dir.mkdir(parents=True, exist_ok=True)
 
 time_periods = ["EA", "AM", "MD", "PM", "EV"]
-tod_order = ['EA', 'AM', 'MD', 'PM', 'EV', 'Total']
-        
-
+tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
 
 
 if __name__ == "__main__":
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
     process_BART_data(combined_gdf, model_run_dir, output_transit_dir, model_BART)
-    process_BART_county(combined_gdf, model_run_dir, output_transit_dir, model_BART_county, model_BART)
-    process_BART_Screenline(combined_gdf, model_run_dir, output_transit_dir,  model_BART_SL)
-    process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line)
-    save_final_screenline_data(combined_gdf, output_transit_dir, model_BART_SL, model_SL)
-    process_mkd_muni(transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line, markdown_output_dir, MUNI_output_dir, MUNI_ib_day,
-                     MUNI_ob_day, MUNI_ib_am, MUNI_ib_pm, MUNI_ob_am, MUNI_ob_pm,MUNI_mode_day, MUNI_mode, MUNI_mode_am_md, MUNI_mode_am, 
-                     MUNI_mode_pm_md, MUNI_mode_pm, MUNI_tod_md,  MUNI_tod, MUNI_EB_md, MUNI_EB, MUNI_LB_md, MUNI_LB, MUNI_Rail_md, MUNI_Rail, MUNI_IB, MUNI_OB)
-    process_mkd_bart(transit_input_dir, observed_BART, output_transit_dir, model_BART, markdown_output_dir, BART_output_dir, observed_BART_county, model_BART_county,
-                     observed_BART_SL, Screenline_output_dir, tod_order, BART_boarding_allday_md, BART_boarding_am_md, BART_boarding_pm_md, BART_at_allday_md, 
-                     BART_at_am_md, BART_at_pm_md, BART_boarding_allday_csv, BART_at_allday_csv, county_br_day_csv, county_br_am_csv, 
-                     county_br_pm_csv, county_at_day_csv, county_at_am_csv, county_at_pm_csv, model_BART_SL, 
-                     county_br_day_md, county_br_am_md, county_br_pm_md, county_at_day_md, county_at_am_md, county_at_pm_md, 
-                     transbay_BART_IB_md, transbay_BART_OB_md, Countyline_BART_OB_md, Countyline_BART_IB_md, SF_out_md, SF_in_md, transbay_BART_IB_csv, 
-                     transbay_BART_OB_csv, Countyline_BART_IB_csv, Countyline_BART_OB_csv, Intra_SF_BART_IB_csv, Intra_SF_BART_OB_csv)
-    process_mkd_screenline(transit_input_dir, observed_SL, output_transit_dir, model_SL, markdown_output_dir, tod_order, Screenline_output_dir,
-                            transbay_AC_IB_md, transbay_AC_OB_md, transbay_overall_IB_md, transbay_overall_OB_md, 
-                            Countyline_CalTrain_IB_md, Countyline_CalTrain_OB_md, Countyline_SamTrans_IB_md, 
-                            Countyline_SamTrans_OB_md, Countyline_overall_IB_md, Countyline_overall_OB_md, 
-                            GG_Transit_IB_md, GG_Transit_OB_md, GG_Ferry_IB_md, GG_Ferry_OB_md, GG_overall_IB_md, 
-                            GG_overall_OB_md, transbay_AC_IB_csv, transbay_AC_OB_csv, transbay_overall_IB_csv, 
-                            transbay_overall_OB_csv, Countyline_CalTrain_IB_csv, Countyline_CalTrain_OB_csv, 
-                            Countyline_SamTrans_IB_csv, Countyline_SamTrans_OB_csv, Countyline_overall_IB_csv, 
-                            Countyline_overall_OB_csv, GG_Transit_IB_csv, GG_Transit_OB_csv, GG_Ferry_IB_csv, 
-                            GG_Ferry_OB_csv, GG_overall_IB_csv, GG_overall_OB_csv)
-    process_muni_map(combined_gdf, output_transit_dir, MUNI_output_dir,SHP_file_dir,FREEFLOW_SHP, model_MUNI_Line, muni_ib, muni_ob, MUNI_OB, MUNI_IB, MUNI_map_IB, MUNI_map_OB)
-    process_bart_map(BART_output_dir, transit_input_dir, output_transit_dir, observed_BART, model_BART, SHP_file_dir, 
-                     BART_br, BART_br_map, BART_br_pm, BART_br_map_pm, BART_br_am, BART_br_map_am, 
-                     BART_at, BART_at_map, BART_at_am,BART_at_map_am, BART_at_pm, BART_at_map_pm)
-    process_obs_data(transit_input_dir, markdown_output_dir, observed_MUNI_Line, observed_BART, observed_BART_county, 
-                     observed_BART_SL, observed_SL, observed_NTD, obs_MUNI_line_md, obs_BART_station_md, 
-                     obs_BART_county_md, obs_BART_SL_md, obs_Screenlines_md, obs_NTD_md)
-    process_valTotal_Operator(combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Operator_md, valTotal_Operator)
-    process_valTotal_Submode(combined_gdf, transit_input_dir, markdown_output_dir, total_output_dir, observed_NTD, valTotal_Submode, valTotal_Submode_md, valTotal_Service_md, valTotal_Service)
+    process_BART_county(
+        combined_gdf, model_run_dir, output_transit_dir, model_BART_county, model_BART
+    )
+    process_BART_Screenline(
+        combined_gdf, model_run_dir, output_transit_dir, model_BART_SL
+    )
+    process_muni(
+        combined_gdf,
+        model_run_dir,
+        transit_line_rename_filepath,
+        transit_input_dir,
+        observed_MUNI_Line,
+        output_transit_dir,
+        model_MUNI_Line,
+    )
+    save_final_screenline_data(
+        combined_gdf, output_transit_dir, model_BART_SL, model_SL
+    )
+    process_mkd_muni(
+        transit_input_dir,
+        observed_MUNI_Line,
+        output_transit_dir,
+        model_MUNI_Line,
+        markdown_output_dir,
+        MUNI_output_dir,
+        MUNI_ib_day,
+        MUNI_ob_day,
+        MUNI_ib_am,
+        MUNI_ib_pm,
+        MUNI_ob_am,
+        MUNI_ob_pm,
+        MUNI_mode_day,
+        MUNI_mode,
+        MUNI_mode_am_md,
+        MUNI_mode_am,
+        MUNI_mode_pm_md,
+        MUNI_mode_pm,
+        MUNI_tod_md,
+        MUNI_tod,
+        MUNI_EB_md,
+        MUNI_EB,
+        MUNI_LB_md,
+        MUNI_LB,
+        MUNI_Rail_md,
+        MUNI_Rail,
+        MUNI_IB,
+        MUNI_OB,
+    )
+    process_mkd_bart(
+        transit_input_dir,
+        observed_BART,
+        output_transit_dir,
+        model_BART,
+        markdown_output_dir,
+        BART_output_dir,
+        observed_BART_county,
+        model_BART_county,
+        observed_BART_SL,
+        Screenline_output_dir,
+        tod_order,
+        BART_boarding_allday_md,
+        BART_boarding_am_md,
+        BART_boarding_pm_md,
+        BART_at_allday_md,
+        BART_at_am_md,
+        BART_at_pm_md,
+        BART_boarding_allday_csv,
+        BART_at_allday_csv,
+        county_br_day_csv,
+        county_br_am_csv,
+        county_br_pm_csv,
+        county_at_day_csv,
+        county_at_am_csv,
+        county_at_pm_csv,
+        model_BART_SL,
+        county_br_day_md,
+        county_br_am_md,
+        county_br_pm_md,
+        county_at_day_md,
+        county_at_am_md,
+        county_at_pm_md,
+        transbay_BART_IB_md,
+        transbay_BART_OB_md,
+        Countyline_BART_OB_md,
+        Countyline_BART_IB_md,
+        SF_out_md,
+        SF_in_md,
+        transbay_BART_IB_csv,
+        transbay_BART_OB_csv,
+        Countyline_BART_IB_csv,
+        Countyline_BART_OB_csv,
+        Intra_SF_BART_IB_csv,
+        Intra_SF_BART_OB_csv,
+    )
+    process_mkd_screenline(
+        transit_input_dir,
+        observed_SL,
+        output_transit_dir,
+        model_SL,
+        markdown_output_dir,
+        tod_order,
+        Screenline_output_dir,
+        transbay_AC_IB_md,
+        transbay_AC_OB_md,
+        transbay_overall_IB_md,
+        transbay_overall_OB_md,
+        Countyline_CalTrain_IB_md,
+        Countyline_CalTrain_OB_md,
+        Countyline_SamTrans_IB_md,
+        Countyline_SamTrans_OB_md,
+        Countyline_overall_IB_md,
+        Countyline_overall_OB_md,
+        GG_Transit_IB_md,
+        GG_Transit_OB_md,
+        GG_Ferry_IB_md,
+        GG_Ferry_OB_md,
+        GG_overall_IB_md,
+        GG_overall_OB_md,
+        transbay_AC_IB_csv,
+        transbay_AC_OB_csv,
+        transbay_overall_IB_csv,
+        transbay_overall_OB_csv,
+        Countyline_CalTrain_IB_csv,
+        Countyline_CalTrain_OB_csv,
+        Countyline_SamTrans_IB_csv,
+        Countyline_SamTrans_OB_csv,
+        Countyline_overall_IB_csv,
+        Countyline_overall_OB_csv,
+        GG_Transit_IB_csv,
+        GG_Transit_OB_csv,
+        GG_Ferry_IB_csv,
+        GG_Ferry_OB_csv,
+        GG_overall_IB_csv,
+        GG_overall_OB_csv,
+    )
+    process_muni_map(
+        combined_gdf,
+        output_transit_dir,
+        MUNI_output_dir,
+        SHP_file_dir,
+        FREEFLOW_SHP,
+        model_MUNI_Line,
+        muni_ib,
+        muni_ob,
+        MUNI_OB,
+        MUNI_IB,
+        MUNI_map_IB,
+        MUNI_map_OB,
+    )
+    process_bart_map(
+        BART_output_dir,
+        transit_input_dir,
+        output_transit_dir,
+        observed_BART,
+        model_BART,
+        SHP_file_dir,
+        BART_br,
+        BART_br_map,
+        BART_br_pm,
+        BART_br_map_pm,
+        BART_br_am,
+        BART_br_map_am,
+        BART_at,
+        BART_at_map,
+        BART_at_am,
+        BART_at_map_am,
+        BART_at_pm,
+        BART_at_map_pm,
+    )
+    process_obs_data(
+        transit_input_dir,
+        markdown_output_dir,
+        observed_MUNI_Line,
+        observed_BART,
+        observed_BART_county,
+        observed_BART_SL,
+        observed_SL,
+        observed_NTD,
+        obs_MUNI_line_md,
+        obs_BART_station_md,
+        obs_BART_county_md,
+        obs_BART_SL_md,
+        obs_Screenlines_md,
+        obs_NTD_md,
+    )
+    process_valTotal_Operator(
+        combined_gdf,
+        transit_input_dir,
+        markdown_output_dir,
+        total_output_dir,
+        observed_NTD,
+        valTotal_Operator_md,
+        valTotal_Operator,
+    )
+    process_valTotal_Submode(
+        combined_gdf,
+        transit_input_dir,
+        markdown_output_dir,
+        total_output_dir,
+        observed_NTD,
+        valTotal_Submode,
+        valTotal_Submode_md,
+        valTotal_Service_md,
+        valTotal_Service,
+    )

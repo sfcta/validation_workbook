@@ -1,35 +1,37 @@
 from pathlib import Path
+
 import geopandas as gpd
 import pandas as pd
 
-def transit_assignment_filepaths(
-    model_run_dir, time_periods
-):
+
+def transit_assignment_filepaths(model_run_dir, time_periods):
     return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}
+
 
 def read_transit_assignments(model_run_dir, time_periods):
     """Reads the DBF files for each time period using Geopandas and concatenates them."""
     filepaths = transit_assignment_filepaths(model_run_dir, time_periods)
-    
+
     # List to store all GeoDataFrames
     gdf_list = []
-    
+
     for period, filepath in filepaths.items():
             # Read the DBF file using geopandas
             gdf = gpd.read_file(str(filepath))
-            
+
             # Add a new column 'TOD' to represent the time period
-            gdf['TOD'] = period
-            
+            gdf["TOD"] = period
+
             # Append to the list
             gdf_list.append(gdf)
-            
+
             print(f"Successfully read and added 'TOD' to: {filepath}")
     
     # Concatenate all GeoDataFrames in the list into a single DataFrame
     combined_gdf = pd.concat(gdf_list, ignore_index=True)
     
     return combined_gdf
+
 
 def read_dbf_and_groupby_sum(dbf_file, system_filter, groupby_columns, sum_column):
     """
@@ -48,10 +50,11 @@ def read_dbf_and_groupby_sum(dbf_file, system_filter, groupby_columns, sum_colum
     if system_filter is not None:
         dbf_file = dbf_file[dbf_file["SYSTEM"] == system_filter]  # filter on SYSTEM columns
     # group by `groupby_columns` and sum `sum_column`
-    grouped_sum =  dbf_file.groupby(groupby_columns)[sum_column].sum()
+    grouped_sum = dbf_file.groupby(groupby_columns)[sum_column].sum()
     # reset index to convert it back to a DataFrame
     grouped_sum_df = grouped_sum.reset_index()
     return grouped_sum_df
+
 
 def dataframe_to_markdown(
     df,

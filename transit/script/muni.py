@@ -1,8 +1,10 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import tomllib
 from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
+
 
 def read_transit_lines(model_run_dir, transit_line_rename_filepath):
     line_names = pd.read_csv(
@@ -69,11 +71,21 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-def process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, transit_input_dir, observed_MUNI_Line, output_transit_dir, model_MUNI_Line):
+def process_muni(
+    combined_gdf,
+    model_run_dir,
+    transit_line_rename_filepath,
+    transit_input_dir,
+    observed_MUNI_Line,
+    output_transit_dir,
+    model_MUNI_Line,
+):
     line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
 
-    MUNI = read_dbf_and_groupby_sum(combined_gdf, "SF MUNI", ["FULLNAME", "NAME","TOD"], "AB_BRDA")
-    MUNI['Direction'] = MUNI['NAME'].apply(map_name_to_direction)
+    MUNI = read_dbf_and_groupby_sum(
+        combined_gdf, "SF MUNI", ["FULLNAME", "NAME", "TOD"], "AB_BRDA"
+    )
+    MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
 
     MUNI = MUNI.sort_values(by="FULLNAME").reset_index(drop=True)
     MUNI = MUNI.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
@@ -108,14 +120,14 @@ def process_muni(combined_gdf, model_run_dir, transit_line_rename_filepath, tran
     MUNI_full.to_csv(output_transit_dir / model_MUNI_Line, index=False)
 
 
-
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-        
+
     transit_line_rename_filepath = (
-        Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
-    ) 
+        Path(config["directories"]["resources"])
+        / config["transit"]["line_rename_filename"]
+    )
     model_run_dir = config["directories"]["model_run"]
     model_MUNI_Line = config["output"]["model_MUNI_Line"]
     observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
@@ -125,12 +137,12 @@ if __name__ == "__main__":
     output_transit_dir.mkdir(parents=True, exist_ok=True)
     time_periods = ["EA", "AM", "MD", "PM", "EV"]
     dbf_file = read_transit_assignments(model_run_dir, time_periods)
-    
+
     process_muni(
         model_run_dir,
         transit_line_rename_filepath,
         transit_input_dir,
         observed_MUNI_Line,
         output_transit_dir,
-        model_MUNI_Line
+        model_MUNI_Line,
     )

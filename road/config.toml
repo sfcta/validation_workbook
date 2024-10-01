@@ -9,7 +9,7 @@ columns = ["A", "B", "AT", "FT", "V_1"]
 
 [OBSERVED_COUNTS]
 # The observed data file path
-obs_filepath = "Q:/Data/Observed/Validation/2019_old/observed_counts.csv"
+obs_filepath = "X:/Projects/Miscellaneous/validation_simwrapper/roads2023/observed_counts.csv"
 
 # The columns used for calculation, usually are 'A,B, and Counts'
 obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
@@ -25,25 +25,27 @@ chosen_period = "Daily"
 classification_col = "Loc Type"
 
 # cols displayed and information we want in our generated csv
-combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Dir"]
+
+output_file_name = "scatter.csv"
 
 [EST_SCATTER_PLOT]
 xfield = "Observed Volume"
 yfield = "Estimated Volume"
 
 # Information we want to display in the hover over
-fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Road", "Dir"]
+fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Dir"]
 
 # Be careful to state all nominal fields from the above fields
-nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", , "Dir"]
 name = "Estimation Volume"
 est_output_template = "{classification_col_types}_{name}_est.vega.json"
 
 [PERCENT_SCATTER_PLOT]
 xfield = "Observed Volume"
 yfield = "Percent Errors"
-fields = ["Observed Volume", "Percent Errors", "Loc Type", "A", "B", "Location", "Road", "Dir"]
-nominal_fields = ["Loc Type", "A", "B", "Location", "Road", "Dir"]
+fields = ["Observed Volume", "Percent Errors", "Loc Type", "A", "B", "Location",  "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", "Dir"]
 name = "Percent Errors"
 diffpercent_output_template = "{classification_col_types}_{name}_diffpercent.vega.json"
 
@@ -51,13 +53,13 @@ dashboard_number = 1
 
 [STATS_INPUT]
 # cols displayed
-combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location", "Road", "Dir"]
+combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "FT Group", "Location",  "Dir"]
 # The output csv file name
 output_file_name = 'scatter.csv'
 
 [MAP_INPUT]
 freeflow_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"
-shp_out_dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads/map"
+shp_out_dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads2023/map"
 output_filename = 'map.csv'
 
 

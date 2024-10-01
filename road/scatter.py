@@ -2,8 +2,7 @@ import json
 import pandas as pd
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
-from validation_road_utils import compute_and_combine
-
+from validation_road_utils import compute_and_combine_scatter
 def compute_and_save_errors(
         est_df,
         obs_df,
@@ -15,7 +14,7 @@ def compute_and_save_errors(
     times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
 
     # Combine dataframes using the utility function
-    select_time_period_loc_df = compute_and_combine(est_df, obs_df, times, combined_df_cols, chosen_timeperiod)
+    select_time_period_loc_df = compute_and_combine_scatter(est_df, obs_df, times, combined_df_cols, chosen_timeperiod)
     
     # Set column names
     calculation_cols = [
@@ -50,8 +49,14 @@ def generate_vega_lite_json_est(
         output_template,
         include_all_data=False):
     df = pd.read_csv(obs_file)
+
+    # Adjust the filtering for single value (string) vs list
     if not include_all_data:
-        df = df[df[classification_col].isin(classification_col_types)]
+        if isinstance(classification_col_types, str):
+            df = df[df[classification_col] == classification_col_types]  # Single value filter
+        else:
+            df = df[df[classification_col].isin(classification_col_types)]  # List-like filter
+
     max_value = max(df[x_field].max(), df[y_field].max())
     model = LinearRegression().fit(df[[x_field]], df[y_field])
     m = model.coef_[0]
@@ -134,6 +139,7 @@ def generate_vega_lite_json_est(
     file_path = Path(output_template.format(classification_col_types=classification_col_types, name=name))
     with open(file_path, 'w') as file:
         json.dump(vega_lite_config, file, indent=4)
+
 
 def generate_vega_lite_json_diffpercent(
         obs_file,

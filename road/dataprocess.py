@@ -18,7 +18,7 @@ def filter_and_aggregate(
     loaded_network_files = generate_loaded_network_file_names(time_periods)
 
     # Read and process the Excel file    
-    base_df = pd.read(obs_file, usecol = extra_columns)
+    base_df = pd.read_csv(obs_file, usecols = extra_columns)
 
     # Initialize columns for time periods and daily total
     for col in time_periods + ['Daily']:

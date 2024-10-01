@@ -2,12 +2,12 @@ import os
 import pandas as pd
 import numpy as np
 import json
-from validation_road_utils import compute_and_combine
+from validation_road_utils import compute_and_combine_stats
 
 
-def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols, chosen_timeperiod=None):
+def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
     # Call the compute_and_combine function to get the combined dataframe
-    combined_df = compute_and_combine(est_df, obs_df, times, combined_df_cols, chosen_timeperiod)
+    combined_df = compute_and_combine_stats(est_df, obs_df, times, combined_df_cols)
     
     # Remove duplicates
     combined_df = combined_df.drop_duplicates(subset=['A', 'B'], keep='first')
@@ -24,7 +24,7 @@ def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols, chosen_time
     for period in times:
         matching_column_indices = [
             i for i, col_name in enumerate(
-                combined_df.columns) if col_name == period]
+                combined_df.columns) if period in col_name]
         select_time_period_df = combined_df.iloc[:, matching_column_indices]
 
         specific_columns_combined_df = combined_df[combined_df_cols]
@@ -115,6 +115,10 @@ def calculate_metrics(df, group_var_column, period):
 
 
 def generate_and_save_tables(time_period_dfs, group_vars):
+    # Create the stats_data directory if it does not exist
+    if not os.path.exists('stats_data'):
+        os.makedirs('stats_data')
+
     for group_var in group_vars:
         percent_rmse_df = pd.DataFrame()
         relative_error_df = pd.DataFrame()
@@ -183,10 +187,10 @@ def generate_and_save_tables(time_period_dfs, group_vars):
         # Save the dataframes to CSV
         group_var_no_spaces = group_var.replace(" ", "").lower()
         file_prefix = f"{group_var_no_spaces}_"
-        count_df.to_csv(f'{file_prefix}count.csv', index=False)
-        percent_rmse_df.to_csv(f'percent_rmse_{group_var}.csv')
-        relative_error_df.to_csv(f'relative_error_{group_var}.csv')
-        est_obs_ratio_df.to_csv(f'est_obs_ratio_{group_var}.csv')
+        count_df.to_csv(f'stats_data/{file_prefix}count.csv', index=False)
+        percent_rmse_df.to_csv(f'stats_data/percent_rmse_{group_var_no_spaces}.csv')
+        relative_error_df.to_csv(f'stats_data/relative_error_{group_var_no_spaces}.csv')
+        est_obs_ratio_df.to_csv(f'stats_data/est_obs_ratio_{group_var_no_spaces}.csv')
 
         # Melt dataframes for easier plotting or analysis
         melted_percent_rmse_df = percent_rmse_df.melt(
@@ -198,11 +202,11 @@ def generate_and_save_tables(time_period_dfs, group_vars):
 
         # Save melted dataframes to CSV
         melted_percent_rmse_df.to_csv(
-            f'{file_prefix}percent_rmse_melted.csv', index=False)
+            f'stats_data/{file_prefix}percent_rmse_melted.csv', index=False)
         melted_relative_error_df.to_csv(
-            f'{file_prefix}relative_error_melted.csv', index=False)
+            f'stats_data/{file_prefix}relative_error_melted.csv', index=False)
         melted_est_obs_ratio_df.to_csv(
-            f'{file_prefix}est_obs_ratio_melted.csv', index=False)
+            f'stats_data/{file_prefix}est_obs_ratio_melted.csv', index=False)
 
         # generate the vega-lite files
         generate_and_save_vega_lite_configs(group_var, file_prefix)
@@ -248,7 +252,7 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": {
-                "url": f"{file_prefix}{file_suffix}"
+                "url": f"stats_data/{file_prefix}{file_suffix}"
             },
             "mark": {
                 "type": "bar",
@@ -283,8 +287,10 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
             }
         }
         config_file_path = os.path.join(
-            output_dir, f"{group_var.lower().replace(' ', '')}_{metric}.vega.json")
+            output_dir, f"stats_data/{group_var.lower().replace(' ', '')}_{metric}.vega.json")
         try:
             with open(config_file_path, 'w') as f:
                 json.dump(config, f, indent=4)
             print(f"Configuration for {metric} saved to: {config_file_path}")
+        except Exception as e:
+            print(f"Failed to save configuration for {metric}: {e}")

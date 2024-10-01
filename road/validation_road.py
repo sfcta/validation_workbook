@@ -100,13 +100,16 @@ def validation_road(config):
     # Load mappings from the config file
     at_mapping = config['AT']['values']
     ft_mapping = config['FT']['values']
+    # Assuming 'AT' and 'FT' contain integer keys or some keys you can map
+    at_mapping_dict = {i: at_mapping[i] for i in range(len(at_mapping))}
+    ft_mapping_dict = {i: ft_mapping[i] for i in range(len(ft_mapping))}
 
     # Extract the observed file name and tab
     obs_filepath = config['OBSERVED_COUNTS']['obs_filepath']
     extra_columns = config['OBSERVED_COUNTS']['obs_extra_columns']
 
     # Convert column letters to numerical indices
-    obs_usecols = [csv_col_letter_to_num(col) for col in config['OBSERVED_COUNTS']['obs_usecols']]
+    obs_usecols = config['OBSERVED_COUNTS']['obs_usecols']
 
     # Read the Obs data and the CHAMP estimation data
     obs_df = pd.read_csv(
@@ -119,14 +122,15 @@ def validation_road(config):
         loaded_network_column_names,
         loaded_network_files_time,
         extra_columns,
-        at_mapping,
-        ft_mapping)
+        at_mapping_dict,
+        ft_mapping_dict)
 
     # Part 1 - Scatter Plot Variables
     chosen_timeperiod = config['SCATTER_INPUT']['chosen_period']
     classification_col = config['SCATTER_INPUT']['classification_col']
     combined_df_cols = config['SCATTER_INPUT']['combined_df_cols']
-    
+    output_file_name = config['SCATTER_INPUT']['output_file_name']
+
     fields1 = config['EST_SCATTER_PLOT']['fields']
     nominal_fields1 = config['EST_SCATTER_PLOT']['nominal_fields']
     x_field1 = config['EST_SCATTER_PLOT']['xfield']
@@ -140,6 +144,7 @@ def validation_road(config):
     y_field2 = config['PERCENT_SCATTER_PLOT']['yfield']
     name2 = config['PERCENT_SCATTER_PLOT']['name']
     vega_diffpercent_output_path = config['PERCENT_SCATTER_PLOT']['diffpercent_output_template']
+ 
 
 
     # Part 2 - Validation Stats Variables
@@ -171,7 +176,16 @@ def validation_road(config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process TOML configuration file for validation.")
     parser.add_argument("config_path", type=str, help="Path to the TOML configuration file.")
-    args = parser.parse_args()
+    
+    # Check if the script is running in an interactive environment or not
+    if len(sys.argv) > 1 and "ipykernel_launcher" not in sys.argv[0]:
+        # Running from command line, use the provided argument
+        args = parser.parse_args()
+    else:
+        # Running in Jupyter or IPython, provide a default path
+        default_config_path = r"X:\Projects\Miscellaneous\validation_simwrapper\roads2023\config.toml"  # Replace with your actual default config path
+        print(f"Running in an interactive environment. Using default config path: {default_config_path}")
+        args = argparse.Namespace(config_path=default_config_path)
 
     # Load the TOML configuration file
     config = toml.load(args.config_path)

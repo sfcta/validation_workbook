@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import tomllib
-from transit_function import dataframe_to_markdown, format_dataframe
+from utils import dataframe_to_markdown, format_dataframe
 
 
 def convert_to_integer(value):
@@ -533,7 +533,7 @@ def process_mkd_bart(
     BART_output_dir,
     observed_BART_county,
     model_BART_county,
-    observed_BART_SL,
+    observed_BART_Screenline,
     Screenline_output_dir,
     tod_order,
     BART_boarding_allday_md,
@@ -550,7 +550,7 @@ def process_mkd_bart(
     county_at_day_csv,
     county_at_am_csv,
     county_at_pm_csv,
-    model_BART_SL,
+    model_BART_Screenline,
     county_br_day_md,
     county_br_am_md,
     county_br_pm_md,
@@ -807,11 +807,11 @@ def process_mkd_bart(
     county_at_pm.to_csv(BART_output_dir / county_at_pm_csv, index=False)
 
     # BART Screenline
-    obs_BART_SL = pd.read_csv(transit_input_dir / observed_BART_SL)
-    model_BART_SL_df = pd.read_csv(output_transit_dir / model_BART_SL)
+    obs_BART_Screenline = pd.read_csv(transit_input_dir / observed_BART_Screenline)
+    model_BART_Screenline_df = pd.read_csv(output_transit_dir / model_BART_Screenline)
     transbay_BART_IB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "Transbay"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -831,8 +831,8 @@ def process_mkd_bart(
         column_widths=70,
     )
     transbay_BART_OB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "Transbay"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -852,8 +852,8 @@ def process_mkd_bart(
         column_widths=70,
     )
     Countyline_BART_OB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "Countyline"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -873,8 +873,8 @@ def process_mkd_bart(
         column_widths=70,
     )
     Countyline_BART_IB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "Countyline"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -894,8 +894,8 @@ def process_mkd_bart(
         column_widths=70,
     )
     Intra_SF_BART_OB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "SF-San Mateo"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -915,8 +915,8 @@ def process_mkd_bart(
         column_widths=70,
     )
     Intra_SF_BART_IB = process_data(
-        obs_BART_SL,
-        model_BART_SL_df,
+        obs_BART_Screenline,
+        model_BART_Screenline_df,
         [("Screenline", "SF-San Mateo"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -957,9 +957,9 @@ def process_mkd_bart(
 
 def process_mkd_screenline(
     transit_input_dir,
-    observed_SL,
+    observed_Screenline,
     output_transit_dir,
-    model_SL,
+    model_Screenline,
     markdown_output_dir,
     tod_order,
     Screenline_output_dir,
@@ -997,11 +997,11 @@ def process_mkd_screenline(
     GG_overall_OB_csv,
 ):
     # Valdiation for Screenlines
-    obs_SL = pd.read_csv(transit_input_dir / observed_SL)
-    model_SL_df = pd.read_csv(output_transit_dir / model_SL)
+    obs_Screenline = pd.read_csv(transit_input_dir / observed_Screenline)
+    model_Screenline_df = pd.read_csv(output_transit_dir / model_Screenline)
     transbay_AC_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Transbay"), ("Operator", "AC Transit"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1020,8 +1020,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     transbay_AC_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Transbay"), ("Operator", "AC Transit"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1040,8 +1040,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     transbay_overall_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Transbay"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1060,8 +1060,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     transbay_overall_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Transbay"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1092,8 +1092,8 @@ def process_mkd_screenline(
         Screenline_output_dir / transbay_AC_OB_csv, index=False
     )
     Countyline_CalTrain_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Operator", "CalTrain"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1112,8 +1112,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_CalTrain_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Operator", "CalTrain"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1132,8 +1132,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_SamTrans_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Operator", "SamTrans"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1152,8 +1152,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_SamTrans_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Operator", "SamTrans"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1172,8 +1172,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_overall_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1192,8 +1192,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_overall_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Countyline"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1230,8 +1230,8 @@ def process_mkd_screenline(
         Screenline_output_dir / Countyline_overall_OB_csv, index=False
     )
     GG_Transit_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [
             ("Screenline", "Golden Gate"),
             ("Operator", "Golden Gate Transit"),
@@ -1254,8 +1254,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_Transit_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [
             ("Screenline", "Golden Gate"),
             ("Operator", "Golden Gate Transit"),
@@ -1278,8 +1278,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_Ferry_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [
             ("Screenline", "Golden Gate"),
             ("Operator", "Golden Gate Ferry"),
@@ -1302,8 +1302,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_Ferry_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [
             ("Screenline", "Golden Gate"),
             ("Operator", "Golden Gate Ferry"),
@@ -1326,8 +1326,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_overall_IB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Golden Gate"), ("Direction", "IB")],
         "TOD",
         "Ridership",
@@ -1346,8 +1346,8 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_overall_OB = process_data(
-        obs_SL,
-        model_SL_df,
+        obs_Screenline,
+        model_Screenline_df,
         [("Screenline", "Golden Gate"), ("Direction", "OB")],
         "TOD",
         "Ridership",
@@ -1397,15 +1397,15 @@ if __name__ == "__main__":
     BART_output_dir = Path(config["directories"]["BART_output_dir"])
     observed_BART = Path(config["transit"]["observed_BART"])
     observed_BART_county = Path(config["transit"]["observed_BART_county"])
-    observed_BART_SL = Path(config["transit"]["observed_BART_SL"])
+    observed_BART_Screenline = Path(config["transit"]["observed_BART_Screenline"])
     observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
-    observed_SL = Path(config["transit"]["observed_SL"])
+    observed_Screenline = Path(config["transit"]["observed_Screenline"])
     observed_NTD = Path(config["transit"]["observed_NTD"])
-    model_BART = Path(config["output"]["model_BART"])
-    model_BART_county = Path(config["output"]["model_BART_county"])
-    model_BART_SL = Path(config["output"]["model_BART_SL"])
-    model_MUNI_Line = Path(config["output"]["model_MUNI_Line"])
-    model_SL = Path(config["output"]["model_SL"])
+    model_BART = Path(config["bart"]["model_BART"])
+    model_BART_county = Path(config["bart"]["model_BART_county"])
+    model_BART_Screenline = Path(config["bart"]["model_BART_Screenline"])
+    model_MUNI_Line = Path(config["muni"]["model_MUNI_Line"])
+    model_Screenline = Path(config["screenline"]["model_Screenline"])
     transbay_BART_IB_csv = Path(config["screenline"]["transbay_BART_IB_csv"])
     transbay_BART_OB_csv = Path(config["screenline"]["transbay_BART_OB_csv"])
     Countyline_BART_IB_csv = Path(config["screenline"]["Countyline_BART_IB_csv"])
@@ -1436,56 +1436,56 @@ if __name__ == "__main__":
     GG_Ferry_OB_csv = Path(config["screenline"]["GG_Ferry_OB_csv"])
     GG_overall_IB_csv = Path(config["screenline"]["GG_overall_IB_csv"])
     GG_overall_OB_csv = Path(config["screenline"]["GG_overall_OB_csv"])
-    MUNI_ib_day = Path(config["markdown"]["MUNI_ib_day"])
-    MUNI_ob_day = Path(config["markdown"]["MUNI_ob_day"])
-    MUNI_ib_am = Path(config["markdown"]["MUNI_ib_am"])
-    MUNI_ib_pm = Path(config["markdown"]["MUNI_ib_pm"])
-    MUNI_ob_am = Path(config["markdown"]["MUNI_ob_am"])
-    MUNI_ob_pm = Path(config["markdown"]["MUNI_ob_pm"])
-    MUNI_mode_day = Path(config["markdown"]["MUNI_mode_day"])
-    MUNI_mode_am_md = Path(config["markdown"]["MUNI_mode_am_md"])
-    MUNI_mode_pm_md = Path(config["markdown"]["MUNI_mode_pm_md"])
-    MUNI_tod_md = Path(config["markdown"]["MUNI_tod_md"])
-    MUNI_EB_md = Path(config["markdown"]["MUNI_EB_md"])
-    MUNI_LB_md = Path(config["markdown"]["MUNI_LB_md"])
-    MUNI_Rail_md = Path(config["markdown"]["MUNI_Rail_md"])
-    BART_boarding_allday_md = Path(config["markdown"]["BART_boarding_allday_md"])
-    BART_boarding_am_md = Path(config["markdown"]["BART_boarding_am_md"])
-    BART_boarding_pm_md = Path(config["markdown"]["BART_boarding_pm_md"])
-    BART_at_allday_md = Path(config["markdown"]["BART_at_allday_md"])
-    BART_at_am_md = Path(config["markdown"]["BART_at_am_md"])
-    BART_at_pm_md = Path(config["markdown"]["BART_at_pm_md"])
-    county_br_day_md = Path(config["markdown"]["county_br_day_md"])
-    county_br_am_md = Path(config["markdown"]["county_br_am_md"])
-    county_br_pm_md = Path(config["markdown"]["county_br_pm_md"])
-    county_at_day_md = Path(config["markdown"]["county_at_day_md"])
-    county_at_am_md = Path(config["markdown"]["county_at_am_md"])
-    county_at_pm_md = Path(config["markdown"]["county_at_pm_md"])
-    transbay_BART_IB_md = Path(config["markdown"]["transbay_BART_IB_md"])
-    transbay_BART_OB_md = Path(config["markdown"]["transbay_BART_OB_md"])
-    Countyline_BART_OB_md = Path(config["markdown"]["Countyline_BART_OB_md"])
-    Countyline_BART_IB_md = Path(config["markdown"]["Countyline_BART_IB_md"])
-    SF_out_md = Path(config["markdown"]["SF_out_md"])
-    SF_in_md = Path(config["markdown"]["SF_in_md"])
-    transbay_AC_IB_md = Path(config["markdown"]["transbay_AC_IB_md"])
-    transbay_AC_OB_md = Path(config["markdown"]["transbay_AC_OB_md"])
-    transbay_overall_IB_md = Path(config["markdown"]["transbay_overall_IB_md"])
-    transbay_overall_OB_md = Path(config["markdown"]["transbay_overall_OB_md"])
-    Countyline_CalTrain_IB_md = Path(config["markdown"]["Countyline_CalTrain_IB_md"])
-    Countyline_CalTrain_OB_md = Path(config["markdown"]["Countyline_CalTrain_OB_md"])
-    Countyline_SamTrans_IB_md = Path(config["markdown"]["Countyline_SamTrans_IB_md"])
-    Countyline_SamTrans_OB_md = Path(config["markdown"]["Countyline_SamTrans_OB_md"])
-    Countyline_overall_IB_md = Path(config["markdown"]["Countyline_overall_IB_md"])
-    Countyline_overall_OB_md = Path(config["markdown"]["Countyline_overall_OB_md"])
-    GG_Transit_IB_md = Path(config["markdown"]["GG_Transit_IB_md"])
-    GG_Transit_OB_md = Path(config["markdown"]["GG_Transit_OB_md"])
-    GG_Ferry_IB_md = Path(config["markdown"]["GG_Ferry_IB_md"])
-    GG_Ferry_OB_md = Path(config["markdown"]["GG_Ferry_OB_md"])
-    GG_overall_IB_md = Path(config["markdown"]["GG_overall_IB_md"])
-    GG_overall_OB_md = Path(config["markdown"]["GG_overall_OB_md"])
-    valTotal_Submode_md = Path(config["markdown"]["valTotal_Submode_md"])
-    valTotal_Service_md = Path(config["markdown"]["valTotal_Service_md"])
-    valTotal_Operator_md = Path(config["markdown"]["valTotal_Operator_md"])
+    MUNI_ib_day = Path(config["muni"]["MUNI_ib_day"])
+    MUNI_ob_day = Path(config["muni"]["MUNI_ob_day"])
+    MUNI_ib_am = Path(config["muni"]["MUNI_ib_am"])
+    MUNI_ib_pm = Path(config["muni"]["MUNI_ib_pm"])
+    MUNI_ob_am = Path(config["muni"]["MUNI_ob_am"])
+    MUNI_ob_pm = Path(config["muni"]["MUNI_ob_pm"])
+    MUNI_mode_day = Path(config["muni"]["MUNI_mode_day"])
+    MUNI_mode_am_md = Path(config["muni"]["MUNI_mode_am_md"])
+    MUNI_mode_pm_md = Path(config["muni"]["MUNI_mode_pm_md"])
+    MUNI_tod_md = Path(config["muni"]["MUNI_tod_md"])
+    MUNI_EB_md = Path(config["muni"]["MUNI_EB_md"])
+    MUNI_LB_md = Path(config["muni"]["MUNI_LB_md"])
+    MUNI_Rail_md = Path(config["muni"]["MUNI_Rail_md"])
+    BART_boarding_allday_md = Path(config["bart"]["BART_boarding_allday_md"])
+    BART_boarding_am_md = Path(config["bart"]["BART_boarding_am_md"])
+    BART_boarding_pm_md = Path(config["bart"]["BART_boarding_pm_md"])
+    BART_at_allday_md = Path(config["bart"]["BART_at_allday_md"])
+    BART_at_am_md = Path(config["bart"]["BART_at_am_md"])
+    BART_at_pm_md = Path(config["bart"]["BART_at_pm_md"])
+    county_br_day_md = Path(config["bart"]["county_br_day_md"])
+    county_br_am_md = Path(config["bart"]["county_br_am_md"])
+    county_br_pm_md = Path(config["bart"]["county_br_pm_md"])
+    county_at_day_md = Path(config["bart"]["county_at_day_md"])
+    county_at_am_md = Path(config["bart"]["county_at_am_md"])
+    county_at_pm_md = Path(config["bart"]["county_at_pm_md"])
+    transbay_BART_IB_md = Path(config["screenline"]["transbay_BART_IB_md"])
+    transbay_BART_OB_md = Path(config["screenline"]["transbay_BART_OB_md"])
+    Countyline_BART_OB_md = Path(config["screenline"]["Countyline_BART_OB_md"])
+    Countyline_BART_IB_md = Path(config["screenline"]["Countyline_BART_IB_md"])
+    SF_out_md = Path(config["screenline"]["SF_out_md"])
+    SF_in_md = Path(config["screenline"]["SF_in_md"])
+    transbay_AC_IB_md = Path(config["screenline"]["transbay_AC_IB_md"])
+    transbay_AC_OB_md = Path(config["screenline"]["transbay_AC_OB_md"])
+    transbay_overall_IB_md = Path(config["screenline"]["transbay_overall_IB_md"])
+    transbay_overall_OB_md = Path(config["screenline"]["transbay_overall_OB_md"])
+    Countyline_CalTrain_IB_md = Path(config["screenline"]["Countyline_CalTrain_IB_md"])
+    Countyline_CalTrain_OB_md = Path(config["screenline"]["Countyline_CalTrain_OB_md"])
+    Countyline_SamTrans_IB_md = Path(config["screenline"]["Countyline_SamTrans_IB_md"])
+    Countyline_SamTrans_OB_md = Path(config["screenline"]["Countyline_SamTrans_OB_md"])
+    Countyline_overall_IB_md = Path(config["screenline"]["Countyline_overall_IB_md"])
+    Countyline_overall_OB_md = Path(config["screenline"]["Countyline_overall_OB_md"])
+    GG_Transit_IB_md = Path(config["screenline"]["GG_Transit_IB_md"])
+    GG_Transit_OB_md = Path(config["screenline"]["GG_Transit_OB_md"])
+    GG_Ferry_IB_md = Path(config["screenline"]["GG_Ferry_IB_md"])
+    GG_Ferry_OB_md = Path(config["screenline"]["GG_Ferry_OB_md"])
+    GG_overall_IB_md = Path(config["screenline"]["GG_overall_IB_md"])
+    GG_overall_OB_md = Path(config["screenline"]["GG_overall_OB_md"])
+    valTotal_Submode_md = Path(config["total"]["valTotal_Submode_md"])
+    valTotal_Service_md = Path(config["total"]["valTotal_Service_md"])
+    valTotal_Operator_md = Path(config["total"]["valTotal_Operator_md"])
     MUNI_OB = Path(config["muni"]["MUNI_OB"])
     MUNI_IB = Path(config["muni"]["MUNI_IB"])
     MUNI_map_IB = Path(config["muni"]["MUNI_map_IB"])
@@ -1554,7 +1554,7 @@ if __name__ == "__main__":
         BART_output_dir,
         observed_BART_county,
         model_BART_county,
-        observed_BART_SL,
+        observed_BART_Screenline,
         Screenline_output_dir,
         tod_order,
         BART_boarding_allday_md,
@@ -1571,7 +1571,7 @@ if __name__ == "__main__":
         county_at_day_csv,
         county_at_am_csv,
         county_at_pm_csv,
-        model_BART_SL,
+        model_BART_Screenline,
         county_br_day_md,
         county_br_am_md,
         county_br_pm_md,
@@ -1593,9 +1593,9 @@ if __name__ == "__main__":
     )
     process_mkd_screenline(
         transit_input_dir,
-        observed_SL,
+        observed_Screenline,
         output_transit_dir,
-        model_SL,
+        model_Screenline,
         markdown_output_dir,
         tod_order,
         Screenline_output_dir,

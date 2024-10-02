@@ -2,10 +2,11 @@ from pathlib import Path
 
 import pandas as pd
 import tomllib
-from transit_function import (
+from utils import (
     dataframe_to_markdown,
     format_numeric,
     read_transit_assignments,
+    time_periods
 )
 
 
@@ -15,13 +16,13 @@ def process_obs_data(
     observed_MUNI_Line,
     observed_BART,
     observed_BART_county,
-    observed_BART_SL,
-    observed_SL,
+    observed_BART_Screenline,
+    observed_Screenline,
     observed_NTD,
     obs_MUNI_line_md,
     obs_BART_station_md,
     obs_BART_county_md,
-    obs_BART_SL_md,
+    obs_BART_Screenline_md,
     obs_Screenlines_md,
     obs_NTD_md,
 ):
@@ -73,22 +74,24 @@ def process_obs_data(
         column_widths=100,
     )
 
-    obs_BART_SL = pd.read_csv(transit_input_dir / observed_BART_SL)
-    obs_BART_SL["Ridership"] = obs_BART_SL["Ridership"].apply(
+    obs_BART_Screenline = pd.read_csv(transit_input_dir / observed_BART_Screenline)
+    obs_BART_Screenline["Ridership"] = obs_BART_Screenline["Ridership"].apply(
         lambda x: format_numeric(x)
     )
     dataframe_to_markdown(
-        obs_BART_SL,
-        Path(markdown_output_dir / obs_BART_SL_md),
+        obs_BART_Screenline,
+        Path(markdown_output_dir / obs_BART_Screenline_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key"],
         column_widths=100,
     )
 
-    obs_SL = pd.read_csv(transit_input_dir / observed_SL)
-    obs_SL["Ridership"] = obs_SL["Ridership"].apply(lambda x: format_numeric(x))
+    obs_Screenline = pd.read_csv(transit_input_dir / observed_Screenline)
+    obs_Screenline["Ridership"] = obs_Screenline["Ridership"].apply(
+        lambda x: format_numeric(x)
+    )
     dataframe_to_markdown(
-        obs_SL,
+        obs_Screenline,
         Path(markdown_output_dir / obs_Screenlines_md),
         highlight_rows=None,
         center_align_columns=["Direction", "TOD", "Key", "Operator", "Mode"],
@@ -115,24 +118,23 @@ if __name__ == "__main__":
     observed_BART = config["transit"]["observed_BART"]
     observed_MUNI_Line = config["transit"]["observed_MUNI_Line"]
     observed_BART_county = config["transit"]["observed_BART_county"]
-    observed_BART_SL = config["transit"]["observed_BART_SL"]
+    observed_BART_Screenline = config["transit"]["observed_BART_Screenline"]
     observed_MUNI_Line = config["transit"]["observed_MUNI_Line"]
-    observed_SL = config["transit"]["observed_SL"]
+    observed_Screenline = config["transit"]["observed_Screenline"]
     observed_NTD = config["transit"]["observed_NTD"]
-    model_BART = config["output"]["model_BART"]
-    model_BART_county = config["output"]["model_BART_county"]
-    model_BART_SL = config["output"]["model_BART_SL"]
-    obs_MUNI_line_md = config["output"]["obs_MUNI_line_md"]
-    obs_BART_station_md = config["output"]["obs_BART_station_md"]
-    obs_BART_county_md = config["output"]["obs_BART_county_md"]
-    obs_BART_SL_md = config["output"]["obs_BART_SL_md"]
-    obs_Screenlines_md = config["output"]["obs_Screenlines_md"]
-    obs_NTD_md = config["output"]["obs_NTD_md"]
+    model_BART = config["bart"]["model_BART"]
+    model_BART_county = config["bart"]["model_BART_county"]
+    model_BART_Screenline = config["bart"]["model_BART_Screenline"]
+    obs_MUNI_line_md = config["muni"]["obs_MUNI_line_md"]
+    obs_BART_station_md = config["bart"]["obs_BART_station_md"]
+    obs_BART_county_md = config["bart"]["obs_BART_county_md"]
+    obs_BART_Screenline_md = config["bart"]["obs_BART_Screenline_md"]
+    obs_Screenlines_md = config["screenline"]["obs_Screenlines_md"]
+    obs_NTD_md = config["total"]["obs_NTD_md"]
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
-    time_periods = ["EA", "AM", "MD", "PM", "EV"]
-    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     process_obs_data(
         transit_input_dir,
@@ -140,13 +142,13 @@ if __name__ == "__main__":
         observed_MUNI_Line,
         observed_BART,
         observed_BART_county,
-        observed_BART_SL,
-        observed_SL,
+        observed_BART_Screenline,
+        observed_Screenline,
         observed_NTD,
         obs_MUNI_line_md,
         obs_BART_station_md,
         obs_BART_county_md,
-        obs_BART_SL_md,
+        obs_BART_Screenline_md,
         obs_Screenlines_md,
         obs_NTD_md,
     )

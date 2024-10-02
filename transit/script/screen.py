@@ -1,6 +1,6 @@
 import pandas as pd
 import tomllib
-from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
+from utils import read_dbf_and_groupby_sum, read_transit_assignments
 
 HWY_SCREENS = {
     "SamTrans": [
@@ -33,34 +33,34 @@ HWY_SCREENS = {
 
 def group_screenline_ridership(combined_gdf, system, A, B, Screenline, Operator, Mode):
     # Read the DBF file and group by 'A' and 'B' while summing 'AB_VOL'
-    sl_total_tod = read_dbf_and_groupby_sum(
+    screenline_total_tod = read_dbf_and_groupby_sum(
         combined_gdf, system, ["A", "B", "TOD"], "AB_VOL"
     )
 
     # Filter rows for IB and calculate the sum of 'AB_VOL"
-    sl_total_tod_ib = sl_total_tod[
-        (sl_total_tod["A"].isin(A)) & (sl_total_tod["B"].isin(B))
+    screenline_total_tod_ib = screenline_total_tod[
+        (screenline_total_tod["A"].isin(A)) & (screenline_total_tod["B"].isin(B))
     ]
-    IB_sum = sl_total_tod_ib.groupby("TOD")["AB_VOL"].sum().reset_index()
+    IB_sum = screenline_total_tod_ib.groupby("TOD")["AB_VOL"].sum().reset_index()
     IB_sum["Screenline"] = Screenline
     IB_sum["Direction"] = "IB"
     IB_sum["Operator"] = Operator
     IB_sum["Mode"] = Mode
 
     # Filter rows for OB and calculate the sum of 'AB_VOL'
-    sl_total_tod_ob = sl_total_tod[
-        (sl_total_tod["A"].isin(B)) & (sl_total_tod["B"].isin(A))
+    screenline_total_tod_ob = screenline_total_tod[
+        (screenline_total_tod["A"].isin(B)) & (screenline_total_tod["B"].isin(A))
     ]
-    OB_sum = sl_total_tod_ob.groupby("TOD")["AB_VOL"].sum().reset_index()
+    OB_sum = screenline_total_tod_ob.groupby("TOD")["AB_VOL"].sum().reset_index()
     OB_sum["Screenline"] = Screenline
     OB_sum["Direction"] = "OB"
     OB_sum["Operator"] = Operator
     OB_sum["Mode"] = Mode
 
-    sl_total = pd.concat([IB_sum, OB_sum])
-    sl_total = sl_total.rename(columns={"AB_VOL": "Ridership"})
+    screenline_total = pd.concat([IB_sum, OB_sum])
+    screenline_total = screenline_total.rename(columns={"AB_VOL": "Ridership"})
 
-    return sl_total
+    return screenline_total
 
 
 def process_screenline_data(combined_gdf, HWY_SCREENS):
@@ -94,10 +94,10 @@ def process_screenline_data(combined_gdf, HWY_SCREENS):
 
 
 def save_final_screenline_data(
-    combined_gdf, output_transit_dir, model_BART_SL, model_SL
+    combined_gdf, output_transit_dir, model_BART_Screenline, model_Screenline
 ):
     model_Screenlines = process_screenline_data(combined_gdf, HWY_SCREENS)
-    BART_Screenlines = pd.read_csv(output_transit_dir / model_BART_SL)
+    BART_Screenlines = pd.read_csv(output_transit_dir / model_BART_Screenline)
     BART_Screenlines["Operator"] = "BART"
     BART_Screenlines["Mode"] = "BART"
     BART_Screenlines["Key"] = (
@@ -106,10 +106,10 @@ def save_final_screenline_data(
         + BART_Screenlines["TOD"]
         + BART_Screenlines["Direction"]
     )
-    model_SL_df = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(
+    model_Screenline_df = pd.concat([BART_Screenlines, model_Screenlines]).reset_index(
         drop=True
     )
-    model_SL_df.to_csv(output_transit_dir / model_SL, index=False)
+    model_Screenline_df.to_csv(output_transit_dir / model_Screenline, index=False)
 
 
 if __name__ == "__main__":
@@ -123,8 +123,8 @@ if __name__ == "__main__":
         "transit_validation_2019_alfaro_filepath"
     ]
     model_run_dir = config["directories"]["model_run"]
-    model_BART_SL = config["output"]["model_BART_SL"]
-    model_SL = config["output"]["model_SL"]
+    model_BART_Screenline = config["bart"]["model_BART_Screenline"]
+    model_Screenline = config["screenline"]["model_Screenline"]
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
@@ -132,5 +132,5 @@ if __name__ == "__main__":
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     save_final_screenline_data(
-        combined_gdf, output_transit_dir, model_BART_SL, model_SL
+        combined_gdf, output_transit_dir, model_BART_Screenline, model_Screenline
     )

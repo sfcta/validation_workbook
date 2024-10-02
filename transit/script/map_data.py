@@ -5,10 +5,11 @@ import geopandas as gpd
 import pandas as pd
 import tomllib
 from shapely.geometry import LineString, Point
-from transit_function import (
+from utils import (
     format_dataframe,
     read_dbf_and_groupby_sum,
     read_transit_assignments,
+    time_periods
 )
 
 
@@ -79,291 +80,16 @@ def concat_ordered_geometries(group):
     return LineString([pt for geom in sorted_geoms for pt in geom.coords])
 
 
-# Convert station abbreviation to full name
-abbr_to_full = {
-    "12TH": "Oakland City Center",
-    "16TH": "16th/Mission",
-    "19TH": "19th St Oakland",
-    "24TH": "24th/Mission",
-    "ANTC": "ANTC",  # NOT IN MODEL (Antioch)
-    "ASHB": "Ashby",
-    "BALB": "Balboa Park",
-    "BAYF": "Bay Fair",
-    "BERY": "Berryessa",
-    "CAST": "Castro Valley",
-    "CIVC": "Civic Center",
-    "COLM": "Colma",
-    "COLS": "Coliseum OAK",
-    "CONC": "Concord",
-    "DALY": "Daly City",
-    "DBRK": "Downtown Berkeley",
-    "DELN": "El Cerrito del Norte",
-    "DUBL": "Dublin/Pleasanton",
-    "EMBR": "Embarcadero",
-    "FRMT": "Fremont",
-    "FTVL": "Fruitvale",
-    "GLEN": "Glen Park",
-    "HAYW": "Hayward",
-    "LAFY": "Lafayette",
-    "LAKE": "Lake Merritt",
-    "MCAR": "MacArthur",
-    "MLBR": "Millbrae",
-    "MONT": "Montgomery",
-    "MLPT": "Milpitas",
-    "NBRK": "North Berkeley",
-    "NCON": "North Concord",
-    "OAKL": "OAKL",  # NOT IN MODEL (Oakland International Airport)
-    "ORIN": "Orinda",
-    "PCTR": "PCTR",  # NOT IN MODEL (Pittsburg Center Station)
-    "PHIL": "Pleasant Hill",
-    "PITT": "Pittsburg/Bay Point",
-    "PLZA": "El Cerrito Plaza",
-    "POWL": "Powell",
-    "RICH": "Richmond",
-    "ROCK": "Rockridge",
-    "SANL": "San Leandro",
-    "SBRN": "San Bruno",
-    "SFIA": "SFO",
-    "SHAY": "S Hayward",
-    "SSAN": "South SF",
-    "UCTY": "Union City",
-    "WARM": "Warm Springs",
-    "WCRK": "Walnut Creek",
-    "WDUB": "West Dublin",
-    "WOAK": "W Oakland",
-}
 
-station_name = {
-    "Station": [
-        "12TH",
-        "16TH",
-        "19TH",
-        "24TH",
-        "ANTC",
-        "ASHB",
-        "BALB",
-        "BAYF",
-        "CAST",
-        "CIVC",
-        "COLM",
-        "COLS",
-        "CONC",
-        "DALY",
-        "DBRK",
-        "DELN",
-        "DUBL",
-        "EMBR",
-        "FRMT",
-        "FTVL",
-        "GLEN",
-        "HAYW",
-        "LAFY",
-        "LAKE",
-        "MCAR",
-        "MLBR",
-        "MONT",
-        "NBRK",
-        "NCON",
-        "OAKL",
-        "ORIN",
-        "PCTR",
-        "PHIL",
-        "PITT",
-        "PLZA",
-        "POWL",
-        "RICH",
-        "ROCK",
-        "SANL",
-        "SBRN",
-        "SFIA",
-        "SHAY",
-        "SSAN",
-        "UCTY",
-        "WARM",
-        "WCRK",
-        "WDUB",
-        "WOAK",
-        "MLPT",
-        "BERY",
-    ],
-    "Node": [
-        16509,
-        16515,
-        16508,
-        16516,
-        15231,
-        16525,
-        16518,
-        16530,
-        16537,
-        16514,
-        16539,
-        16532,
-        16501,
-        16519,
-        16523,
-        16521,
-        16538,
-        16511,
-        16526,
-        16533,
-        16517,
-        16529,
-        16504,
-        16534,
-        16507,
-        16543,
-        16512,
-        16524,
-        16535,
-        16000,
-        16505,
-        15230,
-        16502,
-        16536,
-        16522,
-        16513,
-        16520,
-        16506,
-        16531,
-        16541,
-        16542,
-        16528,
-        16540,
-        16527,
-        16544,
-        16503,
-        16545,
-        16510,
-        11093,
-        15203,
-    ],
-}
-
-station_name = {
-    "Station": [
-        "12TH",
-        "16TH",
-        "19TH",
-        "24TH",
-        "EMBR",
-        "MONT",
-        "POWL",
-        "CIVC",
-        "GLEN",
-        "BALB",
-        "DALY",
-        "ANTC",
-        "ASHB",
-        "UCTY",
-        "BAYF",
-        "CAST",
-        "COLM",
-        "COLS",
-        "CONC",
-        "DBRK",
-        "DELN",
-        "DUBL",
-        "FRMT",
-        "FTVL",
-        "HAYW",
-        "LAFY",
-        "LAKE",
-        "MCAR",
-        "MLBR",
-        "NBRK",
-        "NCON",
-        "OAKL",
-        "ORIN",
-        "PCTR",
-        "PHIL",
-        "PITT",
-        "PLZA",
-        "RICH",
-        "ROCK",
-        "SANL",
-        "SBRN",
-        "SFIA",
-        "SHAY",
-        "SSAN",
-        "WARM",
-        "WCRK",
-        "WDUB",
-        "WOAK",
-        "MLPT",
-        "BERY",
-    ],
-    # Find geometry in X:\Projects\ConnectSF\2050_Baseline
-    "geometry": [
-        (6049767.14, 2119506.7165),
-        (6006767.6834, 2106509.6581),
-        (6050867.2736, 2121607.9255),
-        (6007065.5285, 2101807.0389),
-        (6013668.588, 2116709.2907),
-        (6012268.7237, 2115308.7612),
-        (6010767.7227, 2113809.1607),
-        (6008766.21, 2112007.7684),
-        (6002267.4332, 2095109.9198),
-        (5998566.8683, 2090908.0746),
-        (5992068.011, 2085310.1909),
-        (6190907.33, 2188926.7452),
-        (6050568.4709, 2138306.2913),
-        (6122066.435, 2040507.4321),
-        (6090665.2322, 2081908.2387),
-        (6105865.8549, 2078508.3059),
-        (5992566.8931, 2077808.348),
-        (6071765.9655, 2101207.5399),
-        (6120867.9426, 2181006.9044),
-        (6051067.9389, 2144707.7734),
-        (6037763.8869, 2164902.414),
-        (6157366.8859, 2081006.495),
-        (6133866.765, 2027908.4692),
-        (6063066.6973, 2109207.3256),
-        (6102965.7997, 2071205.9733),
-        (6092368.2914, 2152007.3679),
-        (6051067.7192, 2117807.513),
-        (6051867.9655, 2128708.394),
-        (6015665.034, 2045809.4521),
-        (6046968.3673, 2145106.2995),
-        (6122569.3244, 2191706.0269),
-        (6061416.3918, 2091921.0042),
-        (6075866.7507, 2146907.2611),
-        (6161632.1229, 2195698.4677),
-        (6112666.5933, 2163804.4841),
-        (6146166.9892, 2195906.2658),
-        (6042168.6724, 2155907.4969),
-        (6027067.3566, 2168806.3649),
-        (6055968.0873, 2135207.2884),
-        (6081167.6265, 2090007.967),
-        (6006665.742, 2060908.5058),
-        (6014967.7221, 2051908.139),
-        (6111466.3558, 2057608.1106),
-        (5999066.9282, 2069808.0747),
-        (6142865.7593, 2009107.7673),
-        (6109469.0872, 2155705.9545),
-        (6148868.323, 2080406.2284),
-        (6043866.7193, 2120206.1134),
-        (6156866.4816, 1974108.2663),
-        (6162684.7021, 1961206.4605),
-    ],
-}
-
-
-def create_station_df(station_name):
-    df_station_name = pd.DataFrame(station_name)
-    df_station_name["Station_name"] = df_station_name["Station"].apply(
-        lambda x: abbr_to_full[x]
-    )
-    # Convert the geometry list of tuples into a list of Shapely Point objects
-    station_name["geometry"] = [Point(xy) for xy in station_name["geometry"]]
-    # Create a GeoDataFrame
-    station = gpd.GeoDataFrame(station_name, geometry="geometry")
-    station = station.merge(df_station_name, on="Station", how="left")
+def create_station_df(transit_input_dir, station_node_match):
+    df_station_name = pd.read_csv(transit_input_dir / station_node_match)
+    df_station_name["geometry"] = df_station_name.apply(lambda row: Point(row['x'], row['y']), axis=1)
+    station = gpd.GeoDataFrame(df_station_name, geometry="geometry")
     return station
 
 
 def process_muni_map(
-    file_name,
+    combined_gdf,
     output_transit_dir,
     MUNI_output_dir,
     SHP_file_dir,
@@ -377,7 +103,7 @@ def process_muni_map(
     MUNI_map_OB,
 ):
     MUNI = read_dbf_and_groupby_sum(
-        file_name, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
+        combined_gdf, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
     )
     MUNI = sort_dataframe_by_mixed_column(MUNI, "FULLNAME")
     MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
@@ -620,18 +346,11 @@ def process_bart_map(
     BART_at_am,
     BART_at_map_am,
     BART_at_pm,
-    BART_at_map_pm,
+    BART_at_map_pm, 
+    station_node_match,
 ):
-    df_station_name = pd.DataFrame(station_name)
-    df_station_name["Station_name"] = df_station_name["Station"].apply(
-        lambda x: abbr_to_full[x]
-    )
-    # Convert the geometry list of tuples into a list of Shapely Point objects
-    station_name["geometry"] = [Point(xy) for xy in station_name["geometry"]]
-    # Create a GeoDataFrame
-    station = gpd.GeoDataFrame(station_name, geometry="geometry")
-    station = station.merge(df_station_name, on=["Station", "geometry"], how="left")
     # BART
+    station = create_station_df(transit_input_dir, station_node_match)
     obs_BART_line = pd.read_csv(transit_input_dir / observed_BART)
     model_BART_line = pd.read_csv(output_transit_dir / model_BART)
 
@@ -717,20 +436,70 @@ if __name__ == "__main__":
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
-    WORKING_FOLDER = Path(config["directories"]["transit_input_dir"])
+    transit_input_dir = Path(config["directories"]["transit_input_dir"])
+    station_node_match = Path(config["transit"]["station_node_match"])
     MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
     BART_output_dir = Path(config["directories"]["BART_output_dir"])
     Base_model_dir = Path(config["directories"]["Base_model_dir"])
     SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
+    model_MUNI_Line = Path(config["muni"]["model_MUNI_Line"])
+    model_BART = Path(config["bart"]["model_BART"])
     observed_BART = Path(config["transit"]["observed_BART"])
+    BART_br_map = Path(config["bart"]["BART_br_map"])
+    BART_br = Path(config["bart"]["BART_br"])
+    BART_br_am = Path(config["bart"]["BART_br_am"])
+    BART_br_pm = Path(config["bart"]["BART_br_pm"])
+    BART_at = Path(config["bart"]["BART_at"])
+    BART_at_am = Path(config["bart"]["BART_at_am"])
+    BART_at_pm = Path(config["bart"]["BART_at_pm"])
+    BART_br_map_pm = Path(config["bart"]["BART_br_map_pm"])
+    BART_br_map_am = Path(config["bart"]["BART_br_map_am"])
+    BART_at_map = Path(config["bart"]["BART_at_map"])
+    BART_at_map_am = Path(config["bart"]["BART_at_map_am"])
+    BART_at_map_pm = Path(config["bart"]["BART_at_map_pm"])
+    BART_at_allday_csv = Path(config["bart"]["BART_at_allday_csv"])
+    muni_ib_shp = Path(config["muni"]["muni_ib_shp"])
+    muni_ob_shp = Path(config["muni"]["muni_ob_shp"])
+    MUNI_OB = Path(config["muni"]["MUNI_OB"])
+    MUNI_IB = Path(config["muni"]["MUNI_IB"])
+    MUNI_map_IB = Path(config["muni"]["MUNI_map_IB"])
+    MUNI_map_OB = Path(config["muni"]["MUNI_map_OB"])
+
     FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
-    time_periods = ["EA", "AM", "MD", "PM", "EV"]
-    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
-    # Process MUNI data and save results
     process_muni_map(
-        dbf_file, output_transit_dir, MUNI_output_dir, SHP_file_dir, FREEFLOW_SHP
+        combined_gdf,
+        output_transit_dir,
+        MUNI_output_dir,
+        SHP_file_dir,
+        FREEFLOW_SHP,
+        model_MUNI_Line,
+        muni_ib_shp,
+        muni_ob_shp,
+        MUNI_OB,
+        MUNI_IB,
+        MUNI_map_IB,
+        MUNI_map_OB,
     )
-
-    # Process BART data and save results
-    process_bart_map(BART_output_dir, output_transit_dir, observed_BART, SHP_file_dir)
+    process_bart_map(
+        BART_output_dir,
+        transit_input_dir,
+        output_transit_dir,
+        observed_BART,
+        model_BART,
+        SHP_file_dir,
+        BART_br,
+        BART_br_map,
+        BART_br_pm,
+        BART_br_map_pm,
+        BART_br_am,
+        BART_br_map_am,
+        BART_at,
+        BART_at_map,
+        BART_at_am,
+        BART_at_map_am,
+        BART_at_pm,
+        BART_at_map_pm,
+        station_node_match
+    )

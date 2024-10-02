@@ -1,227 +1,17 @@
-from pathlib import Path
-
 import pandas as pd
 import tomllib
-from transit_function import read_dbf_and_groupby_sum, read_transit_assignments
-
-
-def read_nodes(model_run_dir):
-    filepath = Path(model_run_dir) / "nodes.xls"
-    return pd.read_excel(filepath, header=None, names=["Node", "Node Name"])
-
-
-station_dict = {
-    "Oakland City Center BART": "12TH",
-    "16th/Mission BART": "16TH",
-    "19th St Oakland BART": "19TH",
-    "24th/Mission BART": "24TH",
-    "Hillcrest eBART": "ANTC",
-    "Ashby BART": "ASHB",
-    "Balboa Park BART": "BALB",
-    "Bay Fair BART": "BAYF",
-    "Castro Valley BART": "CAST",
-    "Civic Center BART": "CIVC",
-    "Colma BART": "COLM",
-    "Coliseum OAK BART": "COLS",
-    "Coliseium OAC": "COLS",
-    "Concord BART": "CONC",
-    "Daly City BART": "DALY",
-    "Downtown Berkeley BART": "DBRK",
-    "El Cerrito del Norte BART": "DELN",
-    "Dublin/Pleasanton BART": "DUBL",
-    "Embarcadero BART": "EMBR",
-    "Fremont BART": "FRMT",
-    "Fruitvale BART": "FTVL",
-    "Glen Park BART": "GLEN",
-    "Hayward BART": "HAYW",
-    "Lafayette BART": "LAFY",
-    "Lake Merritt BART": "LAKE",
-    "MacArthur BART": "MCAR",
-    "Millbrae BART": "MLBR",
-    "Montgomery BART": "MONT",
-    "North Berkeley BART": "NBRK",
-    "North Concord BART": "NCON",
-    "Oakland Airport OAC": "OAKL",
-    "Orinda BART": "ORIN",
-    "Somersville Road eBART": "PCTR",
-    "Pleasant Hill BART": "PHIL",
-    "Pittsburg/Bay Point BART": "PITT",
-    "El Cerrito Plaza BART": "PLZA",
-    "Powell BART": "POWL",
-    "Richmond BART": "RICH",
-    "Rockridge BART": "ROCK",
-    "San Leandro BART": "SANL",
-    "San Bruno BART": "SBRN",
-    "SFO BART": "SFIA",
-    "S Hayward BART": "SHAY",
-    "South SF BART": "SSAN",
-    "Union City BART": "UCTY",
-    "Warm Springs BART": "WARM",
-    "Walnut Creek BART": "WCRK",
-    "West Dublin BART": "WDUB",
-    "W Oakland BART": "WOAK",
-}
-
-counties = {
-    "San Francisco": ["EMBR", "CIVC", "24TH", "MONT", "POWL", "GLEN", "16TH", "BALB"],
-    "San Mateo": ["DALY", "COLM", "SSAN", "SBRN", "SFIA", "MLBR"],
-    "Contra Costa": [
-        "RICH",
-        "ORIN",
-        "LAFY",
-        "WCRK",
-        "CONC",
-        "NCON",
-        "PITT",
-        "ANTC",
-        "DELN",
-        "PHIL",
-        "PCTR",
-        "PLZA",
-    ],
-    "Alameda": [
-        "WOAK",
-        "12TH",
-        "19TH",
-        "MCAR",
-        "ASHB",
-        "DUBL",
-        "WDUB",
-        "CAST",
-        "WARM",
-        "UCTY",
-        "SHAY",
-        "HAYW",
-        "BAYF",
-        "SANL",
-        "OAKL",
-        "COLS",
-        "FTVL",
-        "LAKE",
-        "ROCK",
-        "DBRK",
-        "NBRK",
-        "FRMT",
-    ],
-    "Santa Clara": [],  # Add stations for Santa Clara if available
-}
+from utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
 
 station_locations = {
     "downtown": ["CIVC", "POWL", "MONT", "EMBR"],
     "not_downtown": ["GLEN", "BALB", "24TH", "16TH"],
 }
 
-# def station_name():
-#     station_name = {
-#         "Station": [
-#             "12TH",
-#             "16TH",
-#             "19TH",
-#             "24TH",
-#             "ANTC",
-#             "ASHB",
-#             "BALB",
-#             "BAYF",
-#             "CAST",
-#             "CIVC",
-#             "COLM",
-#             "COLS",
-#             "CONC",
-#             "DALY",
-#             "DBRK",
-#             "DELN",
-#             "DUBL",
-#             "EMBR",
-#             "FRMT",
-#             "FTVL",
-#             "GLEN",
-#             "HAYW",
-#             "LAFY",
-#             "LAKE",
-#             "MCAR",
-#             "MLBR",
-#             "MONT",
-#             "NBRK",
-#             "NCON",
-#             "OAKL",
-#             "ORIN",
-#             "PCTR",
-#             "PHIL",
-#             "PITT",
-#             "PLZA",
-#             "POWL",
-#             "RICH",
-#             "ROCK",
-#             "SANL",
-#             "SBRN",
-#             "SFIA",
-#             "SHAY",
-#             "SSAN",
-#             "UCTY",
-#             "WARM",
-#             "WCRK",
-#             "WDUB",
-#             "WOAK",
-#         ],
-#         "Node": [
-#             16509,
-#             16515,
-#             16508,
-#             16516,
-#             15231,
-#             16525,
-#             16518,
-#             16530,
-#             16537,
-#             16514,
-#             16539,
-#             16532,
-#             16501,
-#             16519,
-#             16523,
-#             16521,
-#             16538,
-#             16511,
-#             16526,
-#             16533,
-#             16517,
-#             16529,
-#             16504,
-#             16534,
-#             16507,
-#             16543,
-#             16512,
-#             16524,
-#             16535,
-#             16000,
-#             16505,
-#             15230,
-#             16502,
-#             16536,
-#             16522,
-#             16513,
-#             16520,
-#             16506,
-#             16531,
-#             16541,
-#             16542,
-#             16528,
-#             16540,
-#             16527,
-#             16544,
-#             16503,
-#             16545,
-#             16510,
-#         ],
-#     }
-#     df_station_name = pd.DataFrame(station_name)
-#     return df_station_name
 
-
-def process_BART_data(combined_gdf, model_run_dir, output_dir, model_BART):
+def process_BART_data(combined_gdf, transit_input_dir, station_node_match):
     # Process BART data for different routes and columns
-    nodes = read_nodes(model_run_dir)
-    # station = station_name()
+    nodes = pd.read_csv(transit_input_dir / station_node_match)
+    nodes = nodes[["Station", "Node", "County"]]
     bart_boarding = read_dbf_and_groupby_sum(
         combined_gdf, "BART", ["A", "TOD"], "AB_BRDA"
     )
@@ -253,13 +43,7 @@ def process_BART_data(combined_gdf, model_run_dir, output_dir, model_BART):
 
     # Merge with other dataframes
     bart_nodea = pd.merge(bart_nodea, nodes, on=["Node"], how="left")
-    bart_nodea["Station"] = bart_nodea["Node Name"].map(station_dict)
-    # BART_A = pd.merge(BART_A, station, on=["Node"], how="right")
     bart = pd.merge(bart_nodea, bart_nodeb, on=["Node", "TOD"], how="right")
-
-    # Drop rows with specific values
-    values_to_drop = ["Hillcrest eBART", "Coliseium OAC", "Somersville Road eBART"]
-    bart = bart[~bart["Node Name"].isin(values_to_drop)]
 
     # Add columns and rearrange columns
     bart["Key"] = bart["Station"] + bart["TOD"]
@@ -267,38 +51,41 @@ def process_BART_data(combined_gdf, model_run_dir, output_dir, model_BART):
         "Node",
         "TOD",
         "Boardings",
-        "Node Name",
         "Station",
+        "County",
         "Alightings",
         "Key",
     ]
-    bart = bart[
-        ["Node", "Node Name", "Station", "TOD", "Key", "Boardings", "Alightings"]
-    ]
+    bart = bart[["Node", "Station", "County", "TOD", "Key", "Boardings", "Alightings"]]
 
-    # Sort and reset index
-    bart = bart[["Station", "TOD", "Key", "Boardings", "Alightings"]]
-    bart = bart.sort_values(by="Key").reset_index(drop=True)
-    bart.to_csv(output_dir / model_BART, index=False)
     return bart
 
 
 def process_BART_county(
-    combined_gdf, model_run_dir, output_dir, model_BART_county, model_BART
+    combined_gdf,
+    output_transit_dir,
+    transit_input_dir,
+    station_node_match,
+    model_BART_county,
+    model_BART,
 ):
-    BART_county = process_BART_data(combined_gdf, model_run_dir, output_dir, model_BART)
-    station_to_county = {
-        station: county for county, stations in counties.items() for station in stations
-    }
+    BART_county = process_BART_data(combined_gdf, transit_input_dir, station_node_match)
+
+    bart_model = BART_county[["Station", "TOD", "Key", "Boardings", "Alightings"]]
+    bart_model = bart_model.sort_values(by="Key").reset_index(drop=True)
+    bart_model.to_csv(output_transit_dir / model_BART, index=False)
+    # station_to_county = {
+    #     station: county for county, stations in counties.items() for station in stations
+    # }
 
     # Add the 'County' column to the DataFrame
-    BART_county["County"] = BART_county["Station"].map(station_to_county)
+    # BART_county["County"] = BART_county["Station"].map(station_to_county)
     BART_county = (
         BART_county.groupby(["County", "TOD"])[["Boardings", "Alightings"]]
         .sum()
         .reset_index()
     )
-    BART_county.to_csv(output_dir / model_BART_county, index=False)
+    BART_county.to_csv(output_transit_dir / model_BART_county, index=False)
 
 
 def process_bart_screenline_data(combined_gdf, A, B):
@@ -362,9 +149,10 @@ def determineScreenline(x):
         return False
 
 
-def process_BART_SF(filename, model_run_dir):
-    nodes = read_nodes(model_run_dir)
-    # df_station_name = station_name()
+def process_BART_SF(combined_gdf, transit_input_dir, station_node_match):
+    nodes = pd.read_csv(transit_input_dir / station_node_match)
+    nodes = nodes[["Station", "Node", "County"]]
+
     lines = ["BART", "EBART", "OAC"]
     station_to_label = {
         station: label
@@ -377,7 +165,7 @@ def process_BART_SF(filename, model_run_dir):
 
     # Read, group, and sum data for each line
     dfs = [
-        read_dbf_and_groupby_sum(filename, line, ["A", "B", "TOD"], "AB_VOL")
+        read_dbf_and_groupby_sum(combined_gdf, line, ["A", "B", "TOD"], "AB_VOL")
         for line in lines
     ]
 
@@ -385,20 +173,9 @@ def process_BART_SF(filename, model_run_dir):
     intra = pd.concat(dfs)
 
     # Mapping from Node and Station DataFrames
-    node_mapping = nodes.set_index("Node")["Node Name"].to_dict()
-    # station_mapping = df_station_name.set_index("Node")["Station"].to_dict()
-
-    # Apply mappings
-    intra["A_name"] = intra["A"].map(node_mapping)
-    intra["B_name"] = intra["B"].map(node_mapping)
-    intra["A_station"] = intra["A_name"].map(station_dict)
-    intra["B_station"] = intra["B_name"].map(station_dict)
-
-    # Filter out specific values and stations
-    values_to_drop = ["Hillcrest eBART", "Coliseium OAC", "Somersville Road eBART"]
-    intra = intra[
-        ~intra["A_name"].isin(values_to_drop) & ~intra["B_name"].isin(values_to_drop)
-    ]
+    node_to_station = dict(zip(nodes["Node"], nodes["Station"]))
+    intra["A_station"] = intra["A"].map(node_to_station)
+    intra["B_station"] = intra["B"].map(node_to_station)
     intra = intra[
         intra["A_station"].isin(relevant_stations)
         & intra["B_station"].isin(relevant_stations)
@@ -423,19 +200,51 @@ def process_BART_SF(filename, model_run_dir):
 
 
 def process_BART_Screenline(
-    combined_gdf, model_run_dir, output_dir, model_BART_Screenline
+    combined_gdf,
+    output_transit_dir,
+    transit_input_dir,
+    station_node_match,
+    model_BART_Screenline,
 ):
     transbay_node = [16510, 16511]  # 16510 in, 16511 out
-    BART_sl_tb = BART_Screenline_Concat(
+    BART_screenline_tb = BART_Screenline_Concat(
         combined_gdf, transbay_node[0], transbay_node[1], "Transbay"
     )
     countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
-    BART_sl_ct = BART_Screenline_Concat(
+    BART_screenline_ct = BART_Screenline_Concat(
         combined_gdf, countyline_node[0], countyline_node[1], "Countyline"
     )
-    BART_sf = process_BART_SF(combined_gdf, model_run_dir)
-    bart_screenline = pd.concat([BART_sl_tb, BART_sl_ct, BART_sf], ignore_index=True)
-    bart_screenline.to_csv(output_dir / model_BART_Screenline, index=False)
+    BART_sf = process_BART_SF(combined_gdf, transit_input_dir, station_node_match)
+    bart_screenline = pd.concat(
+        [BART_screenline_tb, BART_screenline_ct, BART_sf], ignore_index=True
+    )
+    bart_screenline.to_csv(output_transit_dir / model_BART_Screenline, index=False)
+
+
+def process_BART_model_outputs(
+    combined_gdf,
+    output_transit_dir,
+    transit_input_dir,
+    station_node_match,
+    model_BART_Screenline,
+    model_BART_county,
+    model_BART,
+):
+    process_BART_Screenline(
+        combined_gdf,
+        output_transit_dir,
+        transit_input_dir,
+        station_node_match,
+        model_BART_Screenline,
+    )
+    process_BART_county(
+        combined_gdf,
+        output_transit_dir,
+        transit_input_dir,
+        station_node_match,
+        model_BART_county,
+        model_BART,
+    )
 
 
 if __name__ == "__main__":
@@ -443,15 +252,24 @@ if __name__ == "__main__":
         config = tomllib.load(f)
 
     model_run_dir = config["directories"]["model_run"]
-    model_BART = config["output"]["model_BART"]
-    model_BART_county = config["output"]["model_BART_county"]
-    model_BART_Screenline = config["output"]["model_BART_Screenline"]
+    model_BART = config["bart"]["model_BART"]
+    model_BART_county = config["bart"]["model_BART_county"]
+    model_BART_Screenline = config["bart"]["model_BART_Screenline"]
+    station_node_match = config["transit"]["station_node_match"]
+    transit_input_dir = config["directories"]["transit_input_dir"]
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)
-    time_periods = ["EA", "AM", "MD", "PM", "EV"]
-    dbf_file = read_transit_assignments(model_run_dir, time_periods)
+    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
-    process_BART_Screenline(dbf_file, model_run_dir, output_dir, model_BART_Screenline)
-    process_BART_county(dbf_file, model_run_dir, output_dir, model_BART_county)
-    process_BART_data(dbf_file, model_run_dir, output_dir, model_BART)
+    process_BART_model_outputs(
+        combined_gdf,
+        output_transit_dir,
+        transit_input_dir,
+        station_node_match,
+        model_run_dir,
+        output_dir,
+        model_BART_Screenline,
+        model_BART_county,
+        model_BART,
+    )

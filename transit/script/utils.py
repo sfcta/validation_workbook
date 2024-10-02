@@ -3,6 +3,7 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
+time_periods = ["EA", "AM", "MD", "PM", "EV"]
 
 def transit_assignment_filepaths(model_run_dir, time_periods):
     return {t: Path(model_run_dir) / f"SFALLMSA{t}.DBF" for t in time_periods}

@@ -2,6 +2,7 @@ import toml
 import string
 import pandas as pd
 import argparse
+import sys
 from dataprocess import generate_loaded_network_file_names, filter_and_aggregate
 from scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
 from stats import prepare_time_period_dfs, generate_and_save_tables

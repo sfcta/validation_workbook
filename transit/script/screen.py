@@ -2,34 +2,6 @@ import pandas as pd
 import tomllib
 from utils import read_dbf_and_groupby_sum, read_transit_assignments
 
-# HWY_SCREENS = {
-#     "SamTrans": [
-#         [40029, 7732, 52774, 33539, 51113, 21584, 50995],  # inbound
-#         [52118, 52264, 21493, 33737, 22464, 21522, 20306],  # outbound
-#         ["SamTrans", "Countyline", "SamTrans", "Local Bus"],
-#     ],
-#     "GG Transit": [
-#         [8318, 8315],  # inbound
-#         [8338, 8339],  # outbound
-#         ["Golden Gate Transit", "Golden Gate", "Golden Gate Transit", "Local Bus"],
-#     ],
-#     "GG Ferry": [
-#         [15503, 15608, 15503, 15608, 15502],  # inbound
-#         [15501, 15600, 15601, 15601, 15600],  # outbound
-#         ["Ferry", "Golden Gate", "Golden Gate Ferry", "Ferry"],
-#     ],
-#     "CalTrain": [
-#         [14659, 14659, 14661, 14660, 14661, 14660],  # inbound
-#         [14658, 14655, 14655, 14655, 14656, 14656],  # outbound
-#         ["Caltrain", "Countyline", "CalTrain", "Premium"],
-#     ],
-#     "AC transit": [
-#         [52833, 52832],  # inbound
-#         [52495, 52494],  # outbound
-#         ["AC Transit", "Transbay", "AC Transit", "Premium"],
-#     ],
-# }
-
 
 def group_screenline_ridership(combined_gdf, system, A, B, Screenline, Operator, Mode):
     # Read the DBF file and group by 'A' and 'B' while summing 'AB_VOL'

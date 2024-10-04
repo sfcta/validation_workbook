@@ -5,7 +5,7 @@ from utils import (
     format_dataframe,
     read_dbf_and_groupby_sum,
     read_transit_assignments,
-    time_periods
+    time_periods,
 )
 
 

@@ -6,7 +6,7 @@ from utils import (
     dataframe_to_markdown,
     format_numeric,
     read_transit_assignments,
-    time_periods
+    time_periods,
 )
 
 

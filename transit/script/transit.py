@@ -153,9 +153,16 @@ GG_Ferry_IB_md = Path(config["screenline"]["GG_Ferry_IB_md"])
 GG_Ferry_OB_md = Path(config["screenline"]["GG_Ferry_OB_md"])
 GG_overall_IB_md = Path(config["screenline"]["GG_overall_IB_md"])
 GG_overall_OB_md = Path(config["screenline"]["GG_overall_OB_md"])
+GG_Transit = config["screenline"]["GG_Transit"]
+SamTrans = config["screenline"]["SamTrans"]
+GG_Ferry = config["screenline"]["GG_Ferry"]
+CalTrain = config["screenline"]["CalTrain"]
+AC_transit = config["screenline"]["AC_transit"]
 valTotal_Submode_md = Path(config["total"]["valTotal_Submode_md"])
 valTotal_Service_md = Path(config["total"]["valTotal_Service_md"])
 valTotal_Operator_md = Path(config["total"]["valTotal_Operator_md"])
+transbay_node = config["screenline"]["transbay_node"]
+countyline_node = config["screenline"]["countyline_node"]
 output_dir = model_run_dir / "validation_workbook" / "output"
 output_transit_dir = output_dir / "transit"
 output_transit_dir.mkdir(parents=True, exist_ok=True)
@@ -174,6 +181,8 @@ if __name__ == "__main__":
         model_BART_Screenline,
         model_BART_county,
         model_BART,
+        transbay_node,
+        countyline_node,
     )
     process_muni(
         combined_gdf,
@@ -185,7 +194,15 @@ if __name__ == "__main__":
         model_MUNI_Line,
     )
     save_final_screenline_data(
-        combined_gdf, output_transit_dir, model_BART_Screenline, model_Screenline
+        combined_gdf,
+        output_transit_dir,
+        model_BART_Screenline,
+        model_Screenline,
+        SamTrans,
+        GG_Transit,
+        GG_Ferry,
+        CalTrain,
+        AC_transit,
     )
     process_mkd_muni(
         transit_input_dir,
@@ -337,7 +354,7 @@ if __name__ == "__main__":
         BART_at_map_am,
         BART_at_pm,
         BART_at_map_pm,
-        station_node_match
+        station_node_match,
     )
     process_obs_data(
         transit_input_dir,

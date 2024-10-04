@@ -9,7 +9,7 @@ from utils import (
     format_dataframe,
     read_dbf_and_groupby_sum,
     read_transit_assignments,
-    time_periods
+    time_periods,
 )
 
 
@@ -80,10 +80,11 @@ def concat_ordered_geometries(group):
     return LineString([pt for geom in sorted_geoms for pt in geom.coords])
 
 
-
 def create_station_df(transit_input_dir, station_node_match):
     df_station_name = pd.read_csv(transit_input_dir / station_node_match)
-    df_station_name["geometry"] = df_station_name.apply(lambda row: Point(row['x'], row['y']), axis=1)
+    df_station_name["geometry"] = df_station_name.apply(
+        lambda row: Point(row["x"], row["y"]), axis=1
+    )
     station = gpd.GeoDataFrame(df_station_name, geometry="geometry")
     return station
 
@@ -346,7 +347,7 @@ def process_bart_map(
     BART_at_am,
     BART_at_map_am,
     BART_at_pm,
-    BART_at_map_pm, 
+    BART_at_map_pm,
     station_node_match,
 ):
     # BART
@@ -501,5 +502,5 @@ if __name__ == "__main__":
         BART_at_map_am,
         BART_at_pm,
         BART_at_map_pm,
-        station_node_match
+        station_node_match,
     )

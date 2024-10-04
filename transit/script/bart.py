@@ -205,12 +205,12 @@ def process_BART_Screenline(
     transit_input_dir,
     station_node_match,
     model_BART_Screenline,
+    transbay_node,
+    countyline_node
 ):
-    transbay_node = [16510, 16511]  # 16510 in, 16511 out
     BART_screenline_tb = BART_Screenline_Concat(
         combined_gdf, transbay_node[0], transbay_node[1], "Transbay"
     )
-    countyline_node = [16519, 16518]  # 16519n-- in, 16518 --out
     BART_screenline_ct = BART_Screenline_Concat(
         combined_gdf, countyline_node[0], countyline_node[1], "Countyline"
     )
@@ -229,6 +229,8 @@ def process_BART_model_outputs(
     model_BART_Screenline,
     model_BART_county,
     model_BART,
+    transbay_node,
+    countyline_node
 ):
     process_BART_Screenline(
         combined_gdf,
@@ -236,6 +238,8 @@ def process_BART_model_outputs(
         transit_input_dir,
         station_node_match,
         model_BART_Screenline,
+        transbay_node,
+        countyline_node
     )
     process_BART_county(
         combined_gdf,
@@ -257,6 +261,8 @@ if __name__ == "__main__":
     model_BART_Screenline = config["bart"]["model_BART_Screenline"]
     station_node_match = config["transit"]["station_node_match"]
     transit_input_dir = config["directories"]["transit_input_dir"]
+    transbay_node = config["screenline"]["transbay_node"]
+    countyline_node = config["screenline"]["countyline_node"]
     output_dir = model_run_dir / "validation_workbook" / "output"
     output_transit_dir = output_dir / "transit"
     output_transit_dir.mkdir(parents=True, exist_ok=True)

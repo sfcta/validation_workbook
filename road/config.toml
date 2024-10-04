@@ -37,7 +37,7 @@ yfield = "Estimated Volume"
 fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Dir"]
 
 # Be careful to state all nominal fields from the above fields
-nominal_fields = ["Loc Type", "A", "B", "Location", , "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", "Dir"]
 name = "Estimation Volume"
 est_output_template = "{classification_col_types}_{name}_est.vega.json"
 

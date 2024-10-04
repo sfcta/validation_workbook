@@ -10,29 +10,28 @@ layout:
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4
-      shapes: road.shp
+      shapes: map.shp
       datasets:
             data:
-                file: map/map_data.csv
+                file: map.csv
                 join: AB
       display:
             lineWidth:
                 dataset: data
                 columnName: Daily_obs
-                scaleFactor: 200
+                scaleFactor: 100
             lineColor:
                 dataset: data
                 columnName: Daily_diff
                 colorRamp:
                     ramp: PRGn
-                    steps: 11
-                    breakpoints: -20000,-10000,-5000,-1000,-500,500,2000,5000,7000,15000
+                    steps: 100
       tooltip:
             - data:AB
             - data:Source ID
             - data:Loc Type
-            - data:AT Grp
-            - data:FT Grp
+            - data:AT Group
+            - data:FT Group
             - data:AM_obs
             - data:AM_est
             - data:AM_diff
@@ -50,29 +49,28 @@ layout:
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4
-      shapes: road.shp
+      shapes: map.shp
       datasets:
             data:
-                file: map/map_data.csv
+                file: map.csv
                 join: AB
       display:
             lineWidth:
                 dataset: data
                 columnName: Daily_obs
-                scaleFactor: 200
+                scaleFactor: 100
             lineColor:
                 dataset: data
                 columnName: Daily_pctdiff
                 colorRamp:
                     ramp: PRGn
                     steps: 10
-                    breakpoints: -100,-70,-30,-15,0,15,30,70,100
       tooltip:
             - data:AB
             - data:Source ID
             - data:Loc Type
-            - data:AT Grp
-            - data:FT Grp
+            - data:AT Group
+            - data:FT Group
             - data:AM_obs
             - data:AM_est
             - data:AM_diff

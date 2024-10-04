@@ -1,7 +1,7 @@
 [LOADED_NETWORK]
 path = "Q:/Model Development/Simwrapper Validation/notebooks/roads/Data"
 
-# The dbf file name is LOAD[TOD].dbf by default
+# The Loaded_network file name is LOAD[TOD].dbf by default
 timeperiods = ["AM", "MD", "PM", "EV", "EA"]
 
 # The needed CHAMP output columns

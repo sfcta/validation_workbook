@@ -114,12 +114,12 @@ def process_bart_screenline_data(combined_gdf, A, B):
     return result
 
 
-def BART_Screenline_Concat(combined_gdf, A, B, Screenline):
+def BART_Screenline_Concat(combined_gdf, A, B, screenline:str):
     # Concatenate the DataFrames
     bart_screenline = process_bart_screenline_data(combined_gdf, A, B)
 
     # Add the 'Screenline' column with 'Countyline'
-    bart_screenline["Screenline"] = Screenline
+    bart_screenline["Screenline"] = screenline
 
     # Create the 'Key' column by combining 'Screenline', 'Direction', and 'TOD'
     bart_screenline["Key"] = (

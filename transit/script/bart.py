@@ -12,6 +12,7 @@ def process_BART_data(combined_gdf, transit_input_dir, station_node_match):
     # Process BART data for different routes and columns
     nodes = pd.read_csv(transit_input_dir / station_node_match)
     nodes = nodes[["Station", "Node", "County"]]
+    # AB_BRDA represents the boarding ridership from A to B
     bart_boarding = read_dbf_and_groupby_sum(
         combined_gdf, "BART", ["A", "TOD"], "AB_BRDA"
     )
@@ -22,6 +23,7 @@ def process_BART_data(combined_gdf, transit_input_dir, station_node_match):
         combined_gdf, "OAC", ["A", "TOD"], "AB_BRDA"
     )
 
+    # AB_XITA represents the alighting ridership from A to B
     bart_alighting = read_dbf_and_groupby_sum(
         combined_gdf, "BART", ["A", "TOD"], "AB_XITA"
     )
@@ -206,14 +208,19 @@ def process_BART_Screenline(
     station_node_match,
     model_BART_Screenline,
     transbay_node,
-    countyline_node
+    countyline_node,
 ):
+    # Transbay
     BART_screenline_tb = BART_Screenline_Concat(
         combined_gdf, transbay_node[0], transbay_node[1], "Transbay"
     )
+
+    # Countyline
     BART_screenline_ct = BART_Screenline_Concat(
         combined_gdf, countyline_node[0], countyline_node[1], "Countyline"
     )
+
+    # Intra-sf: within SF -- Between downtown stations
     BART_sf = process_BART_SF(combined_gdf, transit_input_dir, station_node_match)
     bart_screenline = pd.concat(
         [BART_screenline_tb, BART_screenline_ct, BART_sf], ignore_index=True
@@ -230,7 +237,7 @@ def process_BART_model_outputs(
     model_BART_county,
     model_BART,
     transbay_node,
-    countyline_node
+    countyline_node,
 ):
     process_BART_Screenline(
         combined_gdf,
@@ -239,7 +246,7 @@ def process_BART_model_outputs(
         station_node_match,
         model_BART_Screenline,
         transbay_node,
-        countyline_node
+        countyline_node,
     )
     process_BART_county(
         combined_gdf,

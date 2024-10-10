@@ -101,50 +101,49 @@ def append_group_total(df, stations, group_name):
     return df
 
 
-def process_BART_data(
-    obs_MUNI_line,
-    model_MUNI_line,
+def process_bart_data(
+    obs_bart_line,
+    model_bart_line,
     direction_filter,
     tod_filter,
     groupby_column,
     sum_column,
 ):
     """
-    Process MUNI data from Excel and CSV files with flexible grouping and summing.
+    Process BART data from Excel and CSV files with flexible grouping and summing.
 
     Parameters:
-    excel_file_path (str): Path to the Excel file.
-    csv_file_path (str): Path to the CSV file.
+    obs_bart_line (str): Path to the obs_bart CSV file.
+    model_bart_line (str): Path to the model_bart CSV file.
     direction_filter (str): Direction to filter the data by.
+    tod_filter (str): Time of Day
     groupby_column (str): Column name to group by.
     sum_column (str): Column name to sum.
-    convert_to_integer_function (function): Function to convert column values to integers.
-    format_dataframe_function (function): Function to format the DataFrame.
 
     Returns:
     pd.DataFrame: The processed and formatted DataFrame.
     """
 
     # Apply the custom function to convert values
-    model_MUNI_line[groupby_column] = model_MUNI_line[groupby_column].apply(
+    model_bart_line[groupby_column] = model_bart_line[groupby_column].apply(
         convert_to_integer
     )
 
     # Determine filter conditions
-    obs_condition = pd.Series([True] * len(obs_MUNI_line))
-    model_condition = pd.Series([True] * len(model_MUNI_line))
+    obs_condition = pd.Series([True] * len(obs_bart_line))
+    model_condition = pd.Series([True] * len(model_bart_line))
 
     if direction_filter is not None:
-        obs_condition &= obs_MUNI_line["Direction"] == direction_filter
-        model_condition &= model_MUNI_line["Direction"] == direction_filter
+        obs_condition &= obs_bart_line["Direction"] == direction_filter
+        model_condition &= model_bart_line["Direction"] == direction_filter
 
     if tod_filter is not None:
-        obs_condition &= obs_MUNI_line["TOD"] == tod_filter
-        model_condition &= model_MUNI_line["TOD"] == tod_filter
+        obs_condition &= obs_bart_line["TOD"] == tod_filter
+        model_condition &= model_bart_line["TOD"] == tod_filter
 
     # Processing observed data
     MUNI_IB_obs = (
-        obs_MUNI_line[obs_condition]
+        obs_bart_line[obs_condition]
         .groupby(groupby_column)[sum_column]
         .sum()
         .reset_index()
@@ -155,7 +154,7 @@ def process_BART_data(
 
     # Processing modeled data
     MUNI_IB_model = (
-        model_MUNI_line[model_condition]
+        model_bart_line[model_condition]
         .groupby(groupby_column)[sum_column]
         .sum()
         .reset_index()
@@ -592,7 +591,7 @@ def process_mkd_bart(
     # BART
     obs_BART_line = pd.read_csv(transit_input_dir / observed_BART)
     model_BART_line = pd.read_csv(output_transit_dir / model_BART)
-    BART_boarding_allday = process_BART_data(
+    BART_boarding_allday = process_bart_data(
         obs_BART_line, model_BART_line, None, None, "Station", "Boardings"
     )
     BART_boarding_allday = sort_dataframe_by_custom_order(
@@ -606,7 +605,7 @@ def process_mkd_bart(
         column_widths=80,
     )
     BART_boarding_allday.to_csv(BART_output_dir / BART_boarding_allday_csv, index=False)
-    BART_boarding_am = process_BART_data(
+    BART_boarding_am = process_bart_data(
         obs_BART_line, model_BART_line, None, "AM", "Station", "Boardings"
     )
     BART_boarding_am = sort_dataframe_by_custom_order(
@@ -619,7 +618,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=80,
     )
-    BART_boarding_pm = process_BART_data(
+    BART_boarding_pm = process_bart_data(
         obs_BART_line, model_BART_line, None, "PM", "Station", "Boardings"
     )
     BART_boarding_pm = sort_dataframe_by_custom_order(
@@ -632,7 +631,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=80,
     )
-    BART_at_allday = process_BART_data(
+    BART_at_allday = process_bart_data(
         obs_BART_line, model_BART_line, None, None, "Station", "Alightings"
     )
     BART_at_allday = sort_dataframe_by_custom_order(
@@ -646,7 +645,7 @@ def process_mkd_bart(
         column_widths=80,
     )
     BART_at_allday.to_csv(BART_output_dir / BART_at_allday_csv, index=False)
-    BART_at_am = process_BART_data(
+    BART_at_am = process_bart_data(
         obs_BART_line, model_BART_line, None, "AM", "Station", "Alightings"
     )
     BART_at_am = sort_dataframe_by_custom_order(BART_at_am, "Station", custom_order)
@@ -657,7 +656,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=80,
     )
-    BART_at_pm = process_BART_data(
+    BART_at_pm = process_bart_data(
         obs_BART_line, model_BART_line, None, "PM", "Station", "Alightings"
     )
     BART_at_pm = sort_dataframe_by_custom_order(BART_at_pm, "Station", custom_order)

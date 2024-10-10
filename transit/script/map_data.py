@@ -74,8 +74,8 @@ def map_name_to_direction(name):
         return None  # Return None for other cases
 
 
-# Function to concatenate ordered geometries
 def concat_ordered_geometries(group):
+    """ Function to concatenate ordered geometries """
     sorted_geoms = group.sort_values(by="SEQ")["geometry"]
     return LineString([pt for geom in sorted_geoms for pt in geom.coords])
 

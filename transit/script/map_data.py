@@ -96,8 +96,8 @@ def process_muni_map(
     SHP_file_dir,
     FREEFLOW_SHP,
     model_MUNI_Line,
-    muni_ib,
-    muni_ob,
+    muni_ib_shp,
+    muni_ob_shp,
     MUNI_OB,
     MUNI_IB,
     MUNI_map_IB,
@@ -200,7 +200,7 @@ def process_muni_map(
 
     # Convert to GeoDataFrame
     aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry="geometry")
-    aggregated_muni_ib.to_file(SHP_file_dir / muni_ib)
+    aggregated_muni_ib.to_file(SHP_file_dir / muni_ib_shp)
     MUNI_map_IB_df = aggregated_muni_ib[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -287,7 +287,7 @@ def process_muni_map(
         .reset_index()
     )
 
-    aggregated_muni_ob.to_file(SHP_file_dir / muni_ob)
+    aggregated_muni_ob.to_file(SHP_file_dir / muni_ob_shp)
     MUNI_map_OB_df = aggregated_muni_ob[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -307,7 +307,7 @@ def process_muni_map(
     MUNI_map_OB_df.to_csv(MUNI_output_dir / MUNI_map_OB, index=False)
 
 
-def BART_map(
+def bart_map(
     type,
     group_by,
     TOD,
@@ -342,14 +342,14 @@ def BART_map(
     BART_2 = BART.copy()
     BART_2["Percentage Diff"] = BART_2["Percentage Diff"] * 100
     numeric_cols = ["Observed", "Modeled", "Diff"]
-    BART_map = format_dataframe(
+    bart_map = format_dataframe(
         BART_2, numeric_columns=numeric_cols, percentage_columns=["Percentage Diff"]
     )
-    BART_map = BART_map.merge(station, on="Station", how="right")
-    BART_map = gpd.GeoDataFrame(BART_map, geometry="geometry")
-    BART_map.crs = "epsg:2227"
-    BART_map = BART_map.to_crs(epsg=4236)
-    BART_map.to_file(os.path.join(SHP_file_dir, shp))
+    bart_map = bart_map.merge(station, on="Station", how="right")
+    bart_map = gpd.GeoDataFrame(bart_map, geometry="geometry")
+    bart_map.crs = "epsg:2227"
+    bart_map = bart_map.to_crs(epsg=4236)
+    bart_map.to_file(os.path.join(SHP_file_dir, shp))
 
 
 def process_bart_map(
@@ -378,7 +378,7 @@ def process_bart_map(
     obs_BART_line = pd.read_csv(transit_input_dir / observed_BART)
     model_BART_line = pd.read_csv(output_transit_dir / model_BART)
 
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station"],
         None,
@@ -390,7 +390,7 @@ def process_bart_map(
         BART_output_dir,
         SHP_file_dir,
     )
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station", "TOD"],
         "AM",
@@ -402,7 +402,7 @@ def process_bart_map(
         BART_output_dir,
         SHP_file_dir,
     )
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station", "TOD"],
         "PM",
@@ -414,7 +414,7 @@ def process_bart_map(
         BART_output_dir,
         SHP_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station"],
         None,
@@ -426,7 +426,7 @@ def process_bart_map(
         BART_output_dir,
         SHP_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station", "TOD"],
         "AM",
@@ -438,7 +438,7 @@ def process_bart_map(
         BART_output_dir,
         SHP_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station", "TOD"],
         "PM",

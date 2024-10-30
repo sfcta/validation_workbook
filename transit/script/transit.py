@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import tomllib
-from bart import process_BART_model_outputs
+from bart import process_bart_model_outputs
 from map_data import process_bart_map, process_muni_map
 from muni import process_muni
 from obs import process_obs_data
@@ -131,6 +131,10 @@ county_br_pm_md = Path(config["bart"]["county_br_pm_md"])
 county_at_day_md = Path(config["bart"]["county_at_day_md"])
 county_at_am_md = Path(config["bart"]["county_at_am_md"])
 county_at_pm_md = Path(config["bart"]["county_at_pm_md"])
+screenline_overall_ib_csv = Path(config["screenline"]["screenline_overall_ib_csv"])
+screenline_overall_ob_csv = Path(config["screenline"]["screenline_overall_ob_csv"])
+screenline_overall_ib_md = Path(config["screenline"]["screenline_overall_ib_md"])
+screenline_overall_ob_md = Path(config["screenline"]["screenline_overall_ob_md"])
 transbay_BART_IB_md = Path(config["screenline"]["transbay_BART_IB_md"])
 transbay_BART_OB_md = Path(config["screenline"]["transbay_BART_OB_md"])
 Countyline_BART_OB_md = Path(config["screenline"]["Countyline_BART_OB_md"])
@@ -173,7 +177,7 @@ tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
 
 if __name__ == "__main__":
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
-    process_BART_model_outputs(
+    process_bart_model_outputs(
         combined_gdf,
         output_transit_dir,
         transit_input_dir,
@@ -278,7 +282,7 @@ if __name__ == "__main__":
         Countyline_BART_IB_csv,
         Countyline_BART_OB_csv,
         Intra_SF_BART_IB_csv,
-        Intra_SF_BART_OB_csv,
+        Intra_SF_BART_OB_csv
     )
     process_mkd_screenline(
         transit_input_dir,
@@ -320,6 +324,10 @@ if __name__ == "__main__":
         GG_Ferry_OB_csv,
         GG_overall_IB_csv,
         GG_overall_OB_csv,
+        screenline_overall_ib_csv,
+        screenline_overall_ob_csv,
+        screenline_overall_ib_md,
+        screenline_overall_ob_md
     )
     process_muni_map(
         combined_gdf,

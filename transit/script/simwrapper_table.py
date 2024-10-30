@@ -442,6 +442,7 @@ def process_mkd_muni(
         MUNI_tod_df["TOD"], categories=tod_order, ordered=True
     )
     MUNI_tod_df = MUNI_tod_df.sort_values("TOD")
+    MUNI_tod_df = MUNI_tod_df.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         MUNI_tod_df,
         file_name=Path(markdown_output_dir / MUNI_tod_md),
@@ -465,6 +466,7 @@ def process_mkd_muni(
         MUNI_EB_df["TOD"], categories=tod_order, ordered=True
     )
     MUNI_EB_df = MUNI_EB_df.sort_values("TOD")
+    MUNI_EB_df = MUNI_EB_df.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         MUNI_EB_df,
         file_name=Path(markdown_output_dir / MUNI_EB_md),
@@ -488,6 +490,7 @@ def process_mkd_muni(
         MUNI_LB_df["TOD"], categories=tod_order, ordered=True
     )
     MUNI_LB_df = MUNI_LB_df.sort_values("TOD")
+    MUNI_LB_df = MUNI_LB_df.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         MUNI_LB_df,
         file_name=Path(markdown_output_dir / MUNI_LB_md),
@@ -511,6 +514,7 @@ def process_mkd_muni(
         MUNI_Rail_df["TOD"], categories=tod_order, ordered=True
     )
     MUNI_Rail_df = MUNI_Rail_df.sort_values("TOD")
+    MUNI_Rail_df = MUNI_Rail_df.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         MUNI_Rail_df,
         file_name=Path(markdown_output_dir / MUNI_Rail_md),
@@ -567,7 +571,7 @@ def process_mkd_bart(
     Countyline_BART_IB_csv,
     Countyline_BART_OB_csv,
     Intra_SF_BART_IB_csv,
-    Intra_SF_BART_OB_csv,
+    Intra_SF_BART_OB_csv
 ):
     # Custom order based on the provided list
     custom_order = [
@@ -808,6 +812,7 @@ def process_mkd_bart(
     # BART Screenline
     obs_BART_Screenline = pd.read_csv(transit_input_dir / observed_BART_Screenline)
     model_BART_Screenline_df = pd.read_csv(output_transit_dir / model_BART_Screenline)
+
     transbay_BART_IB = process_data(
         obs_BART_Screenline,
         model_BART_Screenline_df,
@@ -822,6 +827,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     transbay_BART_IB = transbay_BART_IB.sort_values("TOD")
+    transbay_BART_IB = transbay_BART_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_BART_IB,
         file_name=Path(markdown_output_dir / transbay_BART_IB_md),
@@ -843,6 +849,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     transbay_BART_OB = transbay_BART_OB.sort_values("TOD")
+    transbay_BART_OB = transbay_BART_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_BART_OB,
         file_name=Path(markdown_output_dir / transbay_BART_OB_md),
@@ -864,6 +871,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     Countyline_BART_OB = Countyline_BART_OB.sort_values("TOD")
+    Countyline_BART_OB = Countyline_BART_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_BART_OB,
         file_name=Path(markdown_output_dir / Countyline_BART_OB_md),
@@ -885,6 +893,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     Countyline_BART_IB = Countyline_BART_IB.sort_values("TOD")
+    Countyline_BART_IB = Countyline_BART_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_BART_IB,
         file_name=Path(markdown_output_dir / Countyline_BART_IB_md),
@@ -906,6 +915,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     Intra_SF_BART_OB = Intra_SF_BART_OB.sort_values("TOD")
+    Intra_SF_BART_OB = Intra_SF_BART_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Intra_SF_BART_OB,
         file_name=Path(markdown_output_dir / SF_out_md),
@@ -927,6 +937,7 @@ def process_mkd_bart(
     )
     # Sort the DataFrame by the 'TOD' column
     Intra_SF_BART_IB = Intra_SF_BART_IB.sort_values("TOD")
+    Intra_SF_BART_IB = Intra_SF_BART_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Intra_SF_BART_IB,
         file_name=Path(markdown_output_dir / SF_in_md),
@@ -934,6 +945,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=70,
     )
+
     transbay_BART_IB[~transbay_BART_IB["TOD"].isin(["Total"])].to_csv(
         Screenline_output_dir / transbay_BART_IB_csv, index=False
     )
@@ -994,10 +1006,56 @@ def process_mkd_screenline(
     GG_Ferry_OB_csv,
     GG_overall_IB_csv,
     GG_overall_OB_csv,
+    screenline_overall_ib_csv,
+    screenline_overall_ob_csv,
+    screenline_overall_ib_md,
+    screenline_overall_ob_md
 ):
     # Valdiation for Screenlines
     obs_Screenline = pd.read_csv(transit_input_dir / observed_Screenline)
     model_Screenline_df = pd.read_csv(output_transit_dir / model_Screenline)
+    screenline_overall_ib = process_data(
+        obs_Screenline,
+        model_Screenline_df,
+        [("Direction", "IB")],
+        "TOD",
+        "Ridership",
+        "TOD",
+        "left",
+    )
+    screenline_overall_ib["TOD"] = pd.Categorical(
+        screenline_overall_ib["TOD"], categories=tod_order, ordered=True
+    )
+    screenline_overall_ib = screenline_overall_ib.sort_values("TOD")
+    screenline_overall_ib = screenline_overall_ib.set_index('TOD').reindex(tod_order).reset_index()
+    dataframe_to_markdown(
+        screenline_overall_ib,
+        file_name=Path(markdown_output_dir / screenline_overall_ib_md),
+        highlight_rows=[5],
+        center_align_columns=None,
+        column_widths=70,
+    )
+    screenline_overall_ob = process_data(
+        obs_Screenline,
+        model_Screenline_df,
+        [("Direction", "OB")],
+        "TOD",
+        "Ridership",
+        "TOD",
+        "left",
+    )
+    screenline_overall_ob["TOD"] = pd.Categorical(
+        screenline_overall_ob["TOD"], categories=tod_order, ordered=True
+    )
+    screenline_overall_ob = screenline_overall_ob.sort_values("TOD")
+    screenline_overall_ob = screenline_overall_ob.set_index('TOD').reindex(tod_order).reset_index()
+    dataframe_to_markdown(
+        screenline_overall_ob,
+        file_name=Path(markdown_output_dir / screenline_overall_ob_md),
+        highlight_rows=[5],
+        center_align_columns=None,
+        column_widths=70,
+    )
     transbay_AC_IB = process_data(
         obs_Screenline,
         model_Screenline_df,
@@ -1011,6 +1069,7 @@ def process_mkd_screenline(
         transbay_AC_IB["TOD"], categories=tod_order, ordered=True
     )
     transbay_AC_IB = transbay_AC_IB.sort_values("TOD")
+    transbay_AC_IB = transbay_AC_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_AC_IB,
         file_name=Path(markdown_output_dir / transbay_AC_IB_md),
@@ -1031,6 +1090,7 @@ def process_mkd_screenline(
         transbay_AC_OB["TOD"], categories=tod_order, ordered=True
     )
     transbay_AC_OB = transbay_AC_OB.sort_values("TOD")
+    transbay_AC_OB = transbay_AC_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_AC_OB,
         file_name=Path(markdown_output_dir / transbay_AC_OB_md),
@@ -1051,6 +1111,7 @@ def process_mkd_screenline(
         transbay_overall_IB["TOD"], categories=tod_order, ordered=True
     )
     transbay_overall_IB = transbay_overall_IB.sort_values("TOD")
+    transbay_overall_IB = transbay_overall_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_overall_IB,
         file_name=Path(markdown_output_dir / transbay_overall_IB_md),
@@ -1071,6 +1132,7 @@ def process_mkd_screenline(
         transbay_overall_OB["TOD"], categories=tod_order, ordered=True
     )
     transbay_overall_OB = transbay_overall_OB.sort_values("TOD")
+    transbay_overall_OB = transbay_overall_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         transbay_overall_OB,
         file_name=Path(markdown_output_dir / transbay_overall_OB_md),
@@ -1103,6 +1165,7 @@ def process_mkd_screenline(
         Countyline_CalTrain_IB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_CalTrain_IB = Countyline_CalTrain_IB.sort_values("TOD")
+    Countyline_CalTrain_IB = Countyline_CalTrain_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_CalTrain_IB,
         file_name=Path(markdown_output_dir / Countyline_CalTrain_IB_md),
@@ -1123,6 +1186,7 @@ def process_mkd_screenline(
         Countyline_CalTrain_OB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_CalTrain_OB = Countyline_CalTrain_OB.sort_values("TOD")
+    Countyline_CalTrain_OB = Countyline_CalTrain_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_CalTrain_OB,
         file_name=Path(markdown_output_dir / Countyline_CalTrain_OB_md),
@@ -1143,6 +1207,7 @@ def process_mkd_screenline(
         Countyline_SamTrans_IB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_SamTrans_IB = Countyline_SamTrans_IB.sort_values("TOD")
+    Countyline_SamTrans_IB = Countyline_SamTrans_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_SamTrans_IB,
         file_name=Path(markdown_output_dir / Countyline_SamTrans_IB_md),
@@ -1163,6 +1228,7 @@ def process_mkd_screenline(
         Countyline_SamTrans_OB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_SamTrans_OB = Countyline_SamTrans_OB.sort_values("TOD")
+    Countyline_SamTrans_OB = Countyline_SamTrans_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_SamTrans_OB,
         file_name=Path(markdown_output_dir / Countyline_SamTrans_OB_md),
@@ -1183,6 +1249,7 @@ def process_mkd_screenline(
         Countyline_overall_IB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_overall_IB = Countyline_overall_IB.sort_values("TOD")
+    Countyline_overall_IB = Countyline_overall_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_overall_IB,
         file_name=Path(markdown_output_dir / Countyline_overall_IB_md),
@@ -1203,12 +1270,19 @@ def process_mkd_screenline(
         Countyline_overall_OB["TOD"], categories=tod_order, ordered=True
     )
     Countyline_overall_OB = Countyline_overall_OB.sort_values("TOD")
+    Countyline_overall_OB = Countyline_overall_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         Countyline_overall_OB,
         file_name=Path(markdown_output_dir / Countyline_overall_OB_md),
         highlight_rows=[5],
         center_align_columns=None,
         column_widths=70,
+    )
+    screenline_overall_ib[~screenline_overall_ib["TOD"].isin(["Total"])].to_csv(
+        Screenline_output_dir / screenline_overall_ib_csv, index=False
+    )
+    screenline_overall_ob[~screenline_overall_ob["TOD"].isin(["Total"])].to_csv(
+        Screenline_output_dir / screenline_overall_ob_csv, index=False
     )
     Countyline_CalTrain_IB[~Countyline_CalTrain_IB["TOD"].isin(["Total"])].to_csv(
         Screenline_output_dir / Countyline_CalTrain_IB_csv, index=False
@@ -1245,6 +1319,7 @@ def process_mkd_screenline(
         GG_Transit_IB["TOD"], categories=tod_order, ordered=True
     )
     GG_Transit_IB = GG_Transit_IB.sort_values("TOD")
+    GG_Transit_IB = GG_Transit_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_Transit_IB,
         file_name=Path(markdown_output_dir / GG_Transit_IB_md),
@@ -1269,6 +1344,7 @@ def process_mkd_screenline(
         GG_Transit_OB["TOD"], categories=tod_order, ordered=True
     )
     GG_Transit_OB = GG_Transit_OB.sort_values("TOD")
+    GG_Transit_OB = GG_Transit_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_Transit_OB,
         file_name=Path(markdown_output_dir / GG_Transit_OB_md),
@@ -1293,6 +1369,7 @@ def process_mkd_screenline(
         GG_Ferry_IB["TOD"], categories=tod_order, ordered=True
     )
     GG_Ferry_IB = GG_Ferry_IB.sort_values("TOD")
+    GG_Ferry_IB = GG_Ferry_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_Ferry_IB,
         file_name=Path(markdown_output_dir / GG_Ferry_IB_md),
@@ -1317,6 +1394,7 @@ def process_mkd_screenline(
         GG_Ferry_OB["TOD"], categories=tod_order, ordered=True
     )
     GG_Ferry_OB = GG_Ferry_OB.sort_values("TOD")
+    GG_Ferry_OB = GG_Ferry_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_Ferry_OB,
         file_name=Path(markdown_output_dir / GG_Ferry_OB_md),
@@ -1337,6 +1415,7 @@ def process_mkd_screenline(
         GG_overall_IB["TOD"], categories=tod_order, ordered=True
     )
     GG_overall_IB = GG_overall_IB.sort_values("TOD")
+    GG_overall_IB = GG_overall_IB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_overall_IB,
         file_name=Path(markdown_output_dir / GG_overall_IB_md),
@@ -1357,6 +1436,7 @@ def process_mkd_screenline(
         GG_overall_OB["TOD"], categories=tod_order, ordered=True
     )
     GG_overall_OB = GG_overall_OB.sort_values("TOD")
+    GG_overall_OB = GG_overall_OB.set_index('TOD').reindex(tod_order).reset_index()
     dataframe_to_markdown(
         GG_overall_OB,
         file_name=Path(markdown_output_dir / GG_overall_OB_md),
@@ -1482,6 +1562,10 @@ if __name__ == "__main__":
     GG_Ferry_OB_md = Path(config["screenline"]["GG_Ferry_OB_md"])
     GG_overall_IB_md = Path(config["screenline"]["GG_overall_IB_md"])
     GG_overall_OB_md = Path(config["screenline"]["GG_overall_OB_md"])
+    screenline_overall_ib_csv = Path(config["screenline"]["screenline_overall_ib_csv"])
+    screenline_overall_ob_csv = Path(config["screenline"]["screenline_overall_ob_csv"])
+    screenline_overall_ib_md = Path(config["screenline"]["screenline_overall_ib_md"])
+    screenline_overall_ob_md = Path(config["screenline"]["screenline_overall_ob_md"])
     valTotal_Submode_md = Path(config["total"]["valTotal_Submode_md"])
     valTotal_Service_md = Path(config["total"]["valTotal_Service_md"])
     valTotal_Operator_md = Path(config["total"]["valTotal_Operator_md"])
@@ -1588,7 +1672,7 @@ if __name__ == "__main__":
         Countyline_BART_IB_csv,
         Countyline_BART_OB_csv,
         Intra_SF_BART_IB_csv,
-        Intra_SF_BART_OB_csv,
+        Intra_SF_BART_OB_csv
     )
     process_mkd_screenline(
         transit_input_dir,
@@ -1630,4 +1714,8 @@ if __name__ == "__main__":
         GG_Ferry_OB_csv,
         GG_overall_IB_csv,
         GG_overall_OB_csv,
+        screenline_overall_ib_csv,
+        screenline_overall_ob_csv,
+        screenline_overall_ib_md,
+        screenline_overall_ob_md
     )

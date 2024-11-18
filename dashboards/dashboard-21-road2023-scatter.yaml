@@ -1,0 +1,52 @@
+header:
+  tab: '2023 Road Validation - Scatter plots'
+  title: '2023 Road Validation - Scatter plots'
+  description: ''
+  triggerPattern: "validation2023"
+  
+layout:
+  row1:
+  - config: validation2023/road/all_Estimation Volume_est.vega.json
+    description: ''
+    title: all - Estimation Volume
+    type: vega
+  - config: validation2023/road/all_Percent Errors_diffpercent.vega.json
+    description: ''
+    title: all - Percent Errors
+    type: vega
+  row2:
+  - config: validation2023/road/SF Count_Estimation Volume_est.vega.json
+    description: ''
+    title: SF Count - Estimation Volume
+    type: vega
+  - config: validation2023/road/SF Count_Percent Errors_diffpercent.vega.json
+    description: ''
+    title: SF Count - Percent Errors
+    type: vega
+  row3:
+  - config: validation2023/road/SF Screenline_Estimation Volume_est.vega.json
+    description: ''
+    title: SF Screenline - Estimation Volume
+    type: vega
+  - config: validation2023/road/SF Screenline_Percent Errors_diffpercent.vega.json
+    description: ''
+    title: SF Screenline - Percent Errors
+    type: vega
+  row4:
+  - config: validation2023/road/San Francisco_Estimation Volume_est.vega.json
+    description: ''
+    title: San Francisco - Estimation Volume
+    type: vega
+  - config: validation2023/road/San Francisco_Percent Errors_diffpercent.vega.json
+    description: ''
+    title: San Francisco - Percent Errors
+    type: vega
+  row5:
+  - config: validation2023/road/Other County Screenline_Estimation Volume_est.vega.json
+    description: ''
+    title: Other County Screenline - Estimation Volume
+    type: vega
+  - config: validation2023/road/Other County Screenline_Percent Errors_diffpercent.vega.json
+    description: ''
+    title: Other County Screenline - Percent Errors
+    type: vega

@@ -1,8 +1,9 @@
 header:
-  tab: "Val Screenline"
-  title: "Validation of Screenline Ridership"
-  description: ""
-
+  tab: "2023 Transit Validation - Screenline"
+  title: "2023 Transit Validation - Screenline"
+  description: "Validation of Screenline Ridership"
+  triggerPattern: "validation2023"
+  
 layout:
   TBart IN:
     - type: text
@@ -12,13 +13,13 @@ layout:
         ridership for the BART Transbay screenline, offering an assessment of the
         accuracy of the ridership predictions.
         
-      file: './table/transbay_BART_IB.md'
+      file: './validation2023/transit/transbay_BART_IB.md'
 
     - type: 'line'
       title: 'Transbay BART IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_BART_IB.csv'
+      dataset: './validation2023/transit/transbay_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -34,13 +35,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the BART Transbay screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/transbay_BART_OB.md'
+      file: './validation2023/transit/transbay_BART_OB.md'
 
     - type: 'line'
       title: 'Transbay BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_BART_OB.csv'
+      dataset: './validation2023/transit/transbay_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -56,13 +57,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/transbay_AC_IB.md'
+      file: './validation2023/transit/transbay_AC_IB.md'
 
     - type: 'line'
       title: 'Transbay AC Transit IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_AC_IB.csv'
+      dataset: './validation2023/transit/transbay_AC_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -78,13 +79,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/transbay_AC_OB.md'
+      file: './validation2023/transit/transbay_AC_OB.md'
 
     - type: 'line'
       title: 'Transbay AC Transit OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_AC_OB.csv'
+      dataset: './validation2023/transit/transbay_AC_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -101,13 +102,13 @@ layout:
         ridership of BART and AC transit across the 
         Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/transbay_overall_IB.md'
+      file: './validation2023/transit/transbay_overall_IB.md'
     
     - type: 'line'
       title: 'Transbay BART & AC Transit IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_overall_IB.csv'
+      dataset: './validation2023/transit/transbay_overall_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -124,13 +125,13 @@ layout:
         ridership of BART and AC transit across the 
         Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/transbay_overall_OB.md'
+      file: './validation2023/transit/transbay_overall_OB.md'
 
     - type: 'line'
       title: 'Transbay BART & AC Transit OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_overall_OB.csv'
+      dataset: './validation2023/transit/transbay_overall_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -147,13 +148,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the SF - San Mateo Countyline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/Countyline_BART_IB.md'
+      file: './validation2023/transit/Countyline_BART_IB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline BART IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_BART_IB.csv'
+      dataset: './validation2023/transit/Countyline_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -169,13 +170,13 @@ layout:
         This table presents a comparison between observed and modeled outbound 
         ridership for the SF - San Mateo Countyline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/Countyline_BART_OB.md'
+      file: './validation2023/transit/Countyline_BART_OB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_BART_OB.csv'
+      dataset: './validation2023/transit/Countyline_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -191,13 +192,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_CalTrain_IB.md'
+      file: './validation2023/transit/Countyline_CalTrain_IB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline Caltrain IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_CalTrain_IB.csv'
+      dataset: './validation2023/transit/Countyline_CalTrain_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -213,13 +214,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_CalTrain_OB.md'
+      file: './validation2023/transit/Countyline_CalTrain_OB.md'
   
     - type: 'line'
       title: 'SF - San Mateo Countyline Caltrain OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_CalTrain_OB.csv'
+      dataset: './validation2023/transit/Countyline_CalTrain_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -235,13 +236,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_SamTrans_IB.md'
+      file: './validation2023/transit/Countyline_SamTrans_IB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline SamTrans IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_SamTrans_IB.csv'
+      dataset: './validation2023/transit/Countyline_SamTrans_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -257,13 +258,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_SamTrans_OB.md'
+      file: './validation2023/transit/Countyline_SamTrans_OB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline SamTrans OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_SamTrans_OB.csv'
+      dataset: './validation2023/transit/Countyline_SamTrans_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -279,13 +280,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_overall_IB.md'
+      file: './validation2023/transit/Countyline_overall_IB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline Overall IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_overall_IB.csv'
+      dataset: './validation2023/transit/Countyline_overall_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -301,13 +302,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/Countyline_overall_OB.md'
+      file: './validation2023/transit/Countyline_overall_OB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline Overall OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_overall_OB.csv'
+      dataset: './validation2023/transit/Countyline_overall_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -323,13 +324,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the Golden Gate Transit screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/GG_Transit_IB.md'
+      file: './validation2023/transit/GG_Transit_IB.md'
 
     - type: 'line'
       title: 'Golden Gate Transit IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_Transit_IB.csv'
+      dataset: './validation2023/transit/GG_Transit_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -345,13 +346,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the Golden Gate Transit screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/GG_Transit_OB.md'
+      file: './validation2023/transit/GG_Transit_OB.md'
 
     - type: 'line'
       title: 'Golden Gate Transit OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_Transit_OB.csv'
+      dataset: './validation2023/transit/GG_Transit_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -367,13 +368,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         Golden Gate Ferry screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/GG_Ferry_IB.md'
+      file: './validation2023/transit/GG_Ferry_IB.md'
 
     - type: 'line'
       title: 'Golden Gate Ferry IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_Ferry_IB.csv'
+      dataset: './validation2023/transit/GG_Ferry_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -389,13 +390,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         Golden Gate Ferry screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/GG_Ferry_OB.md'
+      file: './validation2023/transit/GG_Ferry_OB.md'
 
     - type: 'line'
       title: 'Golden Gate Ferry OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_Ferry_OB.csv'
+      dataset: './validation2023/transit/GG_Ferry_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -411,13 +412,13 @@ layout:
         This table compares observed and modeled inbound ridership across the 
         Golden Gate Overall screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/GG_overall_IB.md'
+      file: './validation2023/transit/GG_overall_IB.md'
 
     - type: 'line'
       title: 'Golden Gate Overall IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_overall_IB.csv'
+      dataset: './validation2023/transit/GG_overall_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -433,13 +434,13 @@ layout:
         This table compares observed and modeled outbound ridership across the 
         Golden Gate Overall screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './table/GG_overall_OB.md'
+      file: './validation2023/transit/GG_overall_OB.md'
 
     - type: 'line'
       title: 'Golden Gate Overall OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/GG_overall_OB.csv'
+      dataset: './validation2023/transit/GG_overall_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'

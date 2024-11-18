@@ -1,27 +1,27 @@
 header:
-  tab: "Transit Ridership Total"
-  title: "Transit Ridership Total"
+  tab: "2023 Transit Validation"
+  title: "2023 Transit Validation"
   description: ""
-
+  triggerPattern: "validation2023"
 
 layout:
   Service type:
     - type: text
-      title: '2019 Transit Ridership by Service Type'
+      title: '2023 Transit Ridership by Service Type'
       description: >
         The table is structured to present a detailed comparison between observed and 
         modeled transit ridership figures for various Service Type on an 
         average weekday. It effectively highlights the discrepancies between the actual 
         observed data and the projected estimates, offering a clear insight into transit 
         patterns across different service categories and operators.
-      file: "./table/valTotal_Service.md"
+      file: "./validation2023/transit/valTotal_Service.md"
 
     - type: plotly
       #height: 10
-      title: 2019 Transit Ridership by Service Type
+      title: 2023 Transit Ridership by Service Type
       description: 
       datasets:
-        dataset: "./val_Total/valTotal_Service.csv"
+        dataset: "./validation2023/transit/valTotal_Service.csv"
       traces:
         - type: bar
           x: $dataset.Observed
@@ -52,17 +52,17 @@ layout:
   table:
     - type: text
       height: 14
-      title: '2019 Transit Ridership by Operator and Submode'
+      title: '2023 Transit Ridership by Operator and Submode'
       description: >
-        Source: NTD 2019 Annual Agency Profile
-      file: "./table/valTotal_Submode.md"
+        Source: NTD 2023 Annual Agency Profile
+      file: "./validation2023/transit/valTotal_Submode.md"
 
     - type: plotly
       #height: 10
-      title: 2019 Transit Ridership by Operator and Submode
+      title: 2023 Transit Ridership by Operator and Submode
       description: 
       datasets:
-        dataset: "./val_Total/valTotal_Submode.csv"
+        dataset: "./validation2023/transit/valTotal_Submode.csv"
       traces:
         - type: bar
           x: $dataset.Observed
@@ -93,17 +93,17 @@ layout:
   table2:
     - type: text
       height: 14
-      title: '2019 Transit Ridership by Operator'
+      title: '2023 Transit Ridership by Operator'
       description: >
-        Source: NTD 2019 Annual Agency Profile
-      file: "./table/valTotal_Operator.md"
+        Source: NTD 2023 Annual Agency Profile
+      file: "./validation2023/transit/valTotal_Operator.md"
 
     - type: plotly
       #height: 10
-      title: 2019 Transit Ridership by Operato
+      title: 2023 Transit Ridership by Operato
       description: 
       datasets:
-        dataset: "./val_Total/valTotal_Operator.csv"
+        dataset: "./validation2023/transit/valTotal_Operator.csv"
       traces:
         - type: bar
           x: $dataset.Observed

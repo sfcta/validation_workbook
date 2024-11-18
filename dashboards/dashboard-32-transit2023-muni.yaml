@@ -1,7 +1,8 @@
 header:
-  tab: "Val MUNI"
-  title: "Validation of MUNI Line Ridership"
-  description: ""
+  tab: "2023 Transit Validation - Muni"
+  title: "2023 Transit Validation - Muni"
+  description: "Validation of Muni Line Ridership"
+  triggerPattern: "validation2023"
 
 layout:
   Mode:
@@ -10,13 +11,13 @@ layout:
       description: >
         This table provides an overview of Muni line ridership by mode for an entire 
         average weekday.
-      file: './table/MUNI_mode_day.md'
+      file: './validation2023/transit/MUNI_mode_day.md'
 
     - type: 'bar'
       title: 'MUNI Ridership by Mode'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_mode.csv'
+      dataset: './validation2023/transit/MUNI_mode.csv'
       x: 'Mode'
       y1: 'Observed'
       y2: 'Modeled'
@@ -31,13 +32,13 @@ layout:
       description: >
         This table displays Muni line ridership by mode for the morning (AM) hours of an 
         average weekday.
-      file: './table/MUNI_mode_am.md'
+      file: './validation2023/transit/MUNI_mode_am.md'
 
     - type: 'bar'
       title: 'MUNI Ridership by Mode AM'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_mode_am.csv'
+      dataset: './validation2023/transit/MUNI_mode_am.csv'
       x: 'Mode'
       y1: 'Observed'
       y2: 'Modeled'
@@ -52,13 +53,13 @@ layout:
       description: >
         This table displays Muni line ridership by mode for the afternoon (PM) hours of 
         an average weekday.
-      file: './table/MUNI_mode_pm.md'
+      file: './validation2023/transit/MUNI_mode_pm.md'
 
     - type: 'bar'
       title: 'MUNI Ridership by Mode PM'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_mode_pm.csv'
+      dataset: './validation2023/transit/MUNI_mode_pm.csv'
       x: 'Mode'
       y1: 'Observed'
       y2: 'Modeled'
@@ -73,13 +74,13 @@ layout:
       description: >
         This table provides an overview of Muni line ridership by time of day for an average
         weekkday.
-      file: './table/MUNI_tod.md'
+      file: './validation2023/transit/MUNI_tod.md'
 
     - type: 'line'
       title: 'MUNI Ridership by TOD'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_tod.csv'
+      dataset: './validation2023/transit/MUNI_tod.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -93,13 +94,13 @@ layout:
       title: 'Express Bus by TOD'
       description: >
 
-      file: './table/MUNI_EB.md'
+      file: './validation2023/transit/MUNI_EB.md'
 
     - type: 'line'
       title: 'Express Bus by TOD'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_EB.csv'
+      dataset: './validation2023/transit/MUNI_EB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -113,13 +114,13 @@ layout:
       title: 'Local Bus by TOD'
       description: >
 
-      file: './table/MUNI_LB.md'
+      file: './validation2023/transit/MUNI_LB.md'
 
     - type: 'line'
       title: 'Local Bus by TOD'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_LB.csv'
+      dataset: './validation2023/transit/MUNI_LB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -133,13 +134,13 @@ layout:
       title: 'Rail by TOD'
       description: >
 
-      file: './table/MUNI_Rail.md'
+      file: './validation2023/transit/MUNI_Rail.md'
 
     - type: 'line'
       title: 'Rail by TOD'
       description: ''
       width: 1
-      dataset: './val_MUNI/MUNI_Rail.csv'
+      dataset: './validation2023/transit/MUNI_Rail.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -154,21 +155,21 @@ layout:
       description: >
         This table validates the model by comparing observed and modeled inbound 
         Muni line ridership for the entire day, showing differences and percentage differences.
-      file: './table/MUNI_ib_day.md'
+      file: './validation2023/transit/MUNI_ib_day.md'
 
     - type: text
       title: 'Inbound - AM'
       description: >
         This table validates the model by comparing observed and modeled inbound Muni line 
         ridership for the morning (AM) hours, showing differences and percentage differences.
-      file: './table/MUNI_ib_am.md'
+      file: './validation2023/transit/MUNI_ib_am.md'
   
     - type: text
       title: 'Inbound - PM'
       description: >
         This table validates the model by comparing observed and modeled inbound Muni line 
         ridership for the Afternoon (PM) hours, showing differences and percentage differences.
-      file: './table/MUNI_ib_pm.md'
+      file: './validation2023/transit/MUNI_ib_pm.md'
 
   Outbound:
     - type: text
@@ -176,21 +177,21 @@ layout:
       description: >
         This table validates the model by comparing observed and modeled outbound 
         Muni line ridership for the entire day, showing differences and percentage differences
-      file: './table/MUNI_ob_day.md'
+      file: './validation2023/transit/MUNI_ob_day.md'
 
     - type: text
       title: 'Outbound - AM'
       description: >
         This table validates the model by comparing observed and modeled outbound Muni line 
         ridership for the morning (AM) hours, showing differences and percentage differences.
-      file: './table/MUNI_ob_am.md'
+      file: './validation2023/transit/MUNI_ob_am.md'
   
     - type: text
       title: 'Outbound - PM'
       description: >
         This table validates the model by comparing observed and modeled outbound Muni line 
         ridership for the Afternoon (PM) hours, showing differences and percentage differences
-      file: './table/MUNI_ob_pm.md'
+      file: './validation2023/transit/MUNI_ob_pm.md'
 
   Map Muni Bus:
     - type: map
@@ -204,10 +205,10 @@ layout:
       center:
           - -122.42
           - 37.77
-      shapes: ./shp/muni_ib.shp
+      shapes: ./validation2023/transit/muni_ib.shp
       datasets:
           observed:
-              file: ./val_MUNI/MUNI_map_IB.csv
+              file: ./validation2023/transit/MUNI_map_IB.csv
               join: Route     
       display:
           lineColor:
@@ -239,10 +240,10 @@ layout:
       center:
           - -122.42
           - 37.77
-      shapes: ./shp/muni_ob.shp
+      shapes: ./validation2023/transit/muni_ob.shp
       datasets:
           observed:
-              file: ./val_MUNI/MUNI_map_OB.csv
+              file: ./validation2023/transit/MUNI_map_OB.csv
               join: Route   
       display:
           lineColor:

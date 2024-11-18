@@ -242,7 +242,7 @@ def process_mkd_muni(
     output_transit_dir,
     model_MUNI_Line,
     markdown_output_dir,
-    MUNI_output_dir,
+    muni_output_dir,
     MUNI_ib_day,
     MUNI_ob_day,
     MUNI_ib_am,
@@ -302,8 +302,8 @@ def process_mkd_muni(
         center_align_columns=None,
         column_widths=70,
     )
-    MUNI_IB_df.to_csv(MUNI_output_dir / MUNI_IB, index=False)
-    MUNI_OB_df.to_csv(MUNI_output_dir / MUNI_OB, index=False)
+    MUNI_IB_df.to_csv(muni_output_dir / MUNI_IB, index=False)
+    MUNI_OB_df.to_csv(muni_output_dir / MUNI_OB, index=False)
     MUNI_IB_AM_df = process_data(
         obs_MUNI_line_df,
         model_MUNI_line_df,
@@ -395,7 +395,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_mode_df[~MUNI_mode_df["Mode"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_mode), index=False
+        Path(muni_output_dir / MUNI_mode), index=False
     )
     MUNI_mode_am_df = process_data(
         obs_MUNI_line_df,
@@ -414,7 +414,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_mode_am_df[~MUNI_mode_am_df["Mode"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_mode_am), index=False
+        Path(muni_output_dir / MUNI_mode_am), index=False
     )
     MUNI_mode_pm_df = process_data(
         obs_MUNI_line_df,
@@ -433,7 +433,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_mode_pm_df[~MUNI_mode_pm_df["Mode"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_mode_pm), index=False
+        Path(muni_output_dir / MUNI_mode_pm), index=False
     )
     MUNI_tod_df = process_data(
         obs_MUNI_line_df, model_MUNI_line_df, None, "TOD", "Ridership", "TOD", "left"
@@ -450,7 +450,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_tod_df[~MUNI_tod_df["TOD"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_tod), index=False
+        Path(muni_output_dir / MUNI_tod), index=False
     )
     MUNI_EB_df = process_data(
         obs_MUNI_line_df,
@@ -473,7 +473,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_EB_df[~MUNI_EB_df["TOD"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_EB), index=False
+        Path(muni_output_dir / MUNI_EB), index=False
     )
     MUNI_LB_df = process_data(
         obs_MUNI_line_df,
@@ -496,7 +496,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_LB_df[~MUNI_LB_df["TOD"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_LB), index=False
+        Path(muni_output_dir / MUNI_LB), index=False
     )
     MUNI_Rail_df = process_data(
         obs_MUNI_line_df,
@@ -519,7 +519,7 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_Rail_df[~MUNI_Rail_df["TOD"].isin(["Total"])].to_csv(
-        Path(MUNI_output_dir / MUNI_Rail), index=False
+        Path(muni_output_dir / MUNI_Rail), index=False
     )
 
 
@@ -529,11 +529,11 @@ def process_mkd_bart(
     output_transit_dir,
     model_BART,
     markdown_output_dir,
-    BART_output_dir,
+    bart_output_dir,
     observed_BART_county,
     model_BART_county,
     observed_BART_Screenline,
-    Screenline_output_dir,
+    screenline_output_dir,
     tod_order,
     BART_boarding_allday_md,
     BART_boarding_am_md,
@@ -604,7 +604,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=80,
     )
-    BART_boarding_allday.to_csv(BART_output_dir / BART_boarding_allday_csv, index=False)
+    BART_boarding_allday.to_csv(bart_output_dir / BART_boarding_allday_csv, index=False)
     BART_boarding_am = process_bart_data(
         obs_BART_line, model_BART_line, None, "AM", "Station", "Boardings"
     )
@@ -644,7 +644,7 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=80,
     )
-    BART_at_allday.to_csv(BART_output_dir / BART_at_allday_csv, index=False)
+    BART_at_allday.to_csv(bart_output_dir / BART_at_allday_csv, index=False)
     BART_at_am = process_bart_data(
         obs_BART_line, model_BART_line, None, "AM", "Station", "Alightings"
     )
@@ -738,9 +738,9 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=90,
     )
-    county_br_day.to_csv(BART_output_dir / county_br_day_csv, index=False)
-    county_br_am.to_csv(BART_output_dir / county_br_am_csv, index=False)
-    county_br_pm.to_csv(BART_output_dir / county_br_pm_csv, index=False)
+    county_br_day.to_csv(bart_output_dir / county_br_day_csv, index=False)
+    county_br_am.to_csv(bart_output_dir / county_br_am_csv, index=False)
+    county_br_pm.to_csv(bart_output_dir / county_br_pm_csv, index=False)
     county_at_day = process_data(
         obs_BART_county,
         model_BART_county_df,
@@ -801,9 +801,9 @@ def process_mkd_bart(
         center_align_columns=None,
         column_widths=90,
     )
-    county_at_day.to_csv(BART_output_dir / county_at_day_csv, index=False)
-    county_at_am.to_csv(BART_output_dir / county_at_am_csv, index=False)
-    county_at_pm.to_csv(BART_output_dir / county_at_pm_csv, index=False)
+    county_at_day.to_csv(bart_output_dir / county_at_day_csv, index=False)
+    county_at_am.to_csv(bart_output_dir / county_at_am_csv, index=False)
+    county_at_pm.to_csv(bart_output_dir / county_at_pm_csv, index=False)
 
     # BART Screenline
     obs_BART_Screenline = pd.read_csv(transit_input_dir / observed_BART_Screenline)
@@ -935,22 +935,22 @@ def process_mkd_bart(
         column_widths=70,
     )
     transbay_BART_IB[~transbay_BART_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_BART_IB_csv, index=False
+        screenline_output_dir / transbay_BART_IB_csv, index=False
     )
     transbay_BART_OB[~transbay_BART_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_BART_OB_csv, index=False
+        screenline_output_dir / transbay_BART_OB_csv, index=False
     )
     Countyline_BART_IB[~Countyline_BART_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_BART_IB_csv, index=False
+        screenline_output_dir / Countyline_BART_IB_csv, index=False
     )
     Countyline_BART_OB[~Countyline_BART_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_BART_OB_csv, index=False
+        screenline_output_dir / Countyline_BART_OB_csv, index=False
     )
     Intra_SF_BART_IB[~Intra_SF_BART_IB["TOD"].isin(["Total"])].to_csv(
-        BART_output_dir / Intra_SF_BART_IB_csv, index=False
+        bart_output_dir / Intra_SF_BART_IB_csv, index=False
     )
     Intra_SF_BART_OB[~Intra_SF_BART_OB["TOD"].isin(["Total"])].to_csv(
-        BART_output_dir / Intra_SF_BART_OB_csv, index=False
+        bart_output_dir / Intra_SF_BART_OB_csv, index=False
     )
 
 
@@ -961,7 +961,7 @@ def process_mkd_screenline(
     model_Screenline,
     markdown_output_dir,
     tod_order,
-    Screenline_output_dir,
+    screenline_output_dir,
     transbay_AC_IB_md,
     transbay_AC_OB_md,
     transbay_overall_IB_md,
@@ -1079,16 +1079,16 @@ def process_mkd_screenline(
         column_widths=70,
     )
     transbay_overall_IB[~transbay_overall_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_overall_IB_csv, index=False
+        screenline_output_dir / transbay_overall_IB_csv, index=False
     )
     transbay_overall_OB[~transbay_overall_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_overall_OB_csv, index=False
+        screenline_output_dir / transbay_overall_OB_csv, index=False
     )
     transbay_AC_IB[~transbay_AC_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_AC_IB_csv, index=False
+        screenline_output_dir / transbay_AC_IB_csv, index=False
     )
     transbay_AC_OB[~transbay_AC_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / transbay_AC_OB_csv, index=False
+        screenline_output_dir / transbay_AC_OB_csv, index=False
     )
     Countyline_CalTrain_IB = process_data(
         obs_Screenline,
@@ -1211,22 +1211,22 @@ def process_mkd_screenline(
         column_widths=70,
     )
     Countyline_CalTrain_IB[~Countyline_CalTrain_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_CalTrain_IB_csv, index=False
+        screenline_output_dir / Countyline_CalTrain_IB_csv, index=False
     )
     Countyline_CalTrain_OB[~Countyline_CalTrain_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_CalTrain_OB_csv, index=False
+        screenline_output_dir / Countyline_CalTrain_OB_csv, index=False
     )
     Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_SamTrans_IB_csv, index=False
+        screenline_output_dir / Countyline_SamTrans_IB_csv, index=False
     )
     Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_SamTrans_OB_csv, index=False
+        screenline_output_dir / Countyline_SamTrans_OB_csv, index=False
     )
     Countyline_overall_IB[~Countyline_overall_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_overall_IB_csv, index=False
+        screenline_output_dir / Countyline_overall_IB_csv, index=False
     )
     Countyline_overall_OB[~Countyline_overall_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / Countyline_overall_OB_csv, index=False
+        screenline_output_dir / Countyline_overall_OB_csv, index=False
     )
     GG_Transit_IB = process_data(
         obs_Screenline,
@@ -1365,22 +1365,22 @@ def process_mkd_screenline(
         column_widths=70,
     )
     GG_Transit_IB[~GG_Transit_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_Transit_IB_csv, index=False
+        screenline_output_dir / GG_Transit_IB_csv, index=False
     )
     GG_Transit_OB[~GG_Transit_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_Transit_OB_csv, index=False
+        screenline_output_dir / GG_Transit_OB_csv, index=False
     )
     GG_Ferry_IB[~GG_Ferry_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_Ferry_IB_csv, index=False
+        screenline_output_dir / GG_Ferry_IB_csv, index=False
     )
     GG_Ferry_OB[~GG_Ferry_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_Ferry_OB_csv, index=False
+        screenline_output_dir / GG_Ferry_OB_csv, index=False
     )
     GG_overall_IB[~GG_overall_IB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_overall_IB_csv, index=False
+        screenline_output_dir / GG_overall_IB_csv, index=False
     )
     GG_overall_OB[~GG_overall_OB["TOD"].isin(["Total"])].to_csv(
-        Screenline_output_dir / GG_overall_OB_csv, index=False
+        screenline_output_dir / GG_overall_OB_csv, index=False
     )
 
 
@@ -1390,10 +1390,10 @@ if __name__ == "__main__":
 
     model_run_dir = Path(config["directories"]["model_run"])
     transit_input_dir = Path(config["directories"]["transit_input_dir"])
-    MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
+    muni_output_dir = Path(config["directories"]["muni_output_dir"])
     markdown_output_dir = Path(config["directories"]["markdown_output_dir"])
-    Screenline_output_dir = Path(config["directories"]["Screenline_output_dir"])
-    BART_output_dir = Path(config["directories"]["BART_output_dir"])
+    screenline_output_dir = Path(config["directories"]["screenline_output_dir"])
+    bart_output_dir = Path(config["directories"]["bart_output_dir"])
     observed_BART = Path(config["transit"]["observed_BART"])
     observed_BART_county = Path(config["transit"]["observed_BART_county"])
     observed_BART_Screenline = Path(config["transit"]["observed_BART_Screenline"])
@@ -1520,7 +1520,7 @@ if __name__ == "__main__":
         output_transit_dir,
         model_MUNI_Line,
         markdown_output_dir,
-        MUNI_output_dir,
+        muni_output_dir,
         MUNI_ib_day,
         MUNI_ob_day,
         MUNI_ib_am,
@@ -1550,11 +1550,11 @@ if __name__ == "__main__":
         output_transit_dir,
         model_BART,
         markdown_output_dir,
-        BART_output_dir,
+        bart_output_dir,
         observed_BART_county,
         model_BART_county,
         observed_BART_Screenline,
-        Screenline_output_dir,
+        screenline_output_dir,
         tod_order,
         BART_boarding_allday_md,
         BART_boarding_am_md,
@@ -1597,7 +1597,7 @@ if __name__ == "__main__":
         model_Screenline,
         markdown_output_dir,
         tod_order,
-        Screenline_output_dir,
+        screenline_output_dir,
         transbay_AC_IB_md,
         transbay_AC_OB_md,
         transbay_overall_IB_md,

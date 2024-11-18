@@ -114,12 +114,6 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    transit_line_rename_filepath = (
-        config["directories"]["resources"] / config["transit"]["line_rename_filename"]
-    )
-    transit_validation_2019_alfaro_filepath = config["transit"][
-        "transit_validation_2019_alfaro_filepath"
-    ]
     model_run_dir = config["directories"]["model_run"]
     model_BART_Screenline = config["bart"]["model_BART_Screenline"]
     model_Screenline = config["screenline"]["model_Screenline"]

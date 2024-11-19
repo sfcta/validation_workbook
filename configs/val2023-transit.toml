@@ -1,32 +1,26 @@
-[directories]
-model_run = "X:/Projects/CHAMP7/Run25z_Market"
-resources = "Q:/Model Development/Simwrapper Validation/resources"
-transit_input_dir = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed"
-control_file = "Q:/Model Development/Simwrapper Validation/notebooks/transit/script/transit.ctl"
-markdown_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/table"
-MUNI_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_MUNI"
-BART_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_BART"
-Screenline_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_Screenline"
-total_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_Total"
-Base_model_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base"
-SHP_file_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/shp"
-necessary_scripts_for_vmt_folder = "Y:/Users/Patricie/champ/champ/scripts/summarize"
+[input]
 
-# Input
-[transit]
-line_rename_filename = "transit_line_rename.csv"
-transit_validation_2019_alfaro_filepath = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed/Transit_Validation_2019 - MA.xlsx"
-FREEFLOW_SHP = "freeflow.shp"
-observed_BART = "observed_bart_station.csv"
-observed_BART_county = "observed_bart_county.csv"
-observed_BART_Screenline = "observed_bart_screenline.csv"
-observed_MUNI_Line = "observed_muni_line.csv"
-observed_Screenline = "observed_screenlines.csv"
-observed_NTD = "observed_ntd.csv"
+[input.model]
+dir = "."
+freeflow = "freeflow.shp"
+
+[input.observed]
+dir = "Q:/Data/Observed/Validation/2023"
+bart_station = "observed_bart_station.csv"
+bart_county = "observed_bart_county.csv"
+bart_screenline = "observed_bart_screenline.csv"
+muni_line = "observed_muni_line.csv"
+screenline = "observed_screenlines.csv"
+ntd = "observed_ntd.csv"
 muni_name_match = "muni_name_match.csv"
 station_node_match = "station_node_match.csv"
 
-# Output
+[input.support]
+line_rename = "Q:/Model Development/Simwrapper Validation/resources/transit_line_rename.csv"
+
+[output]
+dir = "validation2023/transit"
+
 [bart]
 model_BART = "model_BART.csv"
 model_BART_county = "model_BART_county.csv"

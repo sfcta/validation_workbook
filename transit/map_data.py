@@ -5,7 +5,7 @@ import geopandas as gpd
 import pandas as pd
 import tomllib
 from shapely.geometry import LineString, Point
-from utils import (
+from transit.utils import (
     format_dataframe,
     read_dbf_and_groupby_sum,
     read_transit_assignments,
@@ -92,8 +92,8 @@ def create_station_df(transit_input_dir, station_node_match):
 def process_muni_map(
     combined_gdf,
     output_transit_dir,
-    MUNI_output_dir,
-    SHP_file_dir,
+    muni_output_dir,
+    shp_file_dir,
     FREEFLOW_SHP,
     model_MUNI_Line,
     muni_ib,
@@ -117,14 +117,14 @@ def process_muni_map(
     MUNI_map = MUNI_map[["Name", "Line", "AB", "SEQ"]]
     MUNI_map["Direction"] = MUNI_map["Name"].apply(map_name_to_direction)
 
-    MUNI_IB_df = pd.read_csv(MUNI_output_dir / MUNI_IB)
+    MUNI_IB_df = pd.read_csv(muni_output_dir / MUNI_IB)
     MUNI_map_IN = MUNI_map[MUNI_map["Direction"] == "IB"]
     MUNI_map_IN = MUNI_map_IN.rename(columns={"Line": "Route"})
     MUNI_IB_df = MUNI_IB_df.merge(MUNI_map_IN, on="Route", how="left")
 
     MUNI_map_OUT = MUNI_map[MUNI_map["Direction"] == "OB"]
     MUNI_map_OUT = MUNI_map_OUT.rename(columns={"Line": "Route"})
-    MUNI_OB_df = pd.read_csv(MUNI_output_dir / MUNI_OB)
+    MUNI_OB_df = pd.read_csv(muni_output_dir / MUNI_OB)
     MUNI_OB_df = MUNI_OB_df.merge(MUNI_map_OUT, on="Route", how="left")
     # GEO info
     freeflow = gpd.read_file(FREEFLOW_SHP)
@@ -188,7 +188,7 @@ def process_muni_map(
 
     # Convert to GeoDataFrame
     aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry="geometry")
-    aggregated_muni_ib.to_file(SHP_file_dir / muni_ib)
+    aggregated_muni_ib.to_file(shp_file_dir / muni_ib)
     MUNI_map_IB_df = aggregated_muni_ib[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -207,7 +207,7 @@ def process_muni_map(
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ]
     MUNI_map_IB_df = MUNI_map_IB_df.drop_duplicates()
-    MUNI_map_IB_df.to_csv(MUNI_output_dir / MUNI_map_IB, index=False)
+    MUNI_map_IB_df.to_csv(muni_output_dir / MUNI_map_IB, index=False)
 
     MUNI_OB_df = MUNI_OB_df[
         [
@@ -264,7 +264,7 @@ def process_muni_map(
         .reset_index()
     )
 
-    aggregated_muni_ob.to_file(SHP_file_dir / muni_ob)
+    aggregated_muni_ob.to_file(shp_file_dir / muni_ob)
     MUNI_map_OB_df = aggregated_muni_ob[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -281,7 +281,7 @@ def process_muni_map(
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ]
     MUNI_map_OB_df = MUNI_map_OB_df.drop_duplicates()
-    MUNI_map_OB_df.to_csv(MUNI_output_dir / MUNI_map_OB, index=False)
+    MUNI_map_OB_df.to_csv(muni_output_dir / MUNI_map_OB, index=False)
 
 
 def BART_map(
@@ -293,8 +293,8 @@ def BART_map(
     csv,
     shp,
     station,
-    BART_output_dir,
-    SHP_file_dir,
+    bart_output_dir,
+    shp_file_dir,
 ):
     obs_condition = pd.Series([True] * len(obs_BART_line))
     model_condition = pd.Series([True] * len(model_BART_line))
@@ -315,7 +315,7 @@ def BART_map(
     BART["ABS Diff"] = abs(BART["Diff"])
     if TOD is not None:
         BART = BART[BART["TOD"] == TOD].copy()
-    BART.to_csv(os.path.join(BART_output_dir, csv), index=False)
+    BART.to_csv(os.path.join(bart_output_dir, csv), index=False)
     BART_2 = BART.copy()
     BART_2["Percentage Diff"] = BART_2["Percentage Diff"] * 100
     numeric_cols = ["Observed", "Modeled", "Diff"]
@@ -326,16 +326,16 @@ def BART_map(
     BART_map = gpd.GeoDataFrame(BART_map, geometry="geometry")
     BART_map.crs = "epsg:2227"
     BART_map = BART_map.to_crs(epsg=4236)
-    BART_map.to_file(os.path.join(SHP_file_dir, shp))
+    BART_map.to_file(os.path.join(shp_file_dir, shp))
 
 
 def process_bart_map(
-    BART_output_dir,
+    bart_output_dir,
     transit_input_dir,
     output_transit_dir,
     observed_BART,
     model_BART,
-    SHP_file_dir,
+    shp_file_dir,
     BART_br,
     BART_br_map,
     BART_br_pm,
@@ -364,8 +364,8 @@ def process_bart_map(
         BART_br,
         BART_br_map,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
     BART_map(
         "Boardings",
@@ -376,8 +376,8 @@ def process_bart_map(
         BART_br_am,
         BART_br_map_am,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
     BART_map(
         "Boardings",
@@ -388,8 +388,8 @@ def process_bart_map(
         BART_br_pm,
         BART_br_map_pm,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
     BART_map(
         "Alightings",
@@ -400,8 +400,8 @@ def process_bart_map(
         BART_at,
         BART_at_map,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
     BART_map(
         "Alightings",
@@ -412,8 +412,8 @@ def process_bart_map(
         BART_at_am,
         BART_at_map_am,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
     BART_map(
         "Alightings",
@@ -424,8 +424,8 @@ def process_bart_map(
         BART_at_pm,
         BART_at_map_pm,
         station,
-        BART_output_dir,
-        SHP_file_dir,
+        bart_output_dir,
+        shp_file_dir,
     )
 
 
@@ -433,47 +433,11 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    model_run_dir = config["directories"]["model_run"]
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    transit_input_dir = Path(config["directories"]["transit_input_dir"])
-    station_node_match = Path(config["transit"]["station_node_match"])
-    MUNI_output_dir = Path(config["directories"]["MUNI_output_dir"])
-    BART_output_dir = Path(config["directories"]["BART_output_dir"])
-    Base_model_dir = Path(config["directories"]["Base_model_dir"])
-    SHP_file_dir = Path(config["directories"]["SHP_file_dir"])
-    model_MUNI_Line = Path(config["muni"]["model_MUNI_Line"])
-    model_BART = Path(config["bart"]["model_BART"])
-    observed_BART = Path(config["transit"]["observed_BART"])
-    BART_br_map = Path(config["bart"]["BART_br_map"])
-    BART_br = Path(config["bart"]["BART_br"])
-    BART_br_am = Path(config["bart"]["BART_br_am"])
-    BART_br_pm = Path(config["bart"]["BART_br_pm"])
-    BART_at = Path(config["bart"]["BART_at"])
-    BART_at_am = Path(config["bart"]["BART_at_am"])
-    BART_at_pm = Path(config["bart"]["BART_at_pm"])
-    BART_br_map_pm = Path(config["bart"]["BART_br_map_pm"])
-    BART_br_map_am = Path(config["bart"]["BART_br_map_am"])
-    BART_at_map = Path(config["bart"]["BART_at_map"])
-    BART_at_map_am = Path(config["bart"]["BART_at_map_am"])
-    BART_at_map_pm = Path(config["bart"]["BART_at_map_pm"])
-    BART_at_allday_csv = Path(config["bart"]["BART_at_allday_csv"])
-    muni_ib_shp = Path(config["muni"]["muni_ib_shp"])
-    muni_ob_shp = Path(config["muni"]["muni_ob_shp"])
-    MUNI_OB = Path(config["muni"]["MUNI_OB"])
-    MUNI_IB = Path(config["muni"]["MUNI_IB"])
-    MUNI_map_IB = Path(config["muni"]["MUNI_map_IB"])
-    MUNI_map_OB = Path(config["muni"]["MUNI_map_OB"])
-
-    FREEFLOW_SHP = Base_model_dir / config["transit"]["FREEFLOW_SHP"]
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
-
     process_muni_map(
         combined_gdf,
         output_transit_dir,
-        MUNI_output_dir,
-        SHP_file_dir,
+        muni_output_dir,
+        shp_file_dir,
         FREEFLOW_SHP,
         model_MUNI_Line,
         muni_ib_shp,
@@ -484,12 +448,12 @@ if __name__ == "__main__":
         MUNI_map_OB,
     )
     process_bart_map(
-        BART_output_dir,
+        bart_output_dir,
         transit_input_dir,
         output_transit_dir,
         observed_BART,
         model_BART,
-        SHP_file_dir,
+        shp_file_dir,
         BART_br,
         BART_br_map,
         BART_br_pm,

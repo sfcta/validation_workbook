@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import json
-from validation_road_utils import compute_and_combine_stats
+from road.validation_road_utils import compute_and_combine_stats
 
 
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
@@ -114,10 +114,8 @@ def calculate_metrics(df, group_var_column, period):
     return group['percent_rmse'], relative_error, est_obs_ratio, total_percent_rmse, total_relative_error, total_est_obs_ratio
 
 
-def generate_and_save_tables(time_period_dfs, group_vars):
+def generate_and_save_tables(outdir, time_period_dfs, group_vars):
     # Create the stats_data directory if it does not exist
-    if not os.path.exists('stats_data'):
-        os.makedirs('stats_data')
 
     for group_var in group_vars:
         percent_rmse_df = pd.DataFrame()
@@ -187,10 +185,10 @@ def generate_and_save_tables(time_period_dfs, group_vars):
         # Save the dataframes to CSV
         group_var_no_spaces = group_var.replace(" ", "").lower()
         file_prefix = f"{group_var_no_spaces}_"
-        count_df.to_csv(f'stats_data/{file_prefix}count.csv', index=False)
-        percent_rmse_df.to_csv(f'stats_data/percent_rmse_{group_var_no_spaces}.csv')
-        relative_error_df.to_csv(f'stats_data/relative_error_{group_var_no_spaces}.csv')
-        est_obs_ratio_df.to_csv(f'stats_data/est_obs_ratio_{group_var_no_spaces}.csv')
+        count_df.to_csv(f'{outdir}/{file_prefix}count.csv', index=False)
+        percent_rmse_df.to_csv(f'{outdir}/percent_rmse_{group_var_no_spaces}.csv')
+        relative_error_df.to_csv(f'{outdir}/relative_error_{group_var_no_spaces}.csv')
+        est_obs_ratio_df.to_csv(f'{outdir}/est_obs_ratio_{group_var_no_spaces}.csv')
 
         # Melt dataframes for easier plotting or analysis
         melted_percent_rmse_df = percent_rmse_df.melt(
@@ -202,17 +200,17 @@ def generate_and_save_tables(time_period_dfs, group_vars):
 
         # Save melted dataframes to CSV
         melted_percent_rmse_df.to_csv(
-            f'stats_data/{file_prefix}percent_rmse_melted.csv', index=False)
+            f'{outdir}/{file_prefix}percent_rmse_melted.csv', index=False)
         melted_relative_error_df.to_csv(
-            f'stats_data/{file_prefix}relative_error_melted.csv', index=False)
+            f'{outdir}/{file_prefix}relative_error_melted.csv', index=False)
         melted_est_obs_ratio_df.to_csv(
-            f'stats_data/{file_prefix}est_obs_ratio_melted.csv', index=False)
+            f'{outdir}/{file_prefix}est_obs_ratio_melted.csv', index=False)
 
         # generate the vega-lite files
-        generate_and_save_vega_lite_configs(group_var, file_prefix)
+        generate_and_save_vega_lite_configs(outdir, group_var, file_prefix)
 
 
-def generate_and_save_vega_lite_configs(group_var, file_prefix):
+def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
     output_dir = os.getcwd()
     os.makedirs(output_dir, exist_ok=True)
 
@@ -252,7 +250,7 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": {
-                "url": f"stats_data/{file_prefix}{file_suffix}"
+                "url": f"{outdir}/{file_prefix}{file_suffix}"
             },
             "mark": {
                 "type": "bar",
@@ -287,7 +285,7 @@ def generate_and_save_vega_lite_configs(group_var, file_prefix):
             }
         }
         config_file_path = os.path.join(
-            output_dir, f"stats_data/{group_var.lower().replace(' ', '')}_{metric}.vega.json")
+            output_dir, f"{outdir}/{group_var.lower().replace(' ', '')}_{metric}.vega.json")
         try:
             with open(config_file_path, 'w') as f:
                 json.dump(config, f, indent=4)

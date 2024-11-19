@@ -3,7 +3,7 @@ from pathlib import Path
 # import numpy as np
 import pandas as pd
 import tomllib
-from utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
+from transit.utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
 
 
 def map_name_to_direction(name):
@@ -82,20 +82,6 @@ def process_muni(
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-
-    transit_line_rename_filepath = (
-        Path(config["directories"]["resources"])
-        / config["transit"]["line_rename_filename"]
-    )
-    model_run_dir = config["directories"]["model_run"]
-    model_MUNI_Line = config["muni"]["model_MUNI_Line"]
-    observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
-    muni_name_match = Path(config["transit"]["muni_name_match"])
-    transit_input_dir = Path(config["directories"]["transit_input_dir"])
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     process_muni(
         combined_gdf,

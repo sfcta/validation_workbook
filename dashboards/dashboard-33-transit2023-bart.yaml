@@ -1,8 +1,9 @@
 header:
-  tab: "Val BART"
-  title: "Validation of BART Station"
-  description: ""
-
+  tab: "2023 Transit Validation - BART"
+  title: "2023 Transit Validation - BART"
+  description: "Validation of BART Station"
+  triggerPattern: "validation2023"
+  
 layout:
   Boardings:
     - type: text
@@ -11,7 +12,7 @@ layout:
         This table presents a comprehensive overview of BART station boardings for an 
         average weekday, encompassing data for all stations. Core Sf: EMBR, MONT, POWL,
         CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
-      file: './table/BART_boarding_allday.md'
+      file: './validation2023/transit/BART_boarding_allday.md'
 
     - type: map
       height: 10
@@ -24,10 +25,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_br_map.shp
+      shapes: ./validation2023/transit/BART_br_map.shp
       datasets:
           observed:
-              file: ./val_BART/BART_br.csv
+              file: ./validation2023/transit/BART_br.csv
               join: Station     
       display:
           fill:
@@ -64,7 +65,7 @@ layout:
         providing a focused view of early-day commuter trends across the Bay Area Rapid 
         Transit network. Core Sf: EMBR, MONT, POWL,CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. 
         Oakland Core: 12TH, 19TH.
-      file: './table/BART_boarding_am.md'
+      file: './validation2023/transit/BART_boarding_am.md'
 
     - type: map
       height: 10
@@ -77,10 +78,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_br_map_am.shp
+      shapes: ./validation2023/transit/BART_br_map_am.shp
       datasets:
           observed:
-              file: ./val_BART/BART_br_am.csv
+              file: ./validation2023/transit/BART_br_am.csv
               join: Station     
       display:
           fill:
@@ -115,7 +116,7 @@ layout:
         providing a focused view of late-day commuter trends across the Bay Area Rapid 
         Transit network. Core Sf: EMBR, MONT, POWL,
         CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
-      file: './table/BART_boarding_pm.md'
+      file: './validation2023/transit/BART_boarding_pm.md'
 
     - type: map
       height: 10
@@ -128,10 +129,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_br_map_pm.shp
+      shapes: ./validation2023/transit/BART_br_map_pm.shp
       datasets:
           observed:
-              file: ./val_BART/BART_br_pm.csv
+              file: ./validation2023/transit/BART_br_pm.csv
               join: Station     
       display:
           fill:
@@ -165,7 +166,7 @@ layout:
         This table presents all-day alightings at BART stations for an average weekday, 
         capturing daily passenger exit patterns. Core Sf: EMBR, MONT, POWL,
         CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
-      file: './table/BART_at_allday.md'
+      file: './validation2023/transit/BART_at_allday.md'
 
     - type: map
       height: 10
@@ -178,10 +179,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_at_map.shp
+      shapes: ./validation2023/transit/BART_at_map.shp
       datasets:
           observed:
-              file: ./val_BART/BART_at.csv
+              file: ./validation2023/transit/BART_at.csv
               join: Station     
       display:
           fill:
@@ -221,7 +222,7 @@ layout:
         This table shows AM alightings at BART stations on an average weekday, 
         highlighting morning disembarkation trends. Core Sf: EMBR, MONT, POWL,
         CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
-      file: './table/BART_at_am.md'
+      file: './validation2023/transit/BART_at_am.md'
 
     - type: map
       height: 10
@@ -234,10 +235,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_at_map_am.shp
+      shapes: ./validation2023/transit/BART_at_map_am.shp
       datasets:
           observed:
-              file: ./val_BART/BART_at_am.csv
+              file: ./validation2023/transit/BART_at_am.csv
               join: Station     
       display:
           fill:
@@ -271,7 +272,7 @@ layout:
         This table shows PM alightings at BART stations on an average weekday, 
         highlighting evening disembarkation trends. Core Sf: EMBR, MONT, POWL,
         CIVC. Outer SF: 16TH, 24TH, GLEN, BALB. Oakland Core: 12TH, 19TH.
-      file: './table/BART_at_pm.md'
+      file: './validation2023/transit/BART_at_pm.md'
 
     - type: map
       height: 10
@@ -284,10 +285,10 @@ layout:
       center:
           - -122.35
           - 37.76
-      shapes: ./shp/BART_at_map_pm.shp
+      shapes: ./validation2023/transit/BART_at_map_pm.shp
       datasets:
           observed:
-              file: ./val_BART/BART_at_pm.csv
+              file: ./validation2023/transit/BART_at_pm.csv
               join: Station     
       display:
           fill:
@@ -321,13 +322,13 @@ layout:
       description: >
         This table displays all-day boardings in each county for an average weekday, 
         providing an overview of daily transit usage.
-      file: './table/county_br_day.md'
+      file: './validation2023/transit/county_br_day.md'
 
     - type: 'bar'
       title: 'County Boardings - All Day'
       description: ''
       width: 1
-      dataset: './val_BART/county_br_day.csv'
+      dataset: './validation2023/transit/county_br_day.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -342,13 +343,13 @@ layout:
       description: >
         This table shows morning boardings in each county for an average weekday, 
         highlighting early-day transit trends.
-      file: './table/county_br_am.md'
+      file: './validation2023/transit/county_br_am.md'
 
     - type: 'bar'
       title: 'County Boardings - AM'
       description: ''
       width: 1
-      dataset: './val_BART/county_br_am.csv'
+      dataset: './validation2023/transit/county_br_am.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -363,13 +364,13 @@ layout:
       description: >
         This table shows evening boardings in each county for an average weekday, 
         highlighting late-day transit trends.
-      file: './table/county_br_pm.md'
+      file: './validation2023/transit/county_br_pm.md'
 
     - type: 'bar'
       title: 'County Boardings - PM'
       description: ''
       width: 1
-      dataset: './val_BART/county_br_pm.csv'
+      dataset: './validation2023/transit/county_br_pm.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -384,13 +385,13 @@ layout:
       description: >
         This table presents all-day alightings at BART stations for an average weekday, 
         capturing daily passenger exit patterns. 
-      file: './table/county_at_day.md'
+      file: './validation2023/transit/county_at_day.md'
 
     - type: 'bar'
       title: 'County Alightings - All Day'
       description: ''
       width: 1
-      dataset: './val_BART/county_at_day.csv'
+      dataset: './validation2023/transit/county_at_day.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -405,13 +406,13 @@ layout:
       description: >
         This table summarizes morning alightings in each county for an average weekday, 
         reflecting early-day passenger disembarkations. 
-      file: './table/county_at_am.md'
+      file: './validation2023/transit/county_at_am.md'
 
     - type: 'bar'
       title: 'County Alightings - AM'
       description: ''
       width: 1
-      dataset: './val_BART/county_at_am.csv'
+      dataset: './validation2023/transit/county_at_am.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -426,13 +427,13 @@ layout:
       description: >
         This table summarizes afternoon alightings in each county for an average weekday, 
         reflecting late-day passenger disembarkations. 
-      file: './table/county_at_pm.md'
+      file: './validation2023/transit/county_at_pm.md'
 
     - type: 'bar'
       title: 'County Alightings - PM'
       description: ''
       width: 1
-      dataset: './val_BART/county_at_pm.csv'
+      dataset: './validation2023/transit/county_at_pm.csv'
       x: 'County'
       y1: 'Observed'
       y2: 'Modeled'
@@ -451,13 +452,13 @@ layout:
         the difference between these values, and the percentage difference, aimed at 
         validating transportation models.
         
-      file: './table/transbay_BART_IB.md'
+      file: './validation2023/transit/transbay_BART_IB.md'
 
     - type: 'line'
       title: 'Transbay BART IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_BART_IB.csv'
+      dataset: './validation2023/transit/transbay_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -474,13 +475,13 @@ layout:
         segmented by various times of day. It includes both observed and modeled values, 
         the difference between these values, and the percentage difference, aimed at 
         validating transportation models.
-      file: './table/transbay_BART_OB.md'
+      file: './validation2023/transit/transbay_BART_OB.md'
 
     - type: 'line'
       title: 'Transbay BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/transbay_BART_OB.csv'
+      dataset: './validation2023/transit/transbay_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -496,13 +497,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the Countyline Bart screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/Countyline_BART_IB.md'
+      file: './validation2023/transit/Countyline_BART_IB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline BART IB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_BART_IB.csv'
+      dataset: './validation2023/transit/Countyline_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -518,13 +519,13 @@ layout:
         This table presents a comparison between observed and modeled inbound 
         ridership for the Countyline Bart screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './table/Countyline_BART_OB.md'
+      file: './validation2023/transit/Countyline_BART_OB.md'
 
     - type: 'line'
       title: 'SF - San Mateo Countyline BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_Screenline/Countyline_BART_OB.csv'
+      dataset: './validation2023/transit/Countyline_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -542,13 +543,13 @@ layout:
         24th St. Mission, Glen Park, Balboa Park. It details observed and modeled values, 
         the discrepancies between them, and the percentage differences, serving as a 
         tool for validation within San Francisco's transit system. 
-      file: './table/SF_in.md'
+      file: './validation2023/transit/SF_in.md'
 
     - type: 'line'
       title: 'Intra-SF BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_BART/Intra_SF_BART_IB.csv'
+      dataset: './validation2023/transit/Intra_SF_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -566,13 +567,13 @@ layout:
         24th St. Mission, Glen Park, Balboa Park. It details observed and modeled values, 
         the discrepancies between them, and the percentage differences, serving as a 
         tool for validation within San Francisco's transit system. 
-      file: './table/SF_out.md'
+      file: './validation2023/transit/SF_out.md'
 
     - type: 'line'
       title: 'Intra-SF BART OB by TOD'
       description: ''
       width: 1
-      dataset: './val_BART/Intra_SF_BART_OB.csv'
+      dataset: './validation2023/transit/Intra_SF_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'

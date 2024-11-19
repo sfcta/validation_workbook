@@ -1,0 +1,86 @@
+header:
+  tab: '2023 Road Validation - Map'
+  title: '2023 Road Validation - Map'
+  description: Modeled volume vs observed count map
+  triggerPattern: "validation2023"
+
+layout:
+  row1:
+    - type: map
+      title: 'Difference between modeled and observed counts'
+      description: Color represents the Daily difference, width represents the Daily observation
+      height: 15
+      center: [-122.43,37.73]
+      zoom: 11.4
+      shapes: validation2023/road/map/map.shp
+      datasets:
+            data:
+                file: map.csv
+                join: AB
+      display:
+            lineWidth:
+                dataset: data
+                columnName: Daily_obs
+                scaleFactor: 100
+            lineColor:
+                dataset: data
+                columnName: Daily_diff
+                colorRamp:
+                    ramp: PRGn
+                    steps: 100
+      tooltip:
+            - data:AB
+            - data:Source ID
+            - data:Loc Type
+            - data:AT Group
+            - data:FT Group
+            - data:AM_obs
+            - data:AM_est
+            - data:AM_diff
+            - data:AM_pctdiff
+            - data:PM_obs
+            - data:PM_est
+            - data:PM_diff
+            - data:PM_pctdiff
+            - data:Daily_obs
+            - data:Daily_est 
+            - data:Daily_pctdiff
+    - type: map
+      title: 'Percent difference between modeled and observed counts'
+      description: Color represents the Daily percent difference, width represents the Daily observation
+      height: 15
+      center: [-122.43,37.73]
+      zoom: 11.4
+      shapes: validation2023/road/map/map.shp
+      datasets:
+            data:
+                file: map.csv
+                join: AB
+      display:
+            lineWidth:
+                dataset: data
+                columnName: Daily_obs
+                scaleFactor: 100
+            lineColor:
+                dataset: data
+                columnName: Daily_pctdiff
+                colorRamp:
+                    ramp: PRGn
+                    steps: 10
+      tooltip:
+            - data:AB
+            - data:Source ID
+            - data:Loc Type
+            - data:AT Group
+            - data:FT Group
+            - data:AM_obs
+            - data:AM_est
+            - data:AM_diff
+            - data:AM_pctdiff
+            - data:PM_obs
+            - data:PM_est
+            - data:PM_diff
+            - data:PM_pctdiff
+            - data:Daily_obs
+            - data:Daily_est 
+            - data:Daily_pctdiff

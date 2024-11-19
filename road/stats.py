@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import json
-from validation_road_utils import compute_and_combine_stats
+from road.validation_road_utils import compute_and_combine_stats
 
 
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):

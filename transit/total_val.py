@@ -1,6 +1,6 @@
 import pandas as pd
 import tomllib
-from utils import (
+from transit.utils import (
     dataframe_to_markdown,
     format_dataframe,
     read_dbf_and_groupby_sum,
@@ -365,22 +365,6 @@ def process_valTotal_Submode(
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-
-    model_run_dir = config["directories"]["model_run"]
-    transit_input_dir = config["directories"]["transit_input_dir"]
-    markdown_output_dir = config["directories"]["markdown_output_dir"]
-    total_output_dir = config["directories"]["total_output_dir"]
-    observed_NTD = config["transit"]["observed_NTD"]
-    valTotal_Submode_md = config["total"]["valTotal_Submode_md"]
-    valTotal_Service_md = config["total"]["valTotal_Service_md"]
-    valTotal_Operator_md = config["total"]["valTotal_Operator_md"]
-    valTotal_Service = config["total"]["valTotal_Service"]
-    valTotal_Operator = config["total"]["valTotal_Operator"]
-    valTotal_Submode = config["total"]["valTotal_Submode"]
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     process_valTotal_Operator(
         combined_gdf,

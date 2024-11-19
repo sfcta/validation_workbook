@@ -5,7 +5,7 @@ import geopandas as gpd
 import pandas as pd
 import tomllib
 from shapely.geometry import LineString, Point
-from utils import (
+from transit.utils import (
     format_dataframe,
     read_dbf_and_groupby_sum,
     read_transit_assignments,
@@ -432,41 +432,6 @@ def process_bart_map(
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-
-    model_run_dir = config["directories"]["model_run"]
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    transit_input_dir = Path(config["directories"]["transit_input_dir"])
-    station_node_match = Path(config["transit"]["station_node_match"])
-    muni_output_dir = Path(config["directories"]["muni_output_dir"])
-    bart_output_dir = Path(config["directories"]["bart_output_dir"])
-    shp_file_dir = Path(config["directories"]["shp_file_dir"])
-    model_MUNI_Line = Path(config["muni"]["model_MUNI_Line"])
-    model_BART = Path(config["bart"]["model_BART"])
-    observed_BART = Path(config["transit"]["observed_BART"])
-    BART_br_map = Path(config["bart"]["BART_br_map"])
-    BART_br = Path(config["bart"]["BART_br"])
-    BART_br_am = Path(config["bart"]["BART_br_am"])
-    BART_br_pm = Path(config["bart"]["BART_br_pm"])
-    BART_at = Path(config["bart"]["BART_at"])
-    BART_at_am = Path(config["bart"]["BART_at_am"])
-    BART_at_pm = Path(config["bart"]["BART_at_pm"])
-    BART_br_map_pm = Path(config["bart"]["BART_br_map_pm"])
-    BART_br_map_am = Path(config["bart"]["BART_br_map_am"])
-    BART_at_map = Path(config["bart"]["BART_at_map"])
-    BART_at_map_am = Path(config["bart"]["BART_at_map_am"])
-    BART_at_map_pm = Path(config["bart"]["BART_at_map_pm"])
-    BART_at_allday_csv = Path(config["bart"]["BART_at_allday_csv"])
-    muni_ib_shp = Path(config["muni"]["muni_ib_shp"])
-    muni_ob_shp = Path(config["muni"]["muni_ob_shp"])
-    MUNI_OB = Path(config["muni"]["MUNI_OB"])
-    MUNI_IB = Path(config["muni"]["MUNI_IB"])
-    MUNI_map_IB = Path(config["muni"]["MUNI_map_IB"])
-    MUNI_map_OB = Path(config["muni"]["MUNI_map_OB"])
-
-    FREEFLOW_SHP = model_run_dir / config["transit"]["FREEFLOW_SHP"]
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     process_muni_map(
         combined_gdf,

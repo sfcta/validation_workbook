@@ -1,6 +1,6 @@
 import pandas as pd
 import tomllib
-from utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
+from transit.utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
 
 station_locations = {
     "downtown": ["CIVC", "POWL", "MONT", "EMBR"],
@@ -261,19 +261,6 @@ def process_BART_model_outputs(
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-
-    model_run_dir = config["directories"]["model_run"]
-    model_BART = config["bart"]["model_BART"]
-    model_BART_county = config["bart"]["model_BART_county"]
-    model_BART_Screenline = config["bart"]["model_BART_Screenline"]
-    station_node_match = config["transit"]["station_node_match"]
-    transit_input_dir = config["directories"]["transit_input_dir"]
-    transbay_node = config["screenline"]["transbay_node"]
-    countyline_node = config["screenline"]["countyline_node"]
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     process_BART_model_outputs(
         combined_gdf,

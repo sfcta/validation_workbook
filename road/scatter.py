@@ -2,7 +2,7 @@ import json
 import pandas as pd
 from pathlib import Path
 from sklearn.linear_model import LinearRegression
-from validation_road_utils import compute_and_combine_scatter
+from road.validation_road_utils import compute_and_combine_scatter
 def compute_and_save_errors(
         est_df,
         obs_df,

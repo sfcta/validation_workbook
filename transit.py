@@ -1,14 +1,14 @@
 from pathlib import Path
 
 import tomllib, sys
-from bart import process_BART_model_outputs
-from map_data import process_bart_map, process_muni_map
-from muni import process_muni
-from obs import process_obs_data
-from screen import save_final_screenline_data
-from simwrapper_table import process_mkd_bart, process_mkd_muni, process_mkd_screenline
-from total_val import process_valTotal_Operator, process_valTotal_Submode
-from utils import read_transit_assignments
+from transit.bart import process_BART_model_outputs
+from transit.map_data import process_bart_map, process_muni_map
+from transit.muni import process_muni
+from transit.obs import process_obs_data
+from transit.screen import save_final_screenline_data
+from transit.simwrapper_table import process_mkd_bart, process_mkd_muni, process_mkd_screenline
+from transit.total_val import process_valTotal_Operator, process_valTotal_Submode
+from transit.utils import read_transit_assignments
 
 if __name__ == "__main__":
     toml_path = Path(sys.argv[1])
@@ -17,22 +17,19 @@ if __name__ == "__main__":
     with open(toml_path, "rb") as f:
         config = tomllib.load(f)
 
-    transit_line_rename_filepath = (
-        Path(config["directories"]["resources"]) / config["transit"]["line_rename_filename"]
-    )
-              
-    model_run_dir = Path(config["directories"]["model_run"])
-    transit_input_dir = Path(config["directories"]["transit_input_dir"])
-    shp_file_dir = Path(config["directories"]["shp_file_dir"])
-    freeflow = model_run_dir / config["transit"]["freeflow"]
-    observed_BART = Path(config["transit"]["observed_BART"])
-    station_node_match = Path(config["transit"]["station_node_match"])
-    observed_BART_county = Path(config["transit"]["observed_BART_county"])
-    observed_BART_Screenline = Path(config["transit"]["observed_BART_Screenline"])
-    observed_MUNI_Line = Path(config["transit"]["observed_MUNI_Line"])
-    observed_Screenline = Path(config["transit"]["observed_Screenline"])
-    observed_NTD = Path(config["transit"]["observed_NTD"])
-    muni_name_match = Path(config["transit"]["muni_name_match"])
+    line_rename = Path(config["input"]["support"]["line_rename"])
+    
+    model_run_dir = Path(config["input"]['model']["dir"])
+    transit_input_dir = Path(config["input"]['observed']["dir"])
+    freeflow = model_run_dir / config["input"]["model"]["freeflow"]
+    bart_station = Path(config["input"]["observed"]["bart_station"])
+    station_node_match = Path(config["input"]["observed"]["station_node_match"])
+    bart_county = Path(config["input"]["observed"]["bart_county"])
+    bart_screenline = Path(config["input"]["observed"]["bart_screenline"])
+    observed_MUNI_Line = Path(config["input"]["observed"]["muni_line"])
+    observed_Screenline = Path(config["input"]["observed"]["screenline"])
+    observed_NTD = Path(config["input"]["observed"]["ntd"])
+    muni_name_match = Path(config["input"]["observed"]["muni_name_match"])
     model_BART = Path(config["bart"]["model_BART"])
     model_BART_county = Path(config["bart"]["model_BART_county"])
     model_BART_Screenline = Path(config["bart"]["model_BART_Screenline"])
@@ -159,7 +156,7 @@ if __name__ == "__main__":
     valTotal_Operator_md = Path(config["total"]["valTotal_Operator_md"])
     transbay_node = config["screenline"]["transbay_node"]
     countyline_node = config["screenline"]["countyline_node"]
-    output_dir = Path(config["directories"]["output_dir"])
+    output_dir = Path(config["output"]["dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
 
     time_periods = ["EA", "AM", "MD", "PM", "EV"]
@@ -180,7 +177,7 @@ if __name__ == "__main__":
     process_muni(
         combined_gdf,
         muni_name_match,
-        transit_line_rename_filepath,
+        line_rename,
         transit_input_dir,
         observed_MUNI_Line,
         output_dir,
@@ -229,14 +226,14 @@ if __name__ == "__main__":
     )
     process_mkd_bart(
         transit_input_dir,
-        observed_BART,
+        bart_station,
         output_dir,
         model_BART,
         output_dir,
         output_dir,
-        observed_BART_county,
+        bart_county,
         model_BART_county,
-        observed_BART_Screenline,
+        bart_screenline,
         output_dir,
         tod_order,
         BART_boarding_allday_md,
@@ -318,7 +315,7 @@ if __name__ == "__main__":
         combined_gdf,
         output_dir,
         output_dir,
-        shp_file_dir,
+        output_dir,
         freeflow,
         model_MUNI_Line,
         muni_ib_shp,
@@ -332,9 +329,9 @@ if __name__ == "__main__":
         output_dir,
         transit_input_dir,
         output_dir,
-        observed_BART,
+        bart_station,
         model_BART,
-        shp_file_dir,
+        output_dir,
         BART_br,
         BART_br_map,
         BART_br_pm,
@@ -353,9 +350,9 @@ if __name__ == "__main__":
         transit_input_dir,
         output_dir,
         observed_MUNI_Line,
-        observed_BART,
-        observed_BART_county,
-        observed_BART_Screenline,
+        bart_station,
+        bart_county,
+        bart_screenline,
         observed_Screenline,
         observed_NTD,
         obs_MUNI_line_md,

@@ -3,10 +3,11 @@ import string
 import pandas as pd
 import argparse
 import sys, os
-from dataprocess import generate_loaded_network_file_names, filter_and_aggregate
-from scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
-from stats import prepare_time_period_dfs, generate_and_save_tables
-from map import calculate_differences, process_geospatial_data
+from pathlib import Path
+from road.dataprocess import generate_loaded_network_file_names, filter_and_aggregate
+from road.scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
+from road.stats import prepare_time_period_dfs, generate_and_save_tables
+from road.map import calculate_differences, process_geospatial_data
 
 def csv_col_letter_to_num(letter):
     num = 0
@@ -92,6 +93,7 @@ def scatter_plot(est_df, obs_df, chosen_timeperiod, combined_df_cols, classifica
 def validation_road(config):
     # Output directory
     outdir = config['OUTPUT']['directory']
+    Path(outdir).mkdir(parents=True, exist_ok=True)
     
     # Extract the CHAMP input file names
     loaded_network_directory = config['LOADED_NETWORK']['path']

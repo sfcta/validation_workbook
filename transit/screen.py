@@ -1,6 +1,6 @@
 import pandas as pd
 import tomllib
-from utils import read_dbf_and_groupby_sum, read_transit_assignments
+from transit.utils import read_dbf_and_groupby_sum, read_transit_assignments
 
 
 def group_screenline_ridership(combined_gdf, system, A, B, Screenline, Operator, Mode):
@@ -113,20 +113,6 @@ def save_final_screenline_data(
 if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
-
-    model_run_dir = config["directories"]["model_run"]
-    model_BART_Screenline = config["bart"]["model_BART_Screenline"]
-    model_Screenline = config["screenline"]["model_Screenline"]
-    GG_Transit = config["screenline"]["GG_Transit"]
-    SamTrans = config["screenline"]["SamTrans"]
-    GG_Ferry = config["screenline"]["GG_Ferry"]
-    CalTrain = config["screenline"]["CalTrain"]
-    AC_transit = config["screenline"]["AC_transit"]
-    output_dir = model_run_dir / "validation_workbook" / "output"
-    output_transit_dir = output_dir / "transit"
-    output_transit_dir.mkdir(parents=True, exist_ok=True)
-    time_periods = ["EA", "AM", "MD", "PM", "EV"]
-    combined_gdf = read_transit_assignments(model_run_dir, time_periods)
 
     save_final_screenline_data(
         combined_gdf,

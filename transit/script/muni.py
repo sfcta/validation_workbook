@@ -27,9 +27,9 @@ def process_muni(
     # line_names = read_transit_lines(model_run_dir, transit_line_rename_filepath)
     rename = pd.read_csv(transit_line_rename_filepath)
     obs_model_name_match = pd.read_csv(transit_input_dir / muni_name_match)
-    obs_model_name_match = obs_model_name_match[["obs_line", "model_fullname"]]
+    obs_model_name_match = obs_model_name_match[["obs_line", "Name"]]
     obs_model_name_match = obs_model_name_match.rename(
-        columns={"model_fullname": "FULLNAME"}
+        columns={"Name": "NAME"}
     )
     obs_model_name_match = obs_model_name_match.drop_duplicates()
 
@@ -38,7 +38,7 @@ def process_muni(
     )
     MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
 
-    MUNI = MUNI.sort_values(by="FULLNAME").reset_index(drop=True)
+    MUNI = MUNI.sort_values(by="NAME").reset_index(drop=True)
     # Merge df1 with df2 based on the Name/NAME column
     df_merged = pd.merge(MUNI, rename[["NAME", "New"]], on="NAME", how="left")
 
@@ -68,7 +68,7 @@ def process_muni(
             "Direction",
             "TOD",
             "Key_line_dir",
-            "Key_line_tod",
+            "Key_line_tod", 
             "Ridership",
             "Name",
         ]

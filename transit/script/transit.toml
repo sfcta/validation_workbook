@@ -1,15 +1,15 @@
 [directories]
-model_run = "X:/Projects/CHAMP7/Run25z_Market"
+model_run = "X:/Projects/CHAMP7CE/Run3_2023"
 resources = "Q:/Model Development/Simwrapper Validation/resources"
-transit_input_dir = "Q:/Model Development/CHAMP7/Validation_2023/TransitValidation/Observed"
+transit_input_dir = "Q:/Data/Observed/Validation/2023"
 control_file = "Q:/Model Development/Simwrapper Validation/notebooks/transit/script/transit.ctl"
-markdown_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/table"
-MUNI_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_MUNI"
-BART_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_BART"
-Screenline_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_Screenline"
-total_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/val_Total"
+markdown_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/table"
+MUNI_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/val_MUNI"
+BART_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/val_BART"
+Screenline_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/val_Screenline"
+total_output_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/val_Total"
 Base_model_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base"
-SHP_file_dir = "X:/Projects/Miscellaneous/validation_simwrapper/transit_2023/shp"
+SHP_file_dir = "X:/Projects/Miscellaneous/validation_simwrapper/test/shp"
 necessary_scripts_for_vmt_folder = "Y:/Users/Patricie/champ/champ/scripts/summarize"
 
 # Input
@@ -23,7 +23,7 @@ observed_BART_Screenline = "observed_bart_screenline.csv"
 observed_MUNI_Line = "observed_muni_line.csv"
 observed_Screenline = "observed_screenlines.csv"
 observed_NTD = "observed_ntd.csv"
-muni_name_match = "muni_name_match.csv"
+muni_name_match = "muni_line_name_match.csv"
 station_node_match = "station_node_match.csv"
 
 # Output

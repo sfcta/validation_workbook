@@ -7,7 +7,7 @@ from muni import process_muni
 from obs import process_obs_data
 from screen import save_final_screenline_data
 from simwrapper_table import process_mkd_bart, process_mkd_muni, process_mkd_screenline
-from total_val import process_valTotal_Operator, process_valTotal_Submode
+from total_val import process_valTotal_operator, process_valTotal_Submode
 from utils import read_transit_assignments
 
 script_dir = Path(__file__).parent
@@ -380,7 +380,7 @@ if __name__ == "__main__":
         obs_Screenlines_md,
         obs_NTD_md,
     )
-    process_valTotal_Operator(
+    process_valTotal_operator(
         combined_gdf,
         transit_input_dir,
         markdown_output_dir,

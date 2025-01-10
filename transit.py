@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import tomllib, sys
-from transit.bart import process_BART_model_outputs
+from transit.bart import process_bart_model_outputs
 from transit.map_data import process_bart_map, process_muni_map
 from transit.muni import process_muni
 from transit.obs import process_obs_data
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
     
     combined_gdf = read_transit_assignments(model_run_dir, time_periods)
-    process_BART_model_outputs(
+    process_bart_model_outputs(
         combined_gdf,
         output_dir,
         transit_input_dir,

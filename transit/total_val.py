@@ -10,11 +10,11 @@ from transit.utils import (
 
 
 # Get Observed data from NTD
-def obs_NTD_table(transit_input_dir, observed_NTD):
+def obs_ntd_table(transit_input_dir, observed_NTD):
     obs_NTD_df = pd.read_csv(transit_input_dir / observed_NTD)
     obs_NTD_df = obs_NTD_df[["operator", "annual_upt", "average weekday_upt"]]
     obs_NTD_df["average weekday_upt"] = obs_NTD_df.apply(
-        lambda row: round(row["annual_upt"] / 260)
+        lambda row: round(row["annual_upt"] / 261)
         if pd.isna(row["average weekday_upt"])
         else row["average weekday_upt"],
         axis=1,
@@ -26,38 +26,41 @@ def obs_NTD_table(transit_input_dir, observed_NTD):
     return obs_NTD_avgupt
 
 
-def calcualte_weekday_UPT(transit_input_dir, observed_NTD):
+def calcualte_weekday_upt(transit_input_dir, observed_NTD):
     obs_NTD_df = pd.read_csv(transit_input_dir / observed_NTD)
-    obs_NTD_avgupt = obs_NTD_table(transit_input_dir, observed_NTD)
+    obs_NTD_avgupt = obs_ntd_table(transit_input_dir, observed_NTD)
+    ratio = obs_NTD_df[["operator", "annual_upt", "average weekday_upt"]]
+    ratio["ratio"] = ratio["annual_upt"]/ratio["average weekday_upt"].fillna(261)
+    
     AC_Transbay = (
-        obs_NTD_df[obs_NTD_df["operator"] == "AC-Transit"]["commuter_bus_total"] / 261
+        obs_NTD_df[obs_NTD_df["operator"] == "AC-Transit"]["commuter_bus_total"] / ratio[ratio["operator"] == "AC-Transit" ]["ratio"]
     )
-    AC_Eastbay = obs_NTD_df[obs_NTD_df["operator"] == "AC-Transit"]["bus_total"] / 261
+    AC_Eastbay = obs_NTD_df[obs_NTD_df["operator"] == "AC-Transit"]["bus_total"] / ratio[ratio["operator"] == "AC-Transit" ]["ratio"]
     AC = {
         "Operator": ["AC Transbay", "AC Eastbay"],
         "Observed": [AC_Transbay.mean(), AC_Eastbay.mean()],
     }
     df_AC = pd.DataFrame(AC)
 
-    GGT_bus = obs_NTD_df[obs_NTD_df["operator"] == "GG Transit"]["bus_total"] / 261
-    GGT_Ferry = obs_NTD_df[obs_NTD_df["operator"] == "GG Transit"]["ferry_total"] / 261
+    GGT_bus = obs_NTD_df[obs_NTD_df["operator"] == "GG Transit"]["bus_total"] /  ratio[ratio["operator"] == "GG Transit" ]["ratio"]
+    GGT_Ferry = obs_NTD_df[obs_NTD_df["operator"] == "GG Transit"]["ferry_total"] / ratio[ratio["operator"] == "GG Transit" ]["ratio"]
     GG = {
         "Operator": ["GGT-Bus", "GGT-Ferry"],
         "Observed": [GGT_bus.mean(), GGT_Ferry.mean()],
     }
     GG_Transit = pd.DataFrame(GG)
 
-    MUNI_Bus = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["bus_total"] / 261
-    MUNI_Rail = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["light_rail_total"] / 261
-    MUNI_Cable = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["cable_car_total"] / 261
+    MUNI_Bus = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["bus_total"] / ratio[ratio["operator"] == "MUNI" ]["ratio"]
+    MUNI_Rail = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["light_rail_total"] / ratio[ratio["operator"] == "MUNI" ]["ratio"]
+    MUNI_Cable = obs_NTD_df[obs_NTD_df["operator"] == "MUNI"]["cable_car_total"] / ratio[ratio["operator"] == "MUNI" ]["ratio"]
     MUNI = {
         "Operator": ["MUNI-Bus", "MUNI-Rail", "MUNI_Cable"],
         "Observed": [MUNI_Bus.mean(), MUNI_Rail.mean(), MUNI_Cable.mean()],
     }
     MUNI = pd.DataFrame(MUNI)
 
-    SCVTA_bus = obs_NTD_df[obs_NTD_df["operator"] == "SCVTA"]["bus_total"] / 261
-    SCVTA_rail = obs_NTD_df[obs_NTD_df["operator"] == "SCVTA"]["light_rail_total"] / 261
+    SCVTA_bus = obs_NTD_df[obs_NTD_df["operator"] == "SCVTA"]["bus_total"] / ratio[ratio["operator"] == "SCVTA" ]["ratio"]
+    SCVTA_rail = obs_NTD_df[obs_NTD_df["operator"] == "SCVTA"]["light_rail_total"] / ratio[ratio["operator"] == "SCVTA" ]["ratio"]
     SCVTA = {
         "Operator": ["SCVTA-Bus", "SCVTA-LRT"],
         "Observed": [SCVTA_bus.mean(), SCVTA_rail.mean()],
@@ -191,12 +194,13 @@ def process_total_val(combined_gdf):
     ferry = ferry_df.groupby("Ferry_name")["AB_BRDA"].sum().reset_index()
 
     ac = read_dbf_and_groupby_sum(combined_gdf, "AC Transit", "MODE", "AB_BRDA")
+    vta = read_dbf_and_groupby_sum(combined_gdf, "SCVTA", "MODE", "AB_BRDA")
 
     GG_bus_model = all_mode[all_mode["Operator"] == 23]["Modeled"].mean()
-    VTA_LR_model = all_mode[all_mode["Operator"] == 21]["Modeled"].mean()
-    VTA_bus_model = all_mode[all_mode["Operator"] == 19]["Modeled"].mean()
+    VTA_LR_model = vta[vta["MODE"] == 21]["AB_BRDA"].mean()
+    VTA_bus_model = vta[vta["MODE"] == 19]["AB_BRDA"].mean()
     model_muni_bus = all_mode[all_mode["Operator"] == 11]["Modeled"].mean()
-    model_muni_cable = muni[muni["MUNI_name"] == "Cable Car"]["AB_BRDA"].mean()
+    model_muni_cable = all_mode[all_mode["Operator"] == 14]["Modeled"].mean()
     model_muni_rail = all_mode[all_mode["Operator"] == 15]["Modeled"].mean()
     ac_trans = ac[ac["MODE"] == 22]["AB_BRDA"].mean()
     ac_east = ac[ac["MODE"] == 18]["AB_BRDA"].mean()
@@ -241,7 +245,7 @@ def process_total_val(combined_gdf):
     return df_modeled, model_operator
 
 
-def process_valTotal_Operator(
+def process_valTotal_operator(
     combined_gdf,
     transit_input_dir,
     markdown_output_dir,
@@ -250,7 +254,7 @@ def process_valTotal_Operator(
     valTotal_Operator_md,
     valTotal_Operator,
 ):
-    observal_operator = obs_NTD_table(transit_input_dir, observed_NTD)
+    observal_operator = obs_ntd_table(transit_input_dir, observed_NTD)
     observal_operator["Operator"] = (
         observal_operator["Operator"]
         .map(name_mapping)
@@ -296,7 +300,7 @@ def process_valTotal_Submode(
         columns=["Service Type", "Operator"],
     )
 
-    df_filtered = calcualte_weekday_UPT(transit_input_dir, observed_NTD)
+    df_filtered = calcualte_weekday_upt(transit_input_dir, observed_NTD)
     df_modeled, model_operator = process_total_val(combined_gdf)
 
     df_filtered["Operator"] = (
@@ -366,7 +370,7 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    process_valTotal_Operator(
+    process_valTotal_operator(
         combined_gdf,
         transit_input_dir,
         markdown_output_dir,

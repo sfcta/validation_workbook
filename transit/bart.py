@@ -8,7 +8,7 @@ station_locations = {
 }
 
 
-def process_BART_data(combined_gdf, transit_input_dir, station_node_match):
+def process_bart_data(combined_gdf, transit_input_dir, station_node_match):
     # Process BART data for different routes and columns
     nodes = pd.read_csv(transit_input_dir / station_node_match)
     nodes = nodes[["Station", "Node", "County"]]
@@ -63,31 +63,26 @@ def process_BART_data(combined_gdf, transit_input_dir, station_node_match):
     return bart
 
 
-def process_BART_county(
+def process_bart_county(
     combined_gdf,
     output_transit_dir,
     transit_input_dir,
     station_node_match,
-    model_BART_county,
-    model_BART,
+    model_bart_county,
+    model_bart,
 ):
-    BART_county = process_BART_data(combined_gdf, transit_input_dir, station_node_match)
+    bart_county = process_bart_data(combined_gdf, transit_input_dir, station_node_match)
 
-    bart_model = BART_county[["Station", "TOD", "Key", "Boardings", "Alightings"]]
+    bart_model = bart_county[["Station", "TOD", "Key", "Boardings", "Alightings"]]
     bart_model = bart_model.sort_values(by="Key").reset_index(drop=True)
-    bart_model.to_csv(output_transit_dir / model_BART, index=False)
-    # station_to_county = {
-    #     station: county for county, stations in counties.items() for station in stations
-    # }
+    bart_model.to_csv(output_transit_dir / model_bart, index=False)
 
-    # Add the 'County' column to the DataFrame
-    # BART_county["County"] = BART_county["Station"].map(station_to_county)
-    BART_county = (
-        BART_county.groupby(["County", "TOD"])[["Boardings", "Alightings"]]
+    bart_county = (
+        bart_county.groupby(["County", "TOD"])[["Boardings", "Alightings"]]
         .sum()
         .reset_index()
     )
-    BART_county.to_csv(output_transit_dir / model_BART_county, index=False)
+    bart_county.to_csv(output_transit_dir / model_bart_county, index=False)
 
 
 def process_bart_screenline_data(combined_gdf, A, B):
@@ -114,7 +109,7 @@ def process_bart_screenline_data(combined_gdf, A, B):
     return result
 
 
-def BART_Screenline_Concat(combined_gdf, A, B, screenline:str):
+def bart_screenline_concat(combined_gdf, A, B, screenline:str):
     # Concatenate the DataFrames
     bart_screenline = process_bart_screenline_data(combined_gdf, A, B)
 
@@ -151,7 +146,7 @@ def determineScreenline(x):
         return False
 
 
-def process_BART_SF(combined_gdf, transit_input_dir, station_node_match):
+def process_bart_sf(combined_gdf, transit_input_dir, station_node_match):
     nodes = pd.read_csv(transit_input_dir / station_node_match)
     nodes = nodes[["Station", "Node", "County"]]
 
@@ -201,60 +196,60 @@ def process_BART_SF(combined_gdf, transit_input_dir, station_node_match):
     return intra
 
 
-def process_BART_Screenline(
+def process_bart_screenline(
     combined_gdf,
     output_transit_dir,
     transit_input_dir,
     station_node_match,
-    model_BART_Screenline,
+    model_bart_Screenline,
     transbay_node,
     countyline_node,
 ):
     # Transbay
-    BART_screenline_tb = BART_Screenline_Concat(
+    bart_screenline_tb = bart_screenline_concat(
         combined_gdf, transbay_node[0], transbay_node[1], "Transbay"
     )
 
     # Countyline
-    BART_screenline_ct = BART_Screenline_Concat(
+    bart_screenline_ct = bart_screenline_concat(
         combined_gdf, countyline_node[0], countyline_node[1], "Countyline"
     )
 
     # Intra-sf: within SF -- Between downtown stations
-    BART_sf = process_BART_SF(combined_gdf, transit_input_dir, station_node_match)
+    bart_sf = process_bart_sf(combined_gdf, transit_input_dir, station_node_match)
     bart_screenline = pd.concat(
-        [BART_screenline_tb, BART_screenline_ct, BART_sf], ignore_index=True
+        [bart_screenline_tb, bart_screenline_ct, bart_sf], ignore_index=True
     )
-    bart_screenline.to_csv(output_transit_dir / model_BART_Screenline, index=False)
+    bart_screenline.to_csv(output_transit_dir / model_bart_Screenline, index=False)
 
 
-def process_BART_model_outputs(
+def process_bart_model_outputs(
     combined_gdf,
     output_transit_dir,
     transit_input_dir,
     station_node_match,
-    model_BART_Screenline,
-    model_BART_county,
-    model_BART,
+    model_bart_Screenline,
+    model_bart_county,
+    model_bart,
     transbay_node,
     countyline_node,
 ):
-    process_BART_Screenline(
+    process_bart_screenline(
         combined_gdf,
         output_transit_dir,
         transit_input_dir,
         station_node_match,
-        model_BART_Screenline,
+        model_bart_Screenline,
         transbay_node,
         countyline_node,
     )
-    process_BART_county(
+    process_bart_county(
         combined_gdf,
         output_transit_dir,
         transit_input_dir,
         station_node_match,
-        model_BART_county,
-        model_BART,
+        model_bart_county,
+        model_bart,
     )
 
 
@@ -262,14 +257,14 @@ if __name__ == "__main__":
     with open("transit.toml", "rb") as f:
         config = tomllib.load(f)
 
-    process_BART_model_outputs(
+    process_bart_model_outputs(
         combined_gdf,
         output_transit_dir,
         transit_input_dir,
         station_node_match,
         model_run_dir,
         output_dir,
-        model_BART_Screenline,
-        model_BART_county,
-        model_BART,
+        model_bart_Screenline,
+        model_bart_county,
+        model_bart,
     )

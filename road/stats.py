@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import json
-from road.validation_road_utils import compute_and_combine_stats
+from validation_road_utils import compute_and_combine_stats
 
 
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
@@ -115,7 +115,14 @@ def calculate_metrics(df, group_var_column, period):
 
 
 def generate_and_save_tables(outdir, time_period_dfs, group_vars):
-    # Create the stats_data directory if it does not exist
+    import os
+
+    # Ensure the output directory exists
+    os.makedirs(outdir, exist_ok=True)
+
+    # Loop through each group variable
+    
+    categories = ['<10k', '10-20k', '20-50k', '>=50k']
 
     for group_var in group_vars:
         percent_rmse_df = pd.DataFrame()
@@ -123,29 +130,43 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
         est_obs_ratio_df = pd.DataFrame()
 
         for period, df in time_period_dfs.items():
+            # Handle Observed Volume separately
             if group_var == 'Observed Volume':
+                # Apply classification to Observed Volume for all periods
                 df['Observed Volume Category'] = df['Observed Volume'].apply(
                     classify_observation_volume)
                 group_var_column = 'Observed Volume Category'
             else:
                 group_var_column = group_var
 
+            # Calculate metrics
             percent_rmse, relative_error, est_obs_ratio, total_percent_rmse, total_relative_error, total_est_obs_ratio = calculate_metrics(
                 df, group_var_column, period)
 
+            # Populate DataFrames with metrics
             percent_rmse_df[period] = percent_rmse
             relative_error_df[period] = relative_error
             est_obs_ratio_df[period] = est_obs_ratio
 
             percent_rmse_df.loc['All Locations', period] = total_percent_rmse
-            relative_error_df.loc['All Locations',
-                                  period] = total_relative_error
+            relative_error_df.loc['All Locations', period] = total_relative_error
             est_obs_ratio_df.loc['All Locations', period] = total_est_obs_ratio
+
+            # Debug: Print counts for 'Observed Volume' in each period
+            if group_var == 'Observed Volume':
+                counts = df['Observed Volume Category'].value_counts()
+
+                # Reindex to include all categories
+                counts = counts.reindex(categories, fill_value=0)
+
+                # Print for debugging
+                print(f"Counts Table for Observed Volume in period '{period}':")
+                print(counts)
+                print("\n")
 
         # Reset index and rename columns
         percent_rmse_df = reset_index_and_rename(percent_rmse_df, group_var)
-        relative_error_df = reset_index_and_rename(
-            relative_error_df, group_var)
+        relative_error_df = reset_index_and_rename(relative_error_df, group_var)
         est_obs_ratio_df = reset_index_and_rename(est_obs_ratio_df, group_var)
 
         # Reorder DataFrame based on group_var
@@ -155,28 +176,42 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
 
         # Count for each group_var category
         if group_var == 'Observed Volume':
-            df['Observed Volume Category'] = df['Observed Volume'].apply(
-                classify_observation_volume)
-            counts = df['Observed Volume Category'].value_counts()
-            count_df = pd.DataFrame(counts).reset_index()
-            count_df.columns = ['Observed Volume', 'Count']
+        # Explicitly use the Daily period
+            daily_df = time_period_dfs.get('Daily')
+            if daily_df is not None:
+                daily_df['Observed Volume Category'] = daily_df['Observed Volume'].apply(
+                    classify_observation_volume)
+
+                # Count occurrences for each category in the Daily period
+                counts = daily_df['Observed Volume Category'].value_counts()
+                counts = counts.reindex(categories, fill_value=0)
+                count_df = pd.DataFrame(counts).reset_index()
+                count_df.columns = ['Observed Volume', 'Count']
+
+                # Add total count row
+                total_count = count_df['Count'].sum()
+                total_row = pd.DataFrame(
+                    {'Observed Volume': ['All Locations'], 'Count': [total_count]}
+                )
+                count_df = pd.concat([count_df, total_row], ignore_index=True)
+            else:
+                print("Warning: 'Daily' period data is missing.")
+                count_df = pd.DataFrame(columns=['Observed Volume', 'Count'])
         else:
             counts = df[group_var].value_counts()
             count_df = pd.DataFrame(counts).reset_index()
             count_df.columns = [group_var, 'Count']
 
-        # Handle NaN values
-        if group_var in ['AT Group', 'FT Group']:
-            count_df[group_var] = count_df[group_var].fillna('Other')
+            # Add total count row only if not already added
+            if 'All Locations' not in count_df[group_var].values:
+                total_count = count_df['Count'].sum()
+                total_row = pd.DataFrame(
+                    {group_var: ['All Locations'], 'Count': [total_count]}
+                )
+                count_df = pd.concat([count_df, total_row], ignore_index=True)
 
-        count_df = count_df.groupby(group_var, as_index=False)['Count'].sum()
-
-        total_count = count_df['Count'].sum()
-        total_row = pd.DataFrame(
-            {group_var: ['All Locations'], 'Count': [total_count]})
-        count_df = pd.concat([count_df, total_row], ignore_index=True)
+        # Reorder and reset the DataFrame for output
         count_df = reorder_dataframe(count_df, group_var)
-
         # Round the dataframes for better readability
         percent_rmse_df = percent_rmse_df.round(1)
         relative_error_df = relative_error_df.round(5)
@@ -185,29 +220,37 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
         # Save the dataframes to CSV
         group_var_no_spaces = group_var.replace(" ", "").lower()
         file_prefix = f"{group_var_no_spaces}_"
-        count_df.to_csv(f'{outdir}/{file_prefix}count.csv', index=False)
-        percent_rmse_df.to_csv(f'{outdir}/percent_rmse_{group_var_no_spaces}.csv')
-        relative_error_df.to_csv(f'{outdir}/relative_error_{group_var_no_spaces}.csv')
-        est_obs_ratio_df.to_csv(f'{outdir}/est_obs_ratio_{group_var_no_spaces}.csv')
+        count_df.to_csv(f'{file_prefix}count.csv', index=False)
+        percent_rmse_df.to_csv(f'percent_rmse_{group_var_no_spaces}.csv', index=False)
+        relative_error_df.to_csv(f'relative_error_{group_var_no_spaces}.csv', index=False)
+        est_obs_ratio_df.to_csv(f'est_obs_ratio_{group_var_no_spaces}.csv', index=False)
+
 
         # Melt dataframes for easier plotting or analysis
         melted_percent_rmse_df = percent_rmse_df.melt(
-            id_vars=[group_var], var_name='Time Period', value_name='Percent RMSE')
+            id_vars=[group_var], var_name='Time Period', value_name='Percent RMSE'
+        )
         melted_relative_error_df = relative_error_df.melt(
-            id_vars=[group_var], var_name='Time Period', value_name='Relative Error')
+            id_vars=[group_var], var_name='Time Period', value_name='Relative Error'
+        )
         melted_est_obs_ratio_df = est_obs_ratio_df.melt(
-            id_vars=[group_var], var_name='Time Period', value_name='Est/Obs Ratio')
+            id_vars=[group_var], var_name='Time Period', value_name='Est/Obs Ratio'
+        )
 
         # Save melted dataframes to CSV
         melted_percent_rmse_df.to_csv(
-            f'{outdir}/{file_prefix}percent_rmse_melted.csv', index=False)
+            f'{outdir}/{file_prefix}percent_rmse_melted.csv', index=False
+        )
         melted_relative_error_df.to_csv(
-            f'{outdir}/{file_prefix}relative_error_melted.csv', index=False)
+            f'{outdir}/{file_prefix}relative_error_melted.csv', index=False
+        )
         melted_est_obs_ratio_df.to_csv(
-            f'{outdir}/{file_prefix}est_obs_ratio_melted.csv', index=False)
+            f'{outdir}/{file_prefix}est_obs_ratio_melted.csv', index=False
+        )
 
-        # generate the vega-lite files
+        # Generate the Vega-Lite files
         generate_and_save_vega_lite_configs(outdir, group_var, file_prefix)
+
 
 
 def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):

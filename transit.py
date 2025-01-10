@@ -7,7 +7,7 @@ from transit.muni import process_muni
 from transit.obs import process_obs_data
 from transit.screen import save_final_screenline_data
 from transit.simwrapper_table import process_mkd_bart, process_mkd_muni, process_mkd_screenline
-from transit.total_val import process_valTotal_Operator, process_valTotal_Submode
+from transit.total_val import process_valTotal_operator, process_valTotal_Submode
 from transit.utils import read_transit_assignments
 
 if __name__ == "__main__":
@@ -362,7 +362,7 @@ if __name__ == "__main__":
         obs_Screenlines_md,
         obs_NTD_md,
     )
-    process_valTotal_Operator(
+    process_valTotal_operator(
         combined_gdf,
         transit_input_dir,
         output_dir,

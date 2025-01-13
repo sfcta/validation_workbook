@@ -4,41 +4,48 @@ import numpy as np
 import json
 from validation_road_utils import compute_and_combine_stats
 
-
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
-    # Call the compute_and_combine function to get the combined dataframe
+    # Call the compute_and_combine_stats function to get the combined DataFrame
     combined_df = compute_and_combine_stats(est_df, obs_df, times, combined_df_cols)
-    
-    # Remove duplicates
+
+    # Remove duplicates based on `A` and `B`
     combined_df = combined_df.drop_duplicates(subset=['A', 'B'], keep='first')
 
+    # Columns to include in the time-period-specific DataFrames
     calculation_cols = [
         'Estimated Volume',
         'Observed Volume',
         'Errors',
         'Squared Errors',
-        'Percent Errors']
+        'Percent Errors'
+    ]
 
     time_period_dfs = {}
 
     for period in times:
+        # Select columns specific to the current period
         matching_column_indices = [
-            i for i, col_name in enumerate(
-                combined_df.columns) if period in col_name]
+            i for i, col_name in enumerate(combined_df.columns) if period in col_name
+        ]
         select_time_period_df = combined_df.iloc[:, matching_column_indices]
 
-        specific_columns_combined_df = combined_df[combined_df_cols]
+        # Retain the base columns
+        specific_columns_combined_df = combined_df[combined_df_cols + ['Observed Volume Category']]
 
+        # Combine base columns with period-specific columns
         select_time_period_loc_df = pd.concat(
-            [specific_columns_combined_df, select_time_period_df], axis=1)
+            [specific_columns_combined_df, select_time_period_df], axis=1
+        )
 
-        new_column_names = combined_df_cols + \
-            calculation_cols[:len(select_time_period_loc_df.columns) - len(combined_df_cols)]
+        # Rename columns for clarity
+        new_column_names = combined_df_cols + ['Observed Volume Category'] + \
+            calculation_cols[:len(select_time_period_loc_df.columns) - len(combined_df_cols) - 1]
         select_time_period_loc_df.columns = new_column_names
 
         time_period_dfs[period] = select_time_period_loc_df
 
     return time_period_dfs
+
 
 
 def classify_observation_volume(volume):
@@ -80,38 +87,55 @@ def reorder_dataframe(df, group_var):
 
     return df
 
-
 def calculate_metrics(df, group_var_column, period):
-    sum_estimated = df.groupby(group_var_column)['Estimated Volume'].sum()
-    sum_observed = df.groupby(group_var_column)['Observed Volume'].sum()
+    # Get unique groups for reindexing
+    unique_groups = df[group_var_column].unique()
+
+    # Group and calculate aggregated values
+    sum_estimated = df.groupby(group_var_column)['Estimated Volume'].sum().reindex(unique_groups, fill_value=0)
+    sum_observed = df.groupby(group_var_column)['Observed Volume'].sum().reindex(unique_groups, fill_value=0)
 
     group = df.groupby(group_var_column).agg(
         sum_squared_errors=('Squared Errors', 'sum'),
         sum_observed=('Observed Volume', 'sum'),
         count=('Loc Type', 'count')
-    )
+    ).reindex(unique_groups, fill_value=0)
 
-    group['RMSE'] = np.sqrt(group['sum_squared_errors'] / \
-                            group['count']) / (group['sum_observed'] / group['count'])
+    # Calculate RMSE and percent RMSE
+    group['RMSE'] = np.where(
+        group['sum_observed'] > 0,
+        np.sqrt(group['sum_squared_errors'] / np.maximum(group['count'], 1)) /
+        (group['sum_observed'] / np.maximum(group['count'], 1)),
+        np.nan
+    )
     group['percent_rmse'] = group['RMSE'] * 100
 
-    relative_error = (sum_estimated - sum_observed) / sum_observed
-    est_obs_ratio = sum_estimated / sum_observed * 100
+    # Calculate relative error and estimated-to-observed ratio
+    relative_error = pd.Series(
+        (sum_estimated - sum_observed) / np.where(sum_observed > 0, sum_observed, np.nan),
+        index=unique_groups
+    )
+    est_obs_ratio = pd.Series(
+        np.where(sum_observed > 0, (sum_estimated / sum_observed) * 100, np.nan),
+        index=unique_groups
+    )
 
+    # Calculate total metrics across all groups
     total_sum_squared_errors = df['Squared Errors'].sum()
     total_sum_observed = df['Observed Volume'].sum()
     total_count = df.shape[0]
 
-    total_rmse = np.sqrt(total_sum_squared_errors /
-                         total_count) / (total_sum_observed / total_count)
-    total_percent_rmse = total_rmse * 100
+    total_rmse = np.sqrt(total_sum_squared_errors / total_count) / \
+                 (total_sum_observed / total_count if total_sum_observed > 0 else np.nan)
+    total_percent_rmse = total_rmse * 100 if total_rmse is not np.nan else np.nan
 
     total_sum_estimated = df['Estimated Volume'].sum()
-    total_relative_error = (
-        total_sum_estimated - total_sum_observed) / total_sum_observed
-    total_est_obs_ratio = total_sum_estimated / total_sum_observed
+    total_relative_error = (total_sum_estimated - total_sum_observed) / total_sum_observed \
+        if total_sum_observed > 0 else np.nan
+    total_est_obs_ratio = (total_sum_estimated / total_sum_observed) * 100 if total_sum_observed > 0 else np.nan
 
     return group['percent_rmse'], relative_error, est_obs_ratio, total_percent_rmse, total_relative_error, total_est_obs_ratio
+
 
 
 def generate_and_save_tables(outdir, time_period_dfs, group_vars):
@@ -122,108 +146,68 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
 
     # Loop through each group variable
     
-    categories = ['<10k', '10-20k', '20-50k', '>=50k']
-
     for group_var in group_vars:
         percent_rmse_df = pd.DataFrame()
         relative_error_df = pd.DataFrame()
         est_obs_ratio_df = pd.DataFrame()
 
         for period, df in time_period_dfs.items():
-            # Handle Observed Volume separately
-            if group_var == 'Observed Volume':
-                # Apply classification to Observed Volume for all periods
-                df['Observed Volume Category'] = df['Observed Volume'].apply(
-                    classify_observation_volume)
-                group_var_column = 'Observed Volume Category'
-            else:
-                group_var_column = group_var
-
             # Calculate metrics
             percent_rmse, relative_error, est_obs_ratio, total_percent_rmse, total_relative_error, total_est_obs_ratio = calculate_metrics(
-                df, group_var_column, period)
-
-            # Populate DataFrames with metrics
+                df, group_var, period
+            )
             percent_rmse_df[period] = percent_rmse
             relative_error_df[period] = relative_error
             est_obs_ratio_df[period] = est_obs_ratio
+        
 
+            # # Add totals for all locations
             percent_rmse_df.loc['All Locations', period] = total_percent_rmse
             relative_error_df.loc['All Locations', period] = total_relative_error
             est_obs_ratio_df.loc['All Locations', period] = total_est_obs_ratio
 
-            # Debug: Print counts for 'Observed Volume' in each period
-            if group_var == 'Observed Volume':
-                counts = df['Observed Volume Category'].value_counts()
-
-                # Reindex to include all categories
-                counts = counts.reindex(categories, fill_value=0)
-
-                # Print for debugging
-                print(f"Counts Table for Observed Volume in period '{period}':")
-                print(counts)
-                print("\n")
-
-        # Reset index and rename columns
+        # # Reset index and rename columns
         percent_rmse_df = reset_index_and_rename(percent_rmse_df, group_var)
         relative_error_df = reset_index_and_rename(relative_error_df, group_var)
         est_obs_ratio_df = reset_index_and_rename(est_obs_ratio_df, group_var)
 
-        # Reorder DataFrame based on group_var
+        # # Reorder DataFrame based on group_var
         percent_rmse_df = reorder_dataframe(percent_rmse_df, group_var)
         relative_error_df = reorder_dataframe(relative_error_df, group_var)
         est_obs_ratio_df = reorder_dataframe(est_obs_ratio_df, group_var)
 
-        # Count for each group_var category
-        if group_var == 'Observed Volume':
-        # Explicitly use the Daily period
-            daily_df = time_period_dfs.get('Daily')
-            if daily_df is not None:
-                daily_df['Observed Volume Category'] = daily_df['Observed Volume'].apply(
-                    classify_observation_volume)
 
-                # Count occurrences for each category in the Daily period
-                counts = daily_df['Observed Volume Category'].value_counts()
-                counts = counts.reindex(categories, fill_value=0)
-                count_df = pd.DataFrame(counts).reset_index()
-                count_df.columns = ['Observed Volume', 'Count']
+        counts = df[group_var].value_counts()
 
-                # Add total count row
-                total_count = count_df['Count'].sum()
-                total_row = pd.DataFrame(
-                    {'Observed Volume': ['All Locations'], 'Count': [total_count]}
-                )
-                count_df = pd.concat([count_df, total_row], ignore_index=True)
-            else:
-                print("Warning: 'Daily' period data is missing.")
-                count_df = pd.DataFrame(columns=['Observed Volume', 'Count'])
-        else:
-            counts = df[group_var].value_counts()
-            count_df = pd.DataFrame(counts).reset_index()
-            count_df.columns = [group_var, 'Count']
 
-            # Add total count row only if not already added
-            if 'All Locations' not in count_df[group_var].values:
-                total_count = count_df['Count'].sum()
-                total_row = pd.DataFrame(
-                    {group_var: ['All Locations'], 'Count': [total_count]}
-                )
-                count_df = pd.concat([count_df, total_row], ignore_index=True)
+        # Create a count DataFrame
+        count_df = pd.DataFrame(counts).reset_index()
+        count_df.columns = [group_var, 'Count']
+
+        # Add total count row
+        total_count = count_df['Count'].sum()
+        total_row = pd.DataFrame({group_var: ['All Locations'], 'Count': [total_count]})
+        count_df = pd.concat([count_df, total_row], ignore_index=True)
 
         # Reorder and reset the DataFrame for output
         count_df = reorder_dataframe(count_df, group_var)
-        # Round the dataframes for better readability
+
+        # Round the metrics DataFrames for better readability
         percent_rmse_df = percent_rmse_df.round(1)
-        relative_error_df = relative_error_df.round(5)
+        relative_error_df = relative_error_df.round(2)
         est_obs_ratio_df = est_obs_ratio_df.round(3)
 
-        # Save the dataframes to CSV
-        group_var_no_spaces = group_var.replace(" ", "").lower()
-        file_prefix = f"{group_var_no_spaces}_"
+        if group_var == 'Observed Volume Category':
+            file_prefix = "observedvolume"
+        else:
+            file_prefix = f"{group_var.replace(' ', '').lower()}_"
+
+
+        # Save the DataFrames to CSV
         count_df.to_csv(f'{file_prefix}count.csv', index=False)
-        percent_rmse_df.to_csv(f'percent_rmse_{group_var_no_spaces}.csv', index=False)
-        relative_error_df.to_csv(f'relative_error_{group_var_no_spaces}.csv', index=False)
-        est_obs_ratio_df.to_csv(f'est_obs_ratio_{group_var_no_spaces}.csv', index=False)
+        percent_rmse_df.to_csv(f'percent_rmse_{file_prefix}.csv', index=False)
+        relative_error_df.to_csv(f'relative_error_{file_prefix}.csv', index=False)
+        est_obs_ratio_df.to_csv(f'est_obs_ratio_{file_prefix}.csv', index=False)
 
 
         # Melt dataframes for easier plotting or analysis

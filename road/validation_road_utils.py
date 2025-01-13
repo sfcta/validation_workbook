@@ -28,6 +28,8 @@ def compute_and_combine_stats(est_df, obs_df, times, combined_df_cols):
     # Create a base DataFrame using the specified columns
     combined_df = est_df[combined_df_cols].copy()
 
+    if 'Observed Volume Category' in obs_df.columns:
+        combined_df['Observed Volume Category'] = obs_df['Observed Volume Category'].values
     # Iterate through each time period in the list `times`
     for period in times:
         # Compute the error, squared error, and percent error for the current period

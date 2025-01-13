@@ -96,25 +96,25 @@ def process_muni_map(
     shp_file_dir,
     FREEFLOW_SHP,
     model_MUNI_Line,
-    muni_ib,
-    muni_ob,
+    muni_ib_shp,
+    muni_ob_shp,
     MUNI_OB,
     MUNI_IB,
     MUNI_map_IB,
     MUNI_map_OB,
 ):
     MUNI = read_dbf_and_groupby_sum(
-        combined_gdf, "SF MUNI", ["FULLNAME", "NAME", "AB", "SEQ"], "AB_BRDA"
+        combined_gdf, "SF MUNI", ["FULLNAME", "NAME", "AB", "A", "B", "SEQ"], "AB_BRDA"
     )
     MUNI = sort_dataframe_by_mixed_column(MUNI, "FULLNAME")
     MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
     MUNI_day = MUNI.groupby(
-        ["FULLNAME", "NAME", "AB", "SEQ", "Direction"], as_index=False
+        ["FULLNAME", "NAME", "AB", "A", "B", "SEQ", "Direction"], as_index=False
     )["AB_BRDA"].sum()
     MUNI_day = MUNI_day.rename(columns={"NAME": "Name"})
     model_MUNI_line_df = pd.read_csv(output_transit_dir / model_MUNI_Line)
     MUNI_map = model_MUNI_line_df.merge(MUNI_day, on="Name", how="left")
-    MUNI_map = MUNI_map[["Name", "Line", "AB", "SEQ"]]
+    MUNI_map = MUNI_map[["Name", "Line", "AB", "A", "B", "SEQ"]]
     MUNI_map["Direction"] = MUNI_map["Name"].apply(map_name_to_direction)
 
     MUNI_IB_df = pd.read_csv(muni_output_dir / MUNI_IB)
@@ -130,7 +130,8 @@ def process_muni_map(
     freeflow = gpd.read_file(FREEFLOW_SHP)
     freeflow.crs = "epsg:2227"
     freeflow = freeflow.to_crs(epsg=4236)
-    node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
+    node_geo = freeflow[["N", "geometry"]].copy()
+    # node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
     MUNI_IB_df = MUNI_IB_df[
         [
             "Route",
@@ -140,13 +141,24 @@ def process_muni_map(
             "Diff",
             "Percentage Diff",
             "AB",
+            "A", 
+            "B",
             "SEQ",
             "Direction",
         ]
     ]
-    muni_ib_df = (
-        MUNI_IB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-    )
+    MUNI_IB_df['A'] = pd.to_numeric(MUNI_IB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
+    MUNI_IB_df['B'] = pd.to_numeric(MUNI_IB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
+    muni_ib_df = MUNI_IB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
+    muni_ib_df = muni_ib_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
+
+    # Drop the redundant 'N' columns after the merge
+    muni_ib_df = muni_ib_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
+    muni_ib_df['geometry'] = muni_ib_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
+    # muni_ib_df = (
+    #     MUNI_IB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    # )
     muni_ib_geo = gpd.GeoDataFrame(muni_ib_df, geometry="geometry")
     # Apply aggregation function using `apply` instead of `agg`
     aggregated_muni_ib = (
@@ -188,7 +200,7 @@ def process_muni_map(
 
     # Convert to GeoDataFrame
     aggregated_muni_ib = gpd.GeoDataFrame(aggregated_muni_ib, geometry="geometry")
-    aggregated_muni_ib.to_file(shp_file_dir / muni_ib)
+    aggregated_muni_ib.to_file(shp_file_dir / muni_ib_shp)
     MUNI_map_IB_df = aggregated_muni_ib[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -218,13 +230,24 @@ def process_muni_map(
             "Diff",
             "Percentage Diff",
             "AB",
+            "A", 
+            "B",
             "SEQ",
             "Direction",
         ]
     ]
-    muni_ob_df = (
-        MUNI_OB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-    )
+    MUNI_OB_df['A'] = pd.to_numeric(MUNI_OB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
+    MUNI_OB_df['B'] = pd.to_numeric(MUNI_OB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
+    muni_ob_df = MUNI_OB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
+    muni_ob_df = muni_ob_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
+
+    # Drop the redundant 'N' columns after the merge
+    muni_ob_df = muni_ob_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
+    muni_ob_df['geometry'] = muni_ob_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
+    # muni_ob_df = (
+    #     MUNI_OB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    # )
     muni_ob_geo = gpd.GeoDataFrame(muni_ob_df, geometry="geometry")
     # Apply aggregation function using `apply` instead of `agg`
     aggregated_muni_ob = (
@@ -264,7 +287,7 @@ def process_muni_map(
         .reset_index()
     )
 
-    aggregated_muni_ob.to_file(shp_file_dir / muni_ob)
+    aggregated_muni_ob.to_file(shp_file_dir / muni_ob_shp)
     MUNI_map_OB_df = aggregated_muni_ob[
         ["Route", "Observed", "Modeled", "Diff", "Percentage Diff", "Direction"]
     ].copy()
@@ -284,7 +307,7 @@ def process_muni_map(
     MUNI_map_OB_df.to_csv(muni_output_dir / MUNI_map_OB, index=False)
 
 
-def BART_map(
+def bart_map(
     type,
     group_by,
     TOD,
@@ -319,14 +342,14 @@ def BART_map(
     BART_2 = BART.copy()
     BART_2["Percentage Diff"] = BART_2["Percentage Diff"] * 100
     numeric_cols = ["Observed", "Modeled", "Diff"]
-    BART_map = format_dataframe(
+    bart_map = format_dataframe(
         BART_2, numeric_columns=numeric_cols, percentage_columns=["Percentage Diff"]
     )
-    BART_map = BART_map.merge(station, on="Station", how="right")
-    BART_map = gpd.GeoDataFrame(BART_map, geometry="geometry")
-    BART_map.crs = "epsg:2227"
-    BART_map = BART_map.to_crs(epsg=4236)
-    BART_map.to_file(os.path.join(shp_file_dir, shp))
+    bart_map = bart_map.merge(station, on="Station", how="right")
+    bart_map = gpd.GeoDataFrame(bart_map, geometry="geometry")
+    bart_map.crs = "epsg:2227"
+    bart_map = bart_map.to_crs(epsg=4236)
+    bart_map.to_file(os.path.join(shp_file_dir, shp))
 
 
 def process_bart_map(
@@ -355,7 +378,7 @@ def process_bart_map(
     obs_BART_line = pd.read_csv(transit_input_dir / observed_BART)
     model_BART_line = pd.read_csv(output_transit_dir / model_BART)
 
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station"],
         None,
@@ -367,7 +390,7 @@ def process_bart_map(
         bart_output_dir,
         shp_file_dir,
     )
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station", "TOD"],
         "AM",
@@ -379,7 +402,7 @@ def process_bart_map(
         bart_output_dir,
         shp_file_dir,
     )
-    BART_map(
+    bart_map(
         "Boardings",
         ["Station", "TOD"],
         "PM",
@@ -391,7 +414,7 @@ def process_bart_map(
         bart_output_dir,
         shp_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station"],
         None,
@@ -403,7 +426,7 @@ def process_bart_map(
         bart_output_dir,
         shp_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station", "TOD"],
         "AM",
@@ -415,7 +438,7 @@ def process_bart_map(
         bart_output_dir,
         shp_file_dir,
     )
-    BART_map(
+    bart_map(
         "Alightings",
         ["Station", "TOD"],
         "PM",

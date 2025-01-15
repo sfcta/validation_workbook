@@ -2,7 +2,8 @@ import toml
 import string
 import pandas as pd
 import argparse
-import sys
+import sys, os
+from pathlib import Path
 from dataprocess import generate_loaded_network_file_names, filter_and_aggregate
 from scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
 from stats import prepare_time_period_dfs, generate_and_save_tables
@@ -90,6 +91,10 @@ def scatter_plot(est_df, obs_df, chosen_timeperiod, combined_df_cols, classifica
 
 
 def validation_road(config):
+    # Output directory
+    outdir = config['OUTPUT']['directory']
+    Path(outdir).mkdir(parents=True, exist_ok=True)
+    
     # Extract the CHAMP input file names
     loaded_network_directory = config['LOADED_NETWORK']['path']
     loaded_network_files_time = config['LOADED_NETWORK']['timeperiods']
@@ -99,11 +104,9 @@ def validation_road(config):
     loaded_network_files = generate_loaded_network_file_names(loaded_network_files_time)
 
     # Load mappings from the config file
-    at_mapping = config['AT']['values']
-    ft_mapping = config['FT']['values']
+    at_mapping = {int(key): value for key, value in config['AT'].items()}
+    ft_mapping = {int(key): value for key, value in config['FT'].items()}
     # Assuming 'AT' and 'FT' contain integer keys or some keys you can map
-    at_mapping_dict = {i: at_mapping[i] for i in range(len(at_mapping))}
-    ft_mapping_dict = {i: ft_mapping[i] for i in range(len(ft_mapping))}
 
     # Extract the observed file name and tab
     obs_filepath = config['OBSERVED_COUNTS']['obs_filepath']
@@ -117,47 +120,47 @@ def validation_road(config):
         obs_filepath,
         usecols=obs_usecols)
     est_df = filter_and_aggregate(
-        obs_filepath,
+        obs_filepath,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
         loaded_network_directory,
         loaded_network_files,
         loaded_network_column_names,
         loaded_network_files_time,
         extra_columns,
-        at_mapping_dict,
-        ft_mapping_dict)
+        at_mapping,
+        ft_mapping)
 
     # Part 1 - Scatter Plot Variables
     chosen_timeperiod = config['SCATTER_INPUT']['chosen_period']
     classification_col = config['SCATTER_INPUT']['classification_col']
     combined_df_cols = config['SCATTER_INPUT']['combined_df_cols']
-    output_file_name = config['SCATTER_INPUT']['output_file_name']
+    output_file_name = os.path.join(outdir, config['SCATTER_INPUT']['output_file_name'])
 
     fields1 = config['EST_SCATTER_PLOT']['fields']
     nominal_fields1 = config['EST_SCATTER_PLOT']['nominal_fields']
     x_field1 = config['EST_SCATTER_PLOT']['xfield']
     y_field1 = config['EST_SCATTER_PLOT']['yfield']
     name1 = config['EST_SCATTER_PLOT']['name']
-    vega_est_output_path = config['EST_SCATTER_PLOT']['est_output_template']
+    vega_est_output_path = os.path.join(outdir, config['EST_SCATTER_PLOT']['est_output_template'])
 
     fields2 = config['PERCENT_SCATTER_PLOT']['fields']
     nominal_fields2 = config['PERCENT_SCATTER_PLOT']['nominal_fields']
     x_field2 = config['PERCENT_SCATTER_PLOT']['xfield']
     y_field2 = config['PERCENT_SCATTER_PLOT']['yfield']
     name2 = config['PERCENT_SCATTER_PLOT']['name']
-    vega_diffpercent_output_path = config['PERCENT_SCATTER_PLOT']['diffpercent_output_template']
+    vega_diffpercent_output_path = os.path.join(outdir, config['PERCENT_SCATTER_PLOT']['diffpercent_output_template'])
  
 
 
     # Part 2 - Validation Stats Variables
     combined_df_cols_stats = config['STATS_INPUT']['combined_df_cols']
-    group_vars = ['Observed Volume', 'Loc Type', 'AT Group', 'FT Group']
+    group_vars = ['Observed Volume Category', 'Loc Type', 'AT Group', 'FT Group']
     times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
-    output_file_name = config['STATS_INPUT']['output_file_name']
+    output_file_name = os.path.join(outdir, config['STATS_INPUT']['output_file_name'])
 
     # Part 3 - Map Variables
     freeflow_path = config['MAP_INPUT']['freeflow_dir']
-    shp_output_path = config['MAP_INPUT']['shp_out_dir']
-    output_name = config['MAP_INPUT']['output_filename']
+    shp_output_path = os.path.join(outdir, config['MAP_INPUT']['shp_out_dir'])
+    output_name = os.path.join(outdir, config['MAP_INPUT']['output_filename'])
 
     # Part 1 - Scatter Plot
     scatter_plot(est_df, obs_df, chosen_timeperiod, combined_df_cols, classification_col, output_file_name,
@@ -168,7 +171,7 @@ def validation_road(config):
     # Part 2 - Validation Stats
     time_period_dfs = prepare_time_period_dfs(
         est_df, obs_df, times, combined_df_cols_stats)
-    generate_and_save_tables(time_period_dfs, group_vars)
+    generate_and_save_tables(outdir, time_period_dfs, group_vars)
 
     # Part 3 - Map
     merged_df = calculate_differences(est_df, obs_df, output_name)
@@ -184,7 +187,7 @@ if __name__ == "__main__":
         args = parser.parse_args()
     else:
         # Running in Jupyter or IPython, provide a default path
-        default_config_path = r"X:\Projects\Miscellaneous\validation_simwrapper\roads2023\config.toml"  # Replace with your actual default config path
+        default_config_path = r"config.toml"  # Replace with your actual default config path
         print(f"Running in an interactive environment. Using default config path: {default_config_path}")
         args = argparse.Namespace(config_path=default_config_path)
 

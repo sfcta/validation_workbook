@@ -4,7 +4,7 @@ from simpledbf import Dbf5
 
 def generate_loaded_network_file_names(loaded_network_time_periods):
     """Generate a list of loaded_network file names based on time periods."""
-    return [f"LOAD{tod}_FINAL.dbf" for tod in loaded_network_time_periods]
+    return [f"LOAD{tod}_FINAL.csv" for tod in loaded_network_time_periods]
 
 def filter_and_aggregate(
         obs_file,
@@ -26,8 +26,9 @@ def filter_and_aggregate(
 
     for loaded_network_file, output_column in zip(loaded_network_files, time_periods):
         loaded_network_file_path = os.path.join(loaded_network_directory, loaded_network_file)
-        loaded_network = Dbf5(loaded_network_file_path)
-        loaded_network_df = loaded_network.to_dataframe()
+        #loaded_network = Dbf5(loaded_network_file_path)
+        #loaded_network_df = loaded_network.to_dataframe()
+        loaded_network_df = pd.read_csv(loaded_network_file_path)
         loaded_networkf_df = loaded_network_df[column_names]
 
         # Create a dictionary for quick lookup of loaded_network data

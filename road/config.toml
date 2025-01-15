@@ -12,7 +12,7 @@ columns = ["A", "B", "AT", "FT", "V_1"]
 
 [OBSERVED_COUNTS]
 # The observed data file path
-obs_filepath = "obs_count.csv"
+obs_filepath = "Q:/Data/Observed/Validation/2023/observed_counts.csv"
 
 # The columns used for calculation, usually are 'A,B, and Counts'
 obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA", "Observed Volume Category"]

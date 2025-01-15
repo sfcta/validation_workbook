@@ -48,15 +48,15 @@ def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
 
 
 
-# def classify_observation_volume(volume):
-#     if volume < 10000:
-#         return '<10k'
-#     elif 10000 <= volume < 20000:
-#         return '10-20k'
-#     elif 20000 <= volume < 50000:
-#         return '20-50k'
-#     else:
-#         return '>=50k'
+def classify_observation_volume(volume):
+    if volume < 10000:
+        return '<10k'
+    elif 10000 <= volume < 20000:
+        return '10-20k'
+    elif 20000 <= volume < 50000:
+        return '20-50k'
+    else:
+        return '>=50k'
 
 
 # Define function to reset index and rename columns

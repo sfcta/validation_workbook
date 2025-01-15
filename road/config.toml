@@ -1,5 +1,5 @@
 [OUTPUT]
-directory = "C:/Users/dpang/Downloads/validation_workbook-main (1)/validation_workbook-main/road"
+directory = "./validation2023/road"
 
 [LOADED_NETWORK]
 path = ""

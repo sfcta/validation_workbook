@@ -43,11 +43,11 @@ def process_muni(
     df_merged = pd.merge(MUNI, rename[["NAME", "New"]], on="NAME", how="left")
 
     # Update the FULLNAME in df1 with the New value from df2 if a match is found
-    df_merged["FULLNAME"] = df_merged["New"].combine_first(df_merged["FULLNAME"])
+    df_merged["NAME"] = df_merged["New"].combine_first(df_merged["NAME"])
     df_merged = df_merged.drop(columns=["New"])
     # MUNI = MUNI.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
 
-    MUNI_full = pd.merge(df_merged, obs_model_name_match, on="FULLNAME", how="left")
+    MUNI_full = pd.merge(df_merged, obs_model_name_match, on="NAME", how="left")
     MUNI_full = MUNI_full.rename(
         columns={"NAME": "Name", "AB_BRDA": "Ridership", "obs_line": "Line"}
     )

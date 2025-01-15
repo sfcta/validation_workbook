@@ -124,6 +124,10 @@ if __name__ == "__main__":
     county_at_day_md = Path(config["bart"]["county_at_day_md"])
     county_at_am_md = Path(config["bart"]["county_at_am_md"])
     county_at_pm_md = Path(config["bart"]["county_at_pm_md"])
+    screenline_overall_ib_csv = Path(config["screenline"]["screenline_overall_ib_csv"])
+    screenline_overall_ob_csv = Path(config["screenline"]["screenline_overall_ob_csv"])
+    screenline_overall_ib_md = Path(config["screenline"]["screenline_overall_ib_md"])
+    screenline_overall_ob_md = Path(config["screenline"]["screenline_overall_ob_md"])
     transbay_BART_IB_md = Path(config["screenline"]["transbay_BART_IB_md"])
     transbay_BART_OB_md = Path(config["screenline"]["transbay_BART_OB_md"])
     Countyline_BART_OB_md = Path(config["screenline"]["Countyline_BART_OB_md"])
@@ -310,6 +314,10 @@ if __name__ == "__main__":
         GG_Ferry_OB_csv,
         GG_overall_IB_csv,
         GG_overall_OB_csv,
+        screenline_overall_ib_csv,
+        screenline_overall_ob_csv,
+        screenline_overall_ib_md,
+        screenline_overall_ob_md
     )
     process_muni_map(
         combined_gdf,

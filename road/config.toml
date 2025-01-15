@@ -1,5 +1,8 @@
+[OUTPUT]
+directory = "C:/Users/dpang/Downloads/validation_workbook-main (1)/validation_workbook-main/road"
+
 [LOADED_NETWORK]
-path = "Q:/Model Development/Simwrapper Validation/notebooks/roads/Data"
+path = ""
 
 # The Loaded_network file name is LOAD[TOD].dbf by default
 timeperiods = ["AM", "MD", "PM", "EV", "EA"]
@@ -9,10 +12,10 @@ columns = ["A", "B", "AT", "FT", "V_1"]
 
 [OBSERVED_COUNTS]
 # The observed data file path
-obs_filepath = "X:/Projects/Miscellaneous/validation_simwrapper/roads2023/observed_counts.csv"
+obs_filepath = "obs_count.csv"
 
 # The columns used for calculation, usually are 'A,B, and Counts'
-obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA"]
+obs_usecols = ["A", "B", "Daily", "AM", "MD", "PM", "EV", "EA", "Observed Volume Category"]
 
 # The columns we want to include from the observed data, DONT CHANGE A, B!
 obs_extra_columns = ["A", "B", "Loc Type", "Source", "Source ID", "Location", "Dir"]
@@ -37,7 +40,7 @@ yfield = "Estimated Volume"
 fields = ["Observed Volume", "Estimated Volume", "Loc Type", "A", "B", "Location", "Dir"]
 
 # Be careful to state all nominal fields from the above fields
-nominal_fields = ["Loc Type", "A", "B", "Location", , "Dir"]
+nominal_fields = ["Loc Type", "A", "B", "Location", "Dir"]
 name = "Estimation Volume"
 est_output_template = "{classification_col_types}_{name}_est.vega.json"
 
@@ -58,13 +61,32 @@ combined_df_cols = ["Loc Type", "A", "B", "AT", "FT", "Source ID", "AT Group", "
 output_file_name = 'scatter.csv'
 
 [MAP_INPUT]
-freeflow_dir = "X:/Projects/DTX/CaltrainValidation/s8_2019_Base/freeflow.shp"
-shp_out_dir = "X:/Projects/Miscellaneous/validation_simwrapper/roads2023/map"
+freeflow_dir = "freeflow.shp"
+shp_out_dir = "./map"
 output_filename = 'map.csv'
 
 
 [AT]
-values = ["Core/CBD", "Core/CBD", "UrbBiz", "Urb", "Sub", "Sub"]
+0="Core/CBD"
+1="Core/CBD"
+2="UrbBiz"
+3="Urb"
+4="Sub"
+5="Sub"
 
 [FT]
-values = ["Fwy/Ramp", "Fwy/Ramp", "Fwy/Ramp", "Col", "Fwy/Ramp", "", "Art", "", "Loc", "", "Loc", "Art", "", "", "Art"]
+1="Fwy/Ramp"
+2="Fwy/Ramp"
+3="Fwy/Ramp"
+4="Col"
+5="Fwy/Ramp"
+6=""
+7="Art"
+8=""
+9="Loc"
+10="Fwy/Ramp"
+11="Loc"
+12="Art"
+13=""
+14=""
+15="Art"

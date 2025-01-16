@@ -2,7 +2,7 @@ from pathlib import Path
 
 # import numpy as np
 import pandas as pd
-import tomllib
+import toml
 from transit.utils import read_dbf_and_groupby_sum, read_transit_assignments, time_periods
 
 

@@ -12,22 +12,25 @@ layout:
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4
-      shapes: validation2023/road/map/map.shp
+      shapes: 
+        file: validation2023/road/map/map.shp
+        join: AB
       datasets:
             data:
-                file: map.csv
-                join: AB
+                file: validation2023/road/map.csv
       display:
             lineWidth:
                 dataset: data
+                join: AB
                 columnName: Daily_obs
-                scaleFactor: 100
+                scaleFactor: 3000
             lineColor:
                 dataset: data
+                join: AB
                 columnName: Daily_diff
                 colorRamp:
                     ramp: PRGn
-                    steps: 100
+                    steps: 3000
       tooltip:
             - data:AB
             - data:Source ID
@@ -51,18 +54,21 @@ layout:
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4
-      shapes: validation2023/road/map/map.shp
+      shapes: 
+        file: validation2023/road/map/map.shp
+        join: AB
       datasets:
             data:
-                file: map.csv
-                join: AB
+                file: validation2023/road/map.csv
       display:
             lineWidth:
                 dataset: data
+                join: AB
                 columnName: Daily_obs
-                scaleFactor: 100
+                scaleFactor: 3000
             lineColor:
                 dataset: data
+                join: AB
                 columnName: Daily_pctdiff
                 colorRamp:
                     ramp: PRGn

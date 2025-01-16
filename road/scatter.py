@@ -33,7 +33,7 @@ def compute_and_save_errors(
     select_time_period_loc_df.to_csv(file_name, index=False)
 
     # Get classification column types
-    classification_col_types = select_time_period_loc_df[classification_col].unique()
+    classification_col_types = select_time_period_loc_df[classification_col].dropna().unique()
 
     return select_time_period_loc_df, classification_col_types, file_name
 

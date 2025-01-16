@@ -2,7 +2,7 @@ import toml
 import string
 import pandas as pd
 import argparse
-import sys, os
+import sys, os, subprocess
 from pathlib import Path
 from road.dataprocess import generate_loaded_network_file_names, filter_and_aggregate
 from road.scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
@@ -102,13 +102,25 @@ def validation_road(config):
     
     # Generate loaded_network file names
     loaded_network_files = generate_loaded_network_file_names(loaded_network_files_time)
-
+    
+    for f in loaded_network_files:
+        p = Path(loaded_network_directory) / f
+        if not p.exists():
+            os.environ['CUBENET'] = f.replace('.csv','')
+            cmd = "runtpp {}/scripts/summarize/NETtoCSV_TNC.s".format(os.environ['CHAMPVERSION'])
+            proc = subprocess.Popen( cmd, 
+                                     cwd=loaded_network_directory, 
+                                     stdout=subprocess.PIPE, 
+                                     stderr=subprocess.PIPE,
+                                     shell=True )
+            r = proc.wait()
+            print(r)
     # Load mappings from the config file
-    at_mapping = config['AT']['values']
-    ft_mapping = config['FT']['values']
+    at_mapping = config['AT']
+    ft_mapping = config['FT']
     # Assuming 'AT' and 'FT' contain integer keys or some keys you can map
-    at_mapping_dict = {i: at_mapping[i] for i in range(len(at_mapping))}
-    ft_mapping_dict = {i: ft_mapping[i] for i in range(len(ft_mapping))}
+    at_mapping_dict = {int(k): v for k, v in at_mapping.items()}
+    ft_mapping_dict = {int(k): v for k, v in ft_mapping.items()}
 
     # Extract the observed file name and tab
     obs_filepath = config['OBSERVED_COUNTS']['obs_filepath']
@@ -155,7 +167,7 @@ def validation_road(config):
 
     # Part 2 - Validation Stats Variables
     combined_df_cols_stats = config['STATS_INPUT']['combined_df_cols']
-    group_vars = ['Observed Volume', 'Loc Type', 'AT Group', 'FT Group']
+    group_vars = ['Observed Volume Category', 'Loc Type', 'AT Group', 'FT Group']
     times = ['Daily', 'AM', 'MD', 'PM', 'EV', 'EA']
     output_file_name = os.path.join(outdir, config['STATS_INPUT']['output_file_name'])
 

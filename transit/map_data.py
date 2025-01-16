@@ -3,7 +3,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-import tomllib
+import toml
 from shapely.geometry import LineString, Point
 from transit.utils import (
     format_dataframe,

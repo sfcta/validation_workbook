@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import pandas as pd
-import tomllib
+import toml
 from transit.utils import dataframe_to_markdown, format_dataframe
 
 

@@ -2,7 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 import json
-from validation_road_utils import compute_and_combine_stats
+from road.validation_road_utils import compute_and_combine_stats
 
 def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
     # Call the compute_and_combine_stats function to get the combined DataFrame
@@ -200,14 +200,14 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
         if group_var == 'Observed Volume Category':
             file_prefix = "observedvolume"
         else:
-            file_prefix = f"{group_var.replace(' ', '').lower()}_"
+            file_prefix = f"{group_var.replace(' ', '').lower()}"
 
 
         # Save the DataFrames to CSV
-        count_df.to_csv(f'{file_prefix}count.csv', index=False)
-        percent_rmse_df.to_csv(f'percent_rmse_{file_prefix}.csv', index=False)
-        relative_error_df.to_csv(f'relative_error_{file_prefix}.csv', index=False)
-        est_obs_ratio_df.to_csv(f'est_obs_ratio_{file_prefix}.csv', index=False)
+        count_df.to_csv(f'{outdir}/{file_prefix}_count.csv', index=False)
+        percent_rmse_df.to_csv(f'{outdir}/percent_rmse_{file_prefix}.csv', index=False)
+        relative_error_df.to_csv(f'{outdir}/relative_error_{file_prefix}.csv', index=False)
+        est_obs_ratio_df.to_csv(f'{outdir}/est_obs_ratio_{file_prefix}.csv', index=False)
 
 
         # Melt dataframes for easier plotting or analysis
@@ -223,13 +223,13 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
 
         # Save melted dataframes to CSV
         melted_percent_rmse_df.to_csv(
-            f'{outdir}/{file_prefix}percent_rmse_melted.csv', index=False
+            f'{outdir}/{file_prefix}_percent_rmse_melted.csv', index=False
         )
         melted_relative_error_df.to_csv(
-            f'{outdir}/{file_prefix}relative_error_melted.csv', index=False
+            f'{outdir}/{file_prefix}_relative_error_melted.csv', index=False
         )
         melted_est_obs_ratio_df.to_csv(
-            f'{outdir}/{file_prefix}est_obs_ratio_melted.csv', index=False
+            f'{outdir}/{file_prefix}_est_obs_ratio_melted.csv', index=False
         )
 
         # Generate the Vega-Lite files
@@ -272,12 +272,12 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
 
     for metric, y_field, file_suffix in zip(
             metrics, metric_fields, file_suffixes):
-        file_path = os.path.join(output_dir, f"{file_prefix}{file_suffix}")
+        file_path = os.path.join(output_dir, f"{file_prefix}_{file_suffix}")
 
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": {
-                "url": f"{outdir}/{file_prefix}{file_suffix}"
+                "url": f"{outdir}/{file_prefix}_{file_suffix}"
             },
             "mark": {
                 "type": "bar",

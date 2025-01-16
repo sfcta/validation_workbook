@@ -130,8 +130,8 @@ def process_muni_map(
     freeflow = gpd.read_file(FREEFLOW_SHP)
     freeflow.crs = "epsg:2227"
     freeflow = freeflow.to_crs(epsg=4236)
-    node_geo = freeflow[["N", "geometry"]].copy()
-    # node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
+    # node_geo = freeflow[["N", "geometry"]].copy()
+    node_geo = freeflow[["A", "B", "AB", "geometry"]].copy()
     MUNI_IB_df = MUNI_IB_df[
         [
             "Route",
@@ -147,18 +147,18 @@ def process_muni_map(
             "Direction",
         ]
     ]
-    MUNI_IB_df['A'] = pd.to_numeric(MUNI_IB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
-    MUNI_IB_df['B'] = pd.to_numeric(MUNI_IB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
-    # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
-    muni_ib_df = MUNI_IB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
-    muni_ib_df = muni_ib_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
+    # MUNI_IB_df['A'] = pd.to_numeric(MUNI_IB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # MUNI_IB_df['B'] = pd.to_numeric(MUNI_IB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
+    # muni_ib_df = MUNI_IB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
+    # muni_ib_df = muni_ib_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
 
-    # Drop the redundant 'N' columns after the merge
-    muni_ib_df = muni_ib_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
-    muni_ib_df['geometry'] = muni_ib_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
-    # muni_ib_df = (
-    #     MUNI_IB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-    # )
+    # # Drop the redundant 'N' columns after the merge
+    # muni_ib_df = muni_ib_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
+    # muni_ib_df['geometry'] = muni_ib_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
+    muni_ib_df = (
+        MUNI_IB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    )
     muni_ib_geo = gpd.GeoDataFrame(muni_ib_df, geometry="geometry")
     # Apply aggregation function using `apply` instead of `agg`
     aggregated_muni_ib = (
@@ -236,18 +236,18 @@ def process_muni_map(
             "Direction",
         ]
     ]
-    MUNI_OB_df['A'] = pd.to_numeric(MUNI_OB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
-    MUNI_OB_df['B'] = pd.to_numeric(MUNI_OB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
-    # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
-    muni_ob_df = MUNI_OB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
-    muni_ob_df = muni_ob_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
+    # MUNI_OB_df['A'] = pd.to_numeric(MUNI_OB_df['A'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # MUNI_OB_df['B'] = pd.to_numeric(MUNI_OB_df['B'], errors='coerce').fillna(pd.NA).astype('Int64')
+    # # Merge MUNI_IB_df with node_geo_df to get A_geometry and B_geometry
+    # muni_ob_df = MUNI_OB_df.merge(node_geo, left_on='A', right_on='N', how='left').rename(columns={'geometry': 'A_geometry'})
+    # muni_ob_df = muni_ob_df.merge(node_geo, left_on='B', right_on='N', how='left').rename(columns={'geometry': 'B_geometry'})
 
-    # Drop the redundant 'N' columns after the merge
-    muni_ob_df = muni_ob_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
-    muni_ob_df['geometry'] = muni_ob_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
-    # muni_ob_df = (
-    #     MUNI_OB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
-    # )
+    # # Drop the redundant 'N' columns after the merge
+    # muni_ob_df = muni_ob_df.drop(columns=['N_x', 'N_y']).dropna().drop_duplicates()
+    # muni_ob_df['geometry'] = muni_ob_df.apply(lambda row: LineString([row['A_geometry'], row['B_geometry']]), axis=1)
+    muni_ob_df = (
+        MUNI_OB_df.merge(node_geo, on="AB", how="left").dropna().drop_duplicates()
+    )
     muni_ob_geo = gpd.GeoDataFrame(muni_ob_df, geometry="geometry")
     # Apply aggregation function using `apply` instead of `agg`
     aggregated_muni_ob = (

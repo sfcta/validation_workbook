@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import tomllib, sys
+import toml, sys
 from transit.bart import process_bart_model_outputs
 from transit.map_data import process_bart_map, process_muni_map
 from transit.muni import process_muni
@@ -14,8 +14,11 @@ if __name__ == "__main__":
     toml_path = Path(sys.argv[1])
     print(toml_path)
     
-    with open(toml_path, "rb") as f:
-        config = tomllib.load(f)
+    try:
+        with open(toml_path, "rb") as f:
+            config = toml.load(f)
+    except:
+        config = toml.load(toml_path)
 
     line_rename = Path(config["input"]["support"]["line_rename"])
     

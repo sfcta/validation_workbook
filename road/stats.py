@@ -48,15 +48,15 @@ def prepare_time_period_dfs(est_df, obs_df, times, combined_df_cols):
 
 
 
-def classify_observation_volume(volume):
-    if volume < 10000:
-        return '<10k'
-    elif 10000 <= volume < 20000:
-        return '10-20k'
-    elif 20000 <= volume < 50000:
-        return '20-50k'
-    else:
-        return '>=50k'
+# def classify_observation_volume(volume):
+#     if volume < 10000:
+#         return '<10k'
+#     elif 10000 <= volume < 20000:
+#         return '10-20k'
+#     elif 20000 <= volume < 50000:
+#         return '20-50k'
+#     else:
+#         return '>=50k'
 
 
 # Define function to reset index and rename columns
@@ -217,16 +217,15 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
         melted_est_obs_ratio_df = est_obs_ratio_df.melt(
             id_vars=[group_var], var_name='Time Period', value_name='Est/Obs Ratio'
         )
-
         # Save melted dataframes to CSV
         melted_percent_rmse_df.to_csv(
-            f'{file_prefix}percent_rmse_melted.csv', index=False
+            f'{file_prefix}_percent_rmse_melted.csv', index=False
         )
         melted_relative_error_df.to_csv(
-            f'{file_prefix}relative_error_melted.csv', index=False
+            f'{file_prefix}_relative_error_melted.csv', index=False
         )
         melted_est_obs_ratio_df.to_csv(
-            f'{file_prefix}est_obs_ratio_melted.csv', index=False
+            f'{file_prefix}_est_obs_ratio_melted.csv', index=False
         )
 
         # Generate the Vega-Lite files
@@ -271,6 +270,9 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
             metrics, metric_fields, file_suffixes):
         file_path = os.path.join(output_dir, f"{file_prefix}{file_suffix}")
 
+        # Adjust group_var for the naming step if it's 'Observed Volume Category'
+        naming_group_var = "observedvolume" if group_var == 'Observed Volume Category' else group_var.lower().replace(' ', '')
+
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
             "data": {
@@ -309,7 +311,7 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
             }
         }
         config_file_path = os.path.join(
-            output_dir, f"{outdir}/{group_var.lower().replace(' ', '')}_{metric}.vega.json")
+            output_dir, f"{outdir}/{naming_group_var}_{metric}.vega.json")
         try:
             with open(config_file_path, 'w') as f:
                 json.dump(config, f, indent=4)

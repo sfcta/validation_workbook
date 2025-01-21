@@ -34,17 +34,16 @@ def process_muni(
     obs_model_name_match = obs_model_name_match.drop_duplicates()
 
     MUNI = read_dbf_and_groupby_sum(
-        combined_gdf, "SF MUNI", ["FULLNAME", "NAME", "TOD"], "AB_BRDA"
+        combined_gdf, "SF MUNI", ["NAME", "TOD"], "AB_BRDA"
     )
     MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
 
     MUNI = MUNI.sort_values(by="NAME").reset_index(drop=True)
     # Merge df1 with df2 based on the Name/NAME column
-    df_merged = pd.merge(MUNI, rename[["NAME", "New"]], on="NAME", how="left")
-
-    # Update the FULLNAME in df1 with the New value from df2 if a match is found
-    df_merged["NAME"] = df_merged["New"].combine_first(df_merged["NAME"])
-    df_merged = df_merged.drop(columns=["New"])
+    df_merged = pd.merge(MUNI, rename[["NAME", "Trn_asgn_new"]], on="NAME", how="left")
+    # # Update the FULLNAME in df1 with the New value from df2 if a match is found
+    df_merged["NAME"] = df_merged["Trn_asgn_new"].combine_first(df_merged["NAME"])
+    df_merged = df_merged.drop(columns=["Trn_asgn_new"])
     # MUNI = MUNI.rename(columns={"NAME": "Name", "AB_BRDA": "Ridership"})
 
     MUNI_full = pd.merge(df_merged, obs_model_name_match, on="NAME", how="left")

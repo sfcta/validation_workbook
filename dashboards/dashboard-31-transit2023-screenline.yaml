@@ -3,23 +3,22 @@ header:
   title: "2023 Transit Validation - Screenline"
   description: "Validation of Screenline Ridership"
   triggerPattern: "validation2023"
-  
+
 layout:
-  TBart IN:
+  ScreenlineAll IN:
     - type: text
-      title: 'Transbay BART - Inbound'
+      title: 'Screenline Overall - Inbound by Time of Day'
       description: >
         This table presents a comparison between observed and modeled inbound 
-        ridership for the BART Transbay screenline, offering an assessment of the
-        accuracy of the ridership predictions.
+        ridership for ridership in and out of San Francisco.
         
-      file: './validation2023/transit/transbay_BART_IB.md'
+      file: './validation2023/transit/screenline_overall_ib.md'
 
     - type: 'line'
-      title: 'Transbay BART IB by TOD'
+      title: 'Screenline Overall - Inbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/transbay_BART_IB.csv'
+      dataset: './validation2023/transit/screenline_overall_ib.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -28,64 +27,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  TBart OB:
+  ScreenlineAll OB:
     - type: text
-      title: 'Transbay BART - Outbound'
+      title: 'Screenline Overall - Outbound by Time of Day'
       description: >
         This table presents a comparison between observed and modeled inbound 
         ridership for the BART Transbay screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './validation2023/transit/transbay_BART_OB.md'
+      file: './validation2023/transit/screenline_overall_ob.md'
 
     - type: 'line'
-      title: 'Transbay BART OB by TOD'
+      title: 'Screenline Overall - Outbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/transbay_BART_OB.csv'
-      x: 'TOD'
-      y1: 'Observed'
-      y2: 'Modeled'
-      xAxisName: 'TOD'
-      yAxisName: 'Ridership'
-      columns: [Observed, Modeled]
-      legendTitles: ['Observed', 'Modeled']
-
-  TAC IB:
-    - type: text
-      title: 'Transbay AC Transit - Inbound'
-      description: >
-        This table compares observed and modeled inbound ridership across the 
-        Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
-        into the accuracy of the ridership predictions.
-      file: './validation2023/transit/transbay_AC_IB.md'
-
-    - type: 'line'
-      title: 'Transbay AC Transit IB by TOD'
-      description: ''
-      width: 1
-      dataset: './validation2023/transit/transbay_AC_IB.csv'
-      x: 'TOD'
-      y1: 'Observed'
-      y2: 'Modeled'
-      xAxisName: 'TOD'
-      yAxisName: 'Ridership'
-      columns: [Observed, Modeled]
-      legendTitles: ['Observed', 'Modeled']
-
-  TAC OB:
-    - type: text
-      title: 'Transbay AC Transit - Outbound'
-      description: >
-        This table compares observed and modeled outbound ridership across the 
-        Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
-        into the accuracy of the ridership predictions.
-      file: './validation2023/transit/transbay_AC_OB.md'
-
-    - type: 'line'
-      title: 'Transbay AC Transit OB by TOD'
-      description: ''
-      width: 1
-      dataset: './validation2023/transit/transbay_AC_OB.csv'
+      dataset: './validation2023/transit/screenline_overall_ob.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -96,7 +51,7 @@ layout:
 
   TOverall IB:
     - type: text
-      title: 'Transbay BART & AC Transit - Inbound'
+      title: 'Transbay Screenline BART & AC Transit - Inbound by Time of Day'
       description: >
         This table compares observed and modeled inbound 
         ridership of BART and AC transit across the 
@@ -105,7 +60,7 @@ layout:
       file: './validation2023/transit/transbay_overall_IB.md'
     
     - type: 'line'
-      title: 'Transbay BART & AC Transit IB by TOD'
+      title: 'Transbay Screenline BART & AC Transit - Inbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/transbay_overall_IB.csv'
@@ -119,7 +74,7 @@ layout:
 
   TOverall OB:
     - type: text
-      title: 'Transbay BART & AC Transit - Outbound'
+      title: 'Transbay Screenline BART & AC Transit - Outbound by Time of Day'
       description: >
         This table compares observed and modeled outbound 
         ridership of BART and AC transit across the 
@@ -128,7 +83,7 @@ layout:
       file: './validation2023/transit/transbay_overall_OB.md'
 
     - type: 'line'
-      title: 'Transbay BART & AC Transit OB by TOD'
+      title: 'Transbay Screenline BART & AC Transit - Outbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/transbay_overall_OB.csv'
@@ -140,21 +95,21 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-
-  CBart IB:
+  TBart IN:
     - type: text
-      title: 'SF - San Mateo Countyline BART - Inbound'
+      title: 'Transbay Screenline BART - Inbound by Time of Day'
       description: >
         This table presents a comparison between observed and modeled inbound 
-        ridership for the SF - San Mateo Countyline, offering an assessment of the
+        ridership for the BART Transbay screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_BART_IB.md'
+        
+      file: './validation2023/transit/transbay_BART_IB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline BART IB by TOD'
+      title: 'Transbay Screenline BART - Inbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/Countyline_BART_IB.csv'
+      dataset: './validation2023/transit/transbay_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -163,20 +118,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  CBart OB:
+  TBart OB:
     - type: text
-      title: 'SF - San Mateo Countyline BART - Outbound'
+      title: 'Transbay Screenline BART - Outbound by Time of Day'
       description: >
-        This table presents a comparison between observed and modeled outbound 
-        ridership for the SF - San Mateo Countyline, offering an assessment of the
+        This table presents a comparison between observed and modeled inbound 
+        ridership for the BART Transbay screenline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_BART_OB.md'
+      file: './validation2023/transit/transbay_BART_OB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline BART OB by TOD'
+      title: 'Transbay Screenline BART - Outbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/Countyline_BART_OB.csv'
+      dataset: './validation2023/transit/transbay_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -185,20 +140,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  CC IB:
+  TAC IB:
     - type: text
-      title: 'SF - San Mateo Countyline Caltrain - Inbound'
+      title: 'Transbay Screenline AC Transit - Inbound by Time of Day'
       description: >
         This table compares observed and modeled inbound ridership across the 
-        SF - San Mateo Countyline, providing insights 
+        Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_CalTrain_IB.md'
+      file: './validation2023/transit/transbay_AC_IB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline Caltrain IB by TOD'
+      title: 'Transbay Screenline AC Transit - Inbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/Countyline_CalTrain_IB.csv'
+      dataset: './validation2023/transit/transbay_AC_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -207,64 +162,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  CC OB:
+  TAC OB:
     - type: text
-      title: 'SF - San Mateo Countyline Caltrain - Outbound'
+      title: 'Transbay Screenline AC Transit - Outbound by Time of Day'
       description: >
         This table compares observed and modeled outbound ridership across the 
-        SF - San Mateo Countyline, providing insights 
+        Alameda-Contra Costa Transit District's Transbay screenline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_CalTrain_OB.md'
-  
-    - type: 'line'
-      title: 'SF - San Mateo Countyline Caltrain OB by TOD'
-      description: ''
-      width: 1
-      dataset: './validation2023/transit/Countyline_CalTrain_OB.csv'
-      x: 'TOD'
-      y1: 'Observed'
-      y2: 'Modeled'
-      xAxisName: 'TOD'
-      yAxisName: 'Ridership'
-      columns: [Observed, Modeled]
-      legendTitles: ['Observed', 'Modeled']
-
-  Csam IB:
-    - type: text
-      title: 'SF - San Mateo Countyline SamTrans - Inbound'
-      description: >
-        This table compares observed and modeled inbound ridership across the 
-        SF - San Mateo Countyline, providing insights 
-        into the accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_SamTrans_IB.md'
+      file: './validation2023/transit/transbay_AC_OB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline SamTrans IB by TOD'
+      title: 'Transbay Screenline AC Transit - Outbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/Countyline_SamTrans_IB.csv'
-      x: 'TOD'
-      y1: 'Observed'
-      y2: 'Modeled'
-      xAxisName: 'TOD'
-      yAxisName: 'Ridership'
-      columns: [Observed, Modeled]
-      legendTitles: ['Observed', 'Modeled']
-
-  Csam OB:
-    - type: text
-      title: 'SF - San Mateo Countyline SamTrans - Outbound'
-      description: >
-        This table compares observed and modeled outbound ridership across the 
-        SF - San Mateo Countyline, providing insights 
-        into the accuracy of the ridership predictions.
-      file: './validation2023/transit/Countyline_SamTrans_OB.md'
-
-    - type: 'line'
-      title: 'SF - San Mateo Countyline SamTrans OB by TOD'
-      description: ''
-      width: 1
-      dataset: './validation2023/transit/Countyline_SamTrans_OB.csv'
+      dataset: './validation2023/transit/transbay_AC_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -275,7 +186,7 @@ layout:
 
   COverall IB:
     - type: text
-      title: 'SF - San Mateo Countyline Overall - Inbound'
+      title: 'SF - San Mateo Countyline Overall - Inbound by Time of Day'
       description: >
         This table compares observed and modeled inbound ridership across the 
         SF - San Mateo Countyline, providing insights 
@@ -283,7 +194,7 @@ layout:
       file: './validation2023/transit/Countyline_overall_IB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline Overall IB by TOD'
+      title: 'SF - San Mateo Countyline Overall - Inbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/Countyline_overall_IB.csv'
@@ -297,7 +208,7 @@ layout:
 
   COverall OB:
     - type: text
-      title: 'SF - San Mateo Countyline Overall - Outbound'
+      title: 'SF - San Mateo Countyline Overall - Outbound by Time of Day'
       description: >
         This table compares observed and modeled outbound ridership across the 
         SF - San Mateo Countyline, providing insights 
@@ -305,7 +216,7 @@ layout:
       file: './validation2023/transit/Countyline_overall_OB.md'
 
     - type: 'line'
-      title: 'SF - San Mateo Countyline Overall OB by TOD'
+      title: 'SF - San Mateo Countyline Overall - Outbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/Countyline_overall_OB.csv'
@@ -317,20 +228,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  GGTransit IB:
+  CBart IB:
     - type: text
-      title: 'Golden Gate Transit (bus) - Inbound'
+      title: 'SF - San Mateo Countyline BART - Inbound by Time of Day'
       description: >
         This table presents a comparison between observed and modeled inbound 
-        ridership for the Golden Gate Transit screenline, offering an assessment of the
+        ridership for the SF - San Mateo Countyline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './validation2023/transit/GG_Transit_IB.md'
+      file: './validation2023/transit/Countyline_BART_IB.md'
 
     - type: 'line'
-      title: 'Golden Gate Transit IB by TOD'
+      title: 'SF - San Mateo Countyline BART - Inbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/GG_Transit_IB.csv'
+      dataset: './validation2023/transit/Countyline_BART_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -339,20 +250,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  GGTransit OB:
+  CBart OB:
     - type: text
-      title: 'Golden Gate Transit (bus) - Outbound'
+      title: 'SF - San Mateo Countyline BART - Outbound by Time of Day'
       description: >
-        This table presents a comparison between observed and modeled inbound 
-        ridership for the Golden Gate Transit screenline, offering an assessment of the
+        This table presents a comparison between observed and modeled outbound 
+        ridership for the SF - San Mateo Countyline, offering an assessment of the
         accuracy of the ridership predictions.
-      file: './validation2023/transit/GG_Transit_OB.md'
+      file: './validation2023/transit/Countyline_BART_OB.md'
 
     - type: 'line'
-      title: 'Golden Gate Transit OB by TOD'
+      title: 'SF - San Mateo Countyline BART - Outbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/GG_Transit_OB.csv'
+      dataset: './validation2023/transit/Countyline_BART_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -361,20 +272,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  GGFerry IB:
+  CC IB:
     - type: text
-      title: 'Golden Gate Ferry - Inbound'
+      title: 'SF - San Mateo Countyline Caltrain - Inbound by Time of Day'
       description: >
         This table compares observed and modeled inbound ridership across the 
-        Golden Gate Ferry screenline, providing insights 
+        SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './validation2023/transit/GG_Ferry_IB.md'
+      file: './validation2023/transit/Countyline_CalTrain_IB.md'
 
     - type: 'line'
-      title: 'Golden Gate Ferry IB by TOD'
+      title: 'SF - San Mateo Countyline Caltrain - Inbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/GG_Ferry_IB.csv'
+      dataset: './validation2023/transit/Countyline_CalTrain_IB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -383,20 +294,20 @@ layout:
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
 
-  GGFerry OB:
+  CC OB:
     - type: text
-      title: 'Golden Gate Ferry - Outbound'
+      title: 'SF - San Mateo Countyline Caltrain - Outbound by Time of Day'
       description: >
         This table compares observed and modeled outbound ridership across the 
-        Golden Gate Ferry screenline, providing insights 
+        SF - San Mateo Countyline, providing insights 
         into the accuracy of the ridership predictions.
-      file: './validation2023/transit/GG_Ferry_OB.md'
-
+      file: './validation2023/transit/Countyline_CalTrain_OB.md'
+  
     - type: 'line'
-      title: 'Golden Gate Ferry OB by TOD'
+      title: 'SF - San Mateo Countyline Caltrain - Outbound by Time of Day'
       description: ''
       width: 1
-      dataset: './validation2023/transit/GG_Ferry_OB.csv'
+      dataset: './validation2023/transit/Countyline_CalTrain_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'
@@ -404,10 +315,55 @@ layout:
       yAxisName: 'Ridership'
       columns: [Observed, Modeled]
       legendTitles: ['Observed', 'Modeled']
+
+  Csam IB:
+    - type: text
+      title: 'SF - San Mateo Countyline SamTrans - Inbound by Time of Day'
+      description: >
+        This table compares observed and modeled inbound ridership across the 
+        SF - San Mateo Countyline, providing insights 
+        into the accuracy of the ridership predictions.
+      file: './validation2023/transit/Countyline_SamTrans_IB.md'
+
+    - type: 'line'
+      title: 'SF - San Mateo Countyline SamTrans - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/Countyline_SamTrans_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  Csam OB:
+    - type: text
+      title: 'SF - San Mateo Countyline SamTrans - Outbound by Time of Day'
+      description: >
+        This table compares observed and modeled outbound ridership across the 
+        SF - San Mateo Countyline, providing insights 
+        into the accuracy of the ridership predictions.
+      file: './validation2023/transit/Countyline_SamTrans_OB.md'
+
+    - type: 'line'
+      title: 'SF - San Mateo Countyline SamTrans - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/Countyline_SamTrans_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+  
 
   GGOverall_IB:
     - type: text
-      title: 'Golden Gate Overall (bus & ferry) - Inbound'
+      title: 'Golden Gate Overall (bus & ferry) - Inbound by Time of Day'
       description: >
         This table compares observed and modeled inbound ridership across the 
         Golden Gate Overall screenline, providing insights 
@@ -415,7 +371,7 @@ layout:
       file: './validation2023/transit/GG_overall_IB.md'
 
     - type: 'line'
-      title: 'Golden Gate Overall IB by TOD'
+      title: 'Golden Gate Overall (bus & ferry) - Inbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/GG_overall_IB.csv'
@@ -429,7 +385,7 @@ layout:
 
   GGOverall_OB:
     - type: text
-      title: 'Golden Gate Overall (bus & ferry) - Outbound'
+      title: 'Golden Gate Overall (bus & ferry) - Outbound by Time of Day'
       description: >
         This table compares observed and modeled outbound ridership across the 
         Golden Gate Overall screenline, providing insights 
@@ -437,10 +393,98 @@ layout:
       file: './validation2023/transit/GG_overall_OB.md'
 
     - type: 'line'
-      title: 'Golden Gate Overall OB by TOD'
+      title: 'Golden Gate Overall (bus & ferry) - Outbound by Time of Day'
       description: ''
       width: 1
       dataset: './validation2023/transit/GG_overall_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GGTransit IB:
+    - type: text
+      title: 'Golden Gate Transit (bus) - Inbound by Time of Day'
+      description: >
+        This table presents a comparison between observed and modeled inbound 
+        ridership for the Golden Gate Transit screenline, offering an assessment of the
+        accuracy of the ridership predictions.
+      file: './validation2023/transit/GG_Transit_IB.md'
+
+    - type: 'line'
+      title: 'Golden Gate Transit (bus) - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/GG_Transit_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GGTransit OB:
+    - type: text
+      title: 'Golden Gate Transit (bus) - Outbound by Time of Day'
+      description: >
+        This table presents a comparison between observed and modeled inbound 
+        ridership for the Golden Gate Transit screenline, offering an assessment of the
+        accuracy of the ridership predictions.
+      file: './validation2023/transit/GG_Transit_OB.md'
+
+    - type: 'line'
+      title: 'Golden Gate Transit (bus) - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/GG_Transit_OB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GGFerry IB:
+    - type: text
+      title: 'Golden Gate Ferry - Inbound by Time of Day'
+      description: >
+        This table compares observed and modeled inbound ridership across the 
+        Golden Gate Ferry screenline, providing insights 
+        into the accuracy of the ridership predictions.
+      file: './validation2023/transit/GG_Ferry_IB.md'
+
+    - type: 'line'
+      title: 'Golden Gate Ferry - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/GG_Ferry_IB.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GGFerry OB:
+    - type: text
+      title: 'Golden Gate Ferry - Outbound by Time of Day'
+      description: >
+        This table compares observed and modeled outbound ridership across the 
+        Golden Gate Ferry screenline, providing insights 
+        into the accuracy of the ridership predictions.
+      file: './validation2023/transit/GG_Ferry_OB.md'
+
+    - type: 'line'
+      title: 'Golden Gate Ferry - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: './validation2023/transit/GG_Ferry_OB.csv'
       x: 'TOD'
       y1: 'Observed'
       y2: 'Modeled'

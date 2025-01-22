@@ -8,11 +8,11 @@ layout:
   row1:
   - config: validation2023/road/all_Estimation Volume_est.vega.json
     description: ''
-    title: all - Estimation Volume
+    title: All - Estimation Volume
     type: vega
   - config: validation2023/road/all_Percent Errors_diffpercent.vega.json
     description: ''
-    title: all - Percent Errors
+    title: All - Percent Errors
     type: vega
   row2:
   - config: validation2023/road/San Francisco_Estimation Volume_est.vega.json

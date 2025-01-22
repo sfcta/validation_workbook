@@ -158,7 +158,7 @@ layout:
       width: 2
       dataset: 'validation2023/road/observedvolume_count.csv'
       x: 'Observed Volume'
-      xAxisName: 'Observed Volume'
+      xAxisName: 'Observed Volume Category'
       yAxisName: 'Count'
       
   Count(n):

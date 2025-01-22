@@ -8,7 +8,7 @@ layout:
   row1:
     - type: map
       title: 'Difference between modeled and observed counts'
-      description: Color represents the Daily difference, width represents the Daily observation
+      description: Color represents the daily difference, width represents the daily observation
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4
@@ -50,7 +50,7 @@ layout:
             - data:Daily_pctdiff
     - type: map
       title: 'Percent difference between modeled and observed counts'
-      description: Color represents the Daily percent difference, width represents the Daily observation
+      description: Color represents the daily percent difference, width represents the daily observation
       height: 15
       center: [-122.43,37.73]
       zoom: 11.4

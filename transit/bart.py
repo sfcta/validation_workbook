@@ -23,15 +23,15 @@ def process_bart_data(combined_gdf, transit_input_dir, station_node_match):
         combined_gdf, "OAC", ["A", "TOD"], "AB_BRDA"
     )
 
-    # AB_XITA represents the alighting ridership from A to B
+    # AB_XITB represents the alighting ridership from A to B
     bart_alighting = read_dbf_and_groupby_sum(
-        combined_gdf, "BART", ["A", "TOD"], "AB_XITA"
+        combined_gdf, "BART", ["A", "TOD"], "AB_XITB"
     )
     ebart_alighting = read_dbf_and_groupby_sum(
-        combined_gdf, "EBART", ["A", "TOD"], "AB_XITA"
+        combined_gdf, "EBART", ["A", "TOD"], "AB_XITB"
     )
     oac_alighting = read_dbf_and_groupby_sum(
-        combined_gdf, "OAC", ["A", "TOD"], "AB_XITA"
+        combined_gdf, "OAC", ["A", "TOD"], "AB_XITB"
     )
 
     # Concatenate and group data
@@ -40,8 +40,8 @@ def process_bart_data(combined_gdf, transit_input_dir, station_node_match):
     bart_nodea.columns = ["Node", "TOD", "AB_BRDA"]
 
     bart_nodeb = pd.concat([bart_alighting, ebart_alighting, oac_alighting])
-    bart_nodeb = bart_nodeb.groupby(["A", "TOD"])["AB_XITA"].sum().reset_index()
-    bart_nodeb.columns = ["Node", "TOD", "AB_XITA"]
+    bart_nodeb = bart_nodeb.groupby(["A", "TOD"])["AB_XITB"].sum().reset_index()
+    bart_nodeb.columns = ["Node", "TOD", "AB_XITB"]
 
     # Merge with other dataframes
     bart_nodea = pd.merge(bart_nodea, nodes, on=["Node"], how="left")

@@ -83,6 +83,11 @@ def process_data(
     MUNI_IB = format_dataframe(
         MUNI_IB, numeric_columns=numeric_cols, percentage_columns=["Percentage Diff"]
     )
+    
+    MUNI_IB = MUNI_IB.sort_values(
+        by=rename_column, 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
 
     return MUNI_IB
 
@@ -268,6 +273,8 @@ def process_mkd_muni(
 ):
     obs_MUNI_line_df = pd.read_csv(transit_input_dir / observed_MUNI_Line)
     model_MUNI_line_df = pd.read_csv(output_transit_dir / model_MUNI_Line)
+    model_MUNI_line_df["Line"] = model_MUNI_line_df["Line"].astype(str)
+    obs_MUNI_line_df["Line"] = obs_MUNI_line_df["Line"].astype(str)
     tod_order = ["EA", "AM", "MD", "PM", "EV", "Total"]
     MUNI_IB_df = process_data(
         obs_MUNI_line_df,
@@ -276,15 +283,9 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
-    dataframe_to_markdown(
-        MUNI_IB_df,
-        file_name=Path(markdown_output_dir / MUNI_ib_day),
-        highlight_rows=[72],
-        center_align_columns=None,
-        column_widths=70,
-    )
+    
     MUNI_OB_df = process_data(
         obs_MUNI_line_df,
         model_MUNI_line_df,
@@ -292,9 +293,17 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
-    MUNI_OB_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_df, on="Route", how="left")
+    MUNI_IB_df = pd.merge(MUNI_OB_df[["Route"]], MUNI_IB_df, on="Route", how="outer")
+    MUNI_OB_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_df, on="Route", how="outer")
+    dataframe_to_markdown(
+        MUNI_IB_df,
+        file_name=Path(markdown_output_dir / MUNI_ib_day),
+        highlight_rows=[72],
+        center_align_columns=None,
+        column_widths=70,
+    )
     dataframe_to_markdown(
         MUNI_OB_df,
         file_name=Path(markdown_output_dir / MUNI_ob_day),
@@ -311,10 +320,10 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
     MUNI_IB_AM_df = pd.merge(
-        MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="left"
+        MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="outer"
     )
     MUNI_IB_AM_df = MUNI_IB_AM_df.fillna("-")
     dataframe_to_markdown(
@@ -331,10 +340,10 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
     MUNI_IB_PM_df = pd.merge(
-        MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="left"
+        MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="outer"
     )
     MUNI_IB_PM_df = MUNI_IB_PM_df.fillna("-")
     dataframe_to_markdown(
@@ -351,10 +360,10 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
     MUNI_OB_AM_df = pd.merge(
-        MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="left"
+        MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="outer"
     )
     MUNI_OB_AM_df = MUNI_OB_AM_df.fillna("-")
     dataframe_to_markdown(
@@ -371,10 +380,10 @@ def process_mkd_muni(
         "Line",
         "Ridership",
         "Route",
-        "left",
+        "outer",
     )
     MUNI_OB_PM_df = pd.merge(
-        MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="left"
+        MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="outer"
     )
     MUNI_OB_PM_df = MUNI_OB_PM_df.fillna("-")
     dataframe_to_markdown(
@@ -385,14 +394,14 @@ def process_mkd_muni(
         column_widths=70,
     )
     MUNI_mode_df = process_data(
-        obs_MUNI_line_df, model_MUNI_line_df, None, "Mode", "Ridership", "Mode", "left"
+        obs_MUNI_line_df, model_MUNI_line_df, None, "Mode", "Ridership", "Mode", "outer"
     )
     dataframe_to_markdown(
         MUNI_mode_df,
         file_name=Path(markdown_output_dir / MUNI_mode_day),
-        highlight_rows=[3],
+        highlight_rows=[7],
         center_align_columns=None,
-        column_widths=70,
+        column_widths=120,
     )
     MUNI_mode_df[~MUNI_mode_df["Mode"].isin(["Total"])].to_csv(
         Path(muni_output_dir / MUNI_mode), index=False
@@ -404,14 +413,14 @@ def process_mkd_muni(
         "Mode",
         "Ridership",
         "Mode",
-        "left",
+        "outer",
     )
     dataframe_to_markdown(
         MUNI_mode_am_df,
         file_name=Path(markdown_output_dir / MUNI_mode_am_md),
-        highlight_rows=[3],
+        highlight_rows=[7],
         center_align_columns=None,
-        column_widths=70,
+        column_widths=120,
     )
     MUNI_mode_am_df[~MUNI_mode_am_df["Mode"].isin(["Total"])].to_csv(
         Path(muni_output_dir / MUNI_mode_am), index=False
@@ -423,20 +432,20 @@ def process_mkd_muni(
         "Mode",
         "Ridership",
         "Mode",
-        "left",
+        "outer",
     )
     dataframe_to_markdown(
         MUNI_mode_pm_df,
         file_name=Path(markdown_output_dir / MUNI_mode_pm_md),
-        highlight_rows=[3],
+        highlight_rows=[7],
         center_align_columns=None,
-        column_widths=70,
+        column_widths=120,
     )
     MUNI_mode_pm_df[~MUNI_mode_pm_df["Mode"].isin(["Total"])].to_csv(
         Path(muni_output_dir / MUNI_mode_pm), index=False
     )
     MUNI_tod_df = process_data(
-        obs_MUNI_line_df, model_MUNI_line_df, None, "TOD", "Ridership", "TOD", "left"
+        obs_MUNI_line_df, model_MUNI_line_df, None, "TOD", "Ridership", "TOD", "outer"
     )
     MUNI_tod_df["TOD"] = pd.Categorical(
         MUNI_tod_df["TOD"], categories=tod_order, ordered=True
@@ -460,7 +469,7 @@ def process_mkd_muni(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     MUNI_EB_df["TOD"] = pd.Categorical(
         MUNI_EB_df["TOD"], categories=tod_order, ordered=True
@@ -484,7 +493,7 @@ def process_mkd_muni(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     MUNI_LB_df["TOD"] = pd.Categorical(
         MUNI_LB_df["TOD"], categories=tod_order, ordered=True
@@ -508,7 +517,7 @@ def process_mkd_muni(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     MUNI_Rail_df["TOD"] = pd.Categorical(
         MUNI_Rail_df["TOD"], categories=tod_order, ordered=True
@@ -1136,7 +1145,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         transbay_overall_OB,
         file_name=Path(markdown_output_dir / transbay_overall_OB_md),
-        highlight_rows=[-1],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=70,
     )

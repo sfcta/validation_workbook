@@ -7,12 +7,28 @@ from transit.utils import read_dbf_and_groupby_sum, read_transit_assignments, ti
 
 
 def map_name_to_direction(name):
-    if name.endswith("I"):
+    if name.endswith("I") or name in ["MUN61R"]:
         return "IB"
-    elif name.endswith("O"):
+    elif name.endswith("O") or name in ["MUN61"]:
         return "OB"
     else:
         return None  # Return None for other cases
+
+def routeType(x):
+    if x in ['J-Church', 'KT-Ingleside/Third Street','M-Ocean View','N-Judah','T-Third Street']:
+        return 'Rail'
+    elif x in ['59', '60', '61', '61R']:
+        return 'Cable Car'
+    elif x in ['F-Market & Wharves']:
+        return 'Streetcar'
+    elif 'X' in str(x) or x in ['8']:
+        return 'Express Bus'
+    elif x in ['49']:
+        return 'BRT Muni'
+    elif 'R' in str(x) and x not in ['94R']:
+        return 'Rapid'  # Perhaps change to Rapid later
+    else:
+        return 'Local Bus'
 
 
 def process_muni(
@@ -34,7 +50,7 @@ def process_muni(
     obs_model_name_match = obs_model_name_match.drop_duplicates()
 
     MUNI = read_dbf_and_groupby_sum(
-        combined_gdf, "SF MUNI", ["NAME", "TOD"], "AB_BRDA"
+        combined_gdf, "SF MUNI", ["NAME", "MODE","TOD"], "AB_BRDA"
     )
     MUNI["Direction"] = MUNI["NAME"].apply(map_name_to_direction)
 
@@ -52,10 +68,10 @@ def process_muni(
     )
 
     # Apply the transformation function to the 'Line' column
-    obs_MUNI_line = pd.read_csv(transit_input_dir / observed_MUNI_Line)
-    mode = obs_MUNI_line[["Line", "Mode"]].drop_duplicates().reset_index(drop=True)
-    mode_dict = mode.set_index("Line")["Mode"].to_dict()
-    MUNI_full["Mode"] = MUNI_full["Line"].map(mode_dict)
+    # obs_MUNI_line = pd.read_csv(transit_input_dir / observed_MUNI_Line)
+    # mode = obs_MUNI_line[["Line", "Mode"]].drop_duplicates().reset_index(drop=True)
+    # mode_dict = mode.set_index("Line")["Mode"].to_dict()
+    MUNI_full["Mode"] = MUNI_full["Line"].apply(lambda x: routeType(x))
     MUNI_full["Key_line_dir"] = MUNI_full["Line"].astype(str) + MUNI_full["Direction"]
     MUNI_full["Key_line_tod"] = (
         MUNI_full["Line"].astype(str) + MUNI_full["TOD"] + MUNI_full["Direction"]

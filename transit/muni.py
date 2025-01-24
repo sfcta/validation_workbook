@@ -23,8 +23,6 @@ def routeType(x):
         return 'Streetcar'
     elif 'X' in str(x) or x in ['8']:
         return 'Express Bus'
-    elif x in ['49']:
-        return 'BRT Muni'
     elif 'R' in str(x) and x not in ['94R']:
         return 'Rapid'  # Perhaps change to Rapid later
     else:

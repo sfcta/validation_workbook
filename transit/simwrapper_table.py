@@ -296,7 +296,15 @@ def process_mkd_muni(
         "outer",
     )
     MUNI_IB_df = pd.merge(MUNI_OB_df[["Route"]], MUNI_IB_df, on="Route", how="outer")
+    MUNI_IB_df = MUNI_IB_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_OB_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_df, on="Route", how="outer")
+    MUNI_OB_df = MUNI_OB_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     dataframe_to_markdown(
         MUNI_IB_df,
         file_name=Path(markdown_output_dir / MUNI_ib_day),
@@ -322,8 +330,13 @@ def process_mkd_muni(
         "Route",
         "outer",
     )
+
     MUNI_IB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="outer"
+    )
+    MUNI_IB_AM_df = MUNI_IB_AM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
     )
     MUNI_IB_AM_df = MUNI_IB_AM_df.fillna("-")
     dataframe_to_markdown(
@@ -345,6 +358,10 @@ def process_mkd_muni(
     MUNI_IB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="outer"
     )
+    MUNI_IB_PM_df = MUNI_IB_PM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_IB_PM_df = MUNI_IB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_PM_df,
@@ -364,6 +381,10 @@ def process_mkd_muni(
     )
     MUNI_OB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="outer"
+    )
+    MUNI_OB_AM_df = MUNI_OB_AM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
     )
     MUNI_OB_AM_df = MUNI_OB_AM_df.fillna("-")
     dataframe_to_markdown(
@@ -385,6 +406,10 @@ def process_mkd_muni(
     MUNI_OB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="outer"
     )
+    MUNI_OB_PM_df = MUNI_OB_PM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_OB_PM_df = MUNI_OB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_PM_df,
@@ -399,7 +424,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_df,
         file_name=Path(markdown_output_dir / MUNI_mode_day),
-        highlight_rows=[7],
+        highlight_rows=[6],
         center_align_columns=None,
         column_widths=120,
     )
@@ -418,7 +443,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_am_df,
         file_name=Path(markdown_output_dir / MUNI_mode_am_md),
-        highlight_rows=[7],
+        highlight_rows=[6],
         center_align_columns=None,
         column_widths=120,
     )
@@ -437,7 +462,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_pm_df,
         file_name=Path(markdown_output_dir / MUNI_mode_pm_md),
-        highlight_rows=[7],
+        highlight_rows=[6],
         center_align_columns=None,
         column_widths=120,
     )
@@ -479,7 +504,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_EB_df,
         file_name=Path(markdown_output_dir / MUNI_EB_md),
-        highlight_rows=[4],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=70,
     )

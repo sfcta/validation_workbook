@@ -354,7 +354,7 @@ def process_valTotal_Submode(
             "Local Bus", "Local Bus", "Local Bus", "Light Rail", "Light Rail", 
             "Local Bus", "Local Bus", "Local Bus", "Local Bus", 
             "Local Bus", "Light Rail", "Premium", "Premium", "Premium", 
-            "Premium", "Premium", "Premium", "Premium", 
+            "Premium", "Premium", "Premium", "BART", 
             "Premium", "Premium", "Ferry", "BART"
         ]
     }

@@ -1055,7 +1055,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     screenline_overall_ib["TOD"] = pd.Categorical(
         screenline_overall_ib["TOD"], categories=tod_order, ordered=True
@@ -1076,7 +1076,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     screenline_overall_ob["TOD"] = pd.Categorical(
         screenline_overall_ob["TOD"], categories=tod_order, ordered=True
@@ -1097,7 +1097,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_AC_IB["TOD"] = pd.Categorical(
         transbay_AC_IB["TOD"], categories=tod_order, ordered=True
@@ -1118,7 +1118,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     transbay_AC_OB["TOD"] = pd.Categorical(
         transbay_AC_OB["TOD"], categories=tod_order, ordered=True
@@ -1139,7 +1139,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_overall_IB["TOD"] = pd.Categorical(
         transbay_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1160,7 +1160,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_overall_OB["TOD"] = pd.Categorical(
         transbay_overall_OB["TOD"], categories=tod_order, ordered=True
@@ -1193,7 +1193,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     Countyline_CalTrain_IB["TOD"] = pd.Categorical(
         Countyline_CalTrain_IB["TOD"], categories=tod_order, ordered=True
@@ -1203,7 +1203,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_CalTrain_IB,
         file_name=Path(markdown_output_dir / Countyline_CalTrain_IB_md),
-        highlight_rows=[-1],
+        highlight_rows=[5],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1214,7 +1214,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     Countyline_CalTrain_OB["TOD"] = pd.Categorical(
         Countyline_CalTrain_OB["TOD"], categories=tod_order, ordered=True
@@ -1235,7 +1235,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_SamTrans_IB["TOD"] = pd.Categorical(
         Countyline_SamTrans_IB["TOD"], categories=tod_order, ordered=True
@@ -1256,7 +1256,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_SamTrans_OB["TOD"] = pd.Categorical(
         Countyline_SamTrans_OB["TOD"], categories=tod_order, ordered=True
@@ -1277,7 +1277,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_overall_IB["TOD"] = pd.Categorical(
         Countyline_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1298,7 +1298,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_overall_OB["TOD"] = pd.Categorical(
         Countyline_overall_OB["TOD"], categories=tod_order, ordered=True
@@ -1324,12 +1324,12 @@ def process_mkd_screenline(
     Countyline_CalTrain_OB[~Countyline_CalTrain_OB["TOD"].isin(["Total"])].to_csv(
         screenline_output_dir / Countyline_CalTrain_OB_csv, index=False
     )
-    Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])].to_csv(
-        screenline_output_dir / Countyline_SamTrans_IB_csv, index=False
-    )
-    Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])].to_csv(
-        screenline_output_dir / Countyline_SamTrans_OB_csv, index=False
-    )
+    Countyline_SamTrans_IB = Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])]
+    Countyline_SamTrans_IB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_IB.to_csv(screenline_output_dir / Countyline_SamTrans_IB_csv, index=False)
+    Countyline_SamTrans_OB = Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])]
+    Countyline_SamTrans_OB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_OB.to_csv(screenline_output_dir / Countyline_SamTrans_OB_csv, index=False)
     Countyline_overall_IB[~Countyline_overall_IB["TOD"].isin(["Total"])].to_csv(
         screenline_output_dir / Countyline_overall_IB_csv, index=False
     )
@@ -1347,7 +1347,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_Transit_IB["TOD"] = pd.Categorical(
         GG_Transit_IB["TOD"], categories=tod_order, ordered=True
@@ -1372,7 +1372,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     GG_Transit_OB["TOD"] = pd.Categorical(
         GG_Transit_OB["TOD"], categories=tod_order, ordered=True
@@ -1397,7 +1397,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_Ferry_IB["TOD"] = pd.Categorical(
         GG_Ferry_IB["TOD"], categories=tod_order, ordered=True
@@ -1422,7 +1422,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     GG_Ferry_OB["TOD"] = pd.Categorical(
         GG_Ferry_OB["TOD"], categories=tod_order, ordered=True
@@ -1443,7 +1443,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_overall_IB["TOD"] = pd.Categorical(
         GG_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1464,7 +1464,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_overall_OB["TOD"] = pd.Categorical(
         GG_overall_OB["TOD"], categories=tod_order, ordered=True

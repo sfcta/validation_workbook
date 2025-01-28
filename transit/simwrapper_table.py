@@ -1048,6 +1048,8 @@ def process_mkd_screenline(
     # Valdiation for Screenlines
     obs_Screenline = pd.read_csv(transit_input_dir / observed_Screenline)
     model_Screenline_df = pd.read_csv(output_transit_dir / model_Screenline)
+    model_Screenline_df = model_Screenline_df[model_Screenline_df['Screenline'] != 'SF-San Mateo']
+    obs_Screenline = obs_Screenline[obs_Screenline['Screenline'] != 'SF-San Mateo']
     screenline_overall_ib = process_data(
         obs_Screenline,
         model_Screenline_df,

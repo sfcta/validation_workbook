@@ -221,7 +221,7 @@ layout:
 
           lineWidth:
               dataset: observed
-              columnName: Diff
+              columnName: Observed
               scaleFactor: 500
       filters:
           # shapes.FT!: "6"
@@ -256,7 +256,7 @@ layout:
 
           lineWidth:
               dataset: observed
-              columnName: Diff
+              columnName: Observed
               scaleFactor: 500
       filters:
           # shapes.FT!: "6"

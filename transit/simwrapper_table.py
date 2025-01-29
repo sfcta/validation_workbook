@@ -1328,9 +1328,13 @@ def process_mkd_screenline(
     )
     Countyline_SamTrans_IB = Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])]
     Countyline_SamTrans_IB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_IB['Observed'] = pd.to_numeric(Countyline_SamTrans_IB['Observed'], errors='coerce')
+    Countyline_SamTrans_IB['Modeled'] = pd.to_numeric(Countyline_SamTrans_IB['Modeled'], errors='coerce')
     Countyline_SamTrans_IB.to_csv(screenline_output_dir / Countyline_SamTrans_IB_csv, index=False)
     Countyline_SamTrans_OB = Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])]
     Countyline_SamTrans_OB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_OB['Observed'] = pd.to_numeric(Countyline_SamTrans_OB['Observed'], errors='coerce')
+    Countyline_SamTrans_OB['Modeled'] = pd.to_numeric(Countyline_SamTrans_OB['Modeled'], errors='coerce')
     Countyline_SamTrans_OB.to_csv(screenline_output_dir / Countyline_SamTrans_OB_csv, index=False)
     Countyline_overall_IB[~Countyline_overall_IB["TOD"].isin(["Total"])].to_csv(
         screenline_output_dir / Countyline_overall_IB_csv, index=False

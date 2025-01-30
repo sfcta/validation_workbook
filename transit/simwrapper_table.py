@@ -197,6 +197,17 @@ def process_bart_data(
     MUNI_IB = append_group_total(MUNI_IB, station_oakland, "Oakland Core")
     MUNI_IB = append_group_total(MUNI_IB, all, "All Listed Stations")
 
+    total_observed = MUNI_IB_obs["Observed"].sum()
+    total_modeled = MUNI_IB_model["Modeled"].sum()
+    new_row = {
+        'Station': 'Total Stations',
+        'Observed': total_observed,
+        'Modeled': total_modeled,
+    }
+
+    # Convert the dictionary to a DataFrame
+    new_row_df = pd.DataFrame([new_row])
+    MUNI_IB = pd.concat([MUNI_IB, new_row_df], ignore_index=True)
     # Calculating 'Diff' and 'Percentage Diff'
     MUNI_IB["Diff"] = MUNI_IB["Modeled"] - MUNI_IB["Observed"]
     MUNI_IB["Percentage Diff"] = MUNI_IB["Diff"] * 100 / MUNI_IB["Observed"]
@@ -624,6 +635,7 @@ def process_mkd_bart(
         "Outer SF",
         "Oakland Core",
         "All Listed Stations",
+        "Total Stations"
     ]
 
     # BART
@@ -638,7 +650,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_allday,
         file_name=Path(markdown_output_dir / BART_boarding_allday_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -652,7 +664,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_am,
         file_name=Path(markdown_output_dir / BART_boarding_am_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -665,7 +677,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_pm,
         file_name=Path(markdown_output_dir / BART_boarding_pm_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -678,7 +690,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_allday,
         file_name=Path(markdown_output_dir / BART_at_allday_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -690,7 +702,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_am,
         file_name=Path(markdown_output_dir / BART_at_am_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -701,7 +713,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_pm,
         file_name=Path(markdown_output_dir / BART_at_pm_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )

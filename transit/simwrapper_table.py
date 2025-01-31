@@ -197,6 +197,17 @@ def process_bart_data(
     MUNI_IB = append_group_total(MUNI_IB, station_oakland, "Oakland Core")
     MUNI_IB = append_group_total(MUNI_IB, all, "All Listed Stations")
 
+    total_observed = MUNI_IB_obs["Observed"].sum()
+    total_modeled = MUNI_IB_model["Modeled"].sum()
+    new_row = {
+        'Station': 'Total Stations',
+        'Observed': total_observed,
+        'Modeled': total_modeled,
+    }
+
+    # Convert the dictionary to a DataFrame
+    new_row_df = pd.DataFrame([new_row])
+    MUNI_IB = pd.concat([MUNI_IB, new_row_df], ignore_index=True)
     # Calculating 'Diff' and 'Percentage Diff'
     MUNI_IB["Diff"] = MUNI_IB["Modeled"] - MUNI_IB["Observed"]
     MUNI_IB["Percentage Diff"] = MUNI_IB["Diff"] * 100 / MUNI_IB["Observed"]
@@ -296,18 +307,26 @@ def process_mkd_muni(
         "outer",
     )
     MUNI_IB_df = pd.merge(MUNI_OB_df[["Route"]], MUNI_IB_df, on="Route", how="outer")
+    MUNI_IB_df = MUNI_IB_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_OB_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_df, on="Route", how="outer")
+    MUNI_OB_df = MUNI_OB_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     dataframe_to_markdown(
         MUNI_IB_df,
         file_name=Path(markdown_output_dir / MUNI_ib_day),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_IB_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
     dataframe_to_markdown(
         MUNI_OB_df,
         file_name=Path(markdown_output_dir / MUNI_ob_day),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_OB_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -322,14 +341,19 @@ def process_mkd_muni(
         "Route",
         "outer",
     )
+
     MUNI_IB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="outer"
+    )
+    MUNI_IB_AM_df = MUNI_IB_AM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
     )
     MUNI_IB_AM_df = MUNI_IB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_AM_df,
         file_name=Path(markdown_output_dir / MUNI_ib_am),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_IB_AM_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -345,11 +369,15 @@ def process_mkd_muni(
     MUNI_IB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="outer"
     )
+    MUNI_IB_PM_df = MUNI_IB_PM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_IB_PM_df = MUNI_IB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_PM_df,
         file_name=Path(markdown_output_dir / MUNI_ib_pm),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_IB_PM_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -365,11 +393,15 @@ def process_mkd_muni(
     MUNI_OB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="outer"
     )
+    MUNI_OB_AM_df = MUNI_OB_AM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_OB_AM_df = MUNI_OB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_AM_df,
         file_name=Path(markdown_output_dir / MUNI_ob_am),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_OB_AM_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -385,11 +417,15 @@ def process_mkd_muni(
     MUNI_OB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="outer"
     )
+    MUNI_OB_PM_df = MUNI_OB_PM_df.sort_values(
+        by="Route", 
+        key=lambda col: col.where(col != "Total").str.zfill(5)
+    )
     MUNI_OB_PM_df = MUNI_OB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_PM_df,
         file_name=Path(markdown_output_dir / MUNI_ob_pm),
-        highlight_rows=[72],
+        highlight_rows=[len(MUNI_OB_PM_df) - 1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -399,7 +435,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_df,
         file_name=Path(markdown_output_dir / MUNI_mode_day),
-        highlight_rows=[7],
+        highlight_rows=[len(MUNI_mode_df)-1],
         center_align_columns=None,
         column_widths=120,
     )
@@ -418,7 +454,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_am_df,
         file_name=Path(markdown_output_dir / MUNI_mode_am_md),
-        highlight_rows=[7],
+        highlight_rows=[len(MUNI_mode_am_df)-1],
         center_align_columns=None,
         column_widths=120,
     )
@@ -437,7 +473,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_mode_pm_df,
         file_name=Path(markdown_output_dir / MUNI_mode_pm_md),
-        highlight_rows=[7],
+        highlight_rows=[len(MUNI_mode_pm_df)-1],
         center_align_columns=None,
         column_widths=120,
     )
@@ -455,7 +491,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_tod_df,
         file_name=Path(markdown_output_dir / MUNI_tod_md),
-        highlight_rows=[5],
+        highlight_rows=[len(MUNI_tod_df)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -479,7 +515,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_EB_df,
         file_name=Path(markdown_output_dir / MUNI_EB_md),
-        highlight_rows=[4],
+        highlight_rows=[len(MUNI_EB_df)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -503,7 +539,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_LB_df,
         file_name=Path(markdown_output_dir / MUNI_LB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(MUNI_LB_df)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -527,7 +563,7 @@ def process_mkd_muni(
     dataframe_to_markdown(
         MUNI_Rail_df,
         file_name=Path(markdown_output_dir / MUNI_Rail_md),
-        highlight_rows=[5],
+        highlight_rows=[len(MUNI_Rail_df)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -599,6 +635,7 @@ def process_mkd_bart(
         "Outer SF",
         "Oakland Core",
         "All Listed Stations",
+        "Total Stations"
     ]
 
     # BART
@@ -613,7 +650,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_allday,
         file_name=Path(markdown_output_dir / BART_boarding_allday_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -627,7 +664,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_am,
         file_name=Path(markdown_output_dir / BART_boarding_am_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -640,7 +677,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_boarding_pm,
         file_name=Path(markdown_output_dir / BART_boarding_pm_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -653,7 +690,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_allday,
         file_name=Path(markdown_output_dir / BART_at_allday_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -665,7 +702,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_am,
         file_name=Path(markdown_output_dir / BART_at_am_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -676,7 +713,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         BART_at_pm,
         file_name=Path(markdown_output_dir / BART_at_pm_md),
-        highlight_rows=[11, 12, 13, 14],
+        highlight_rows=[11, 12, 13, 14, 15],
         center_align_columns=None,
         column_widths=80,
     )
@@ -707,7 +744,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_br_day,
         file_name=Path(markdown_output_dir / county_br_day_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_br_day)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -727,7 +764,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_br_am,
         file_name=Path(markdown_output_dir / county_br_am_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_br_am)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -747,7 +784,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_br_pm,
         file_name=Path(markdown_output_dir / county_br_pm_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_br_pm)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -770,7 +807,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_at_day,
         file_name=Path(markdown_output_dir / county_at_day_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_at_day)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -790,7 +827,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_at_am,
         file_name=Path(markdown_output_dir / county_at_am_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_at_am)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -810,7 +847,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         county_at_pm,
         file_name=Path(markdown_output_dir / county_at_pm_md),
-        highlight_rows=[5],
+        highlight_rows=[len(county_at_pm)-1],
         center_align_columns=None,
         column_widths=90,
     )
@@ -840,7 +877,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         transbay_BART_IB,
         file_name=Path(markdown_output_dir / transbay_BART_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_BART_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -862,7 +899,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         transbay_BART_OB,
         file_name=Path(markdown_output_dir / transbay_BART_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_BART_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -884,7 +921,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         Countyline_BART_OB,
         file_name=Path(markdown_output_dir / Countyline_BART_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_BART_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -906,7 +943,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         Countyline_BART_IB,
         file_name=Path(markdown_output_dir / Countyline_BART_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_BART_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -928,7 +965,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         Intra_SF_BART_OB,
         file_name=Path(markdown_output_dir / SF_out_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Intra_SF_BART_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -950,7 +987,7 @@ def process_mkd_bart(
     dataframe_to_markdown(
         Intra_SF_BART_IB,
         file_name=Path(markdown_output_dir / SF_in_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Intra_SF_BART_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1023,6 +1060,8 @@ def process_mkd_screenline(
     # Valdiation for Screenlines
     obs_Screenline = pd.read_csv(transit_input_dir / observed_Screenline)
     model_Screenline_df = pd.read_csv(output_transit_dir / model_Screenline)
+    model_Screenline_df = model_Screenline_df[model_Screenline_df['Screenline'] != 'SF-San Mateo']
+    obs_Screenline = obs_Screenline[obs_Screenline['Screenline'] != 'SF-San Mateo']
     screenline_overall_ib = process_data(
         obs_Screenline,
         model_Screenline_df,
@@ -1030,7 +1069,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     screenline_overall_ib["TOD"] = pd.Categorical(
         screenline_overall_ib["TOD"], categories=tod_order, ordered=True
@@ -1040,7 +1079,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         screenline_overall_ib,
         file_name=Path(markdown_output_dir / screenline_overall_ib_md),
-        highlight_rows=[5],
+        highlight_rows=[len(screenline_overall_ib)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1051,7 +1090,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     screenline_overall_ob["TOD"] = pd.Categorical(
         screenline_overall_ob["TOD"], categories=tod_order, ordered=True
@@ -1061,7 +1100,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         screenline_overall_ob,
         file_name=Path(markdown_output_dir / screenline_overall_ob_md),
-        highlight_rows=[5],
+        highlight_rows=[len(screenline_overall_ob)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1072,7 +1111,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_AC_IB["TOD"] = pd.Categorical(
         transbay_AC_IB["TOD"], categories=tod_order, ordered=True
@@ -1082,7 +1121,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         transbay_AC_IB,
         file_name=Path(markdown_output_dir / transbay_AC_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_AC_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1093,7 +1132,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     transbay_AC_OB["TOD"] = pd.Categorical(
         transbay_AC_OB["TOD"], categories=tod_order, ordered=True
@@ -1103,7 +1142,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         transbay_AC_OB,
         file_name=Path(markdown_output_dir / transbay_AC_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_AC_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1114,7 +1153,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_overall_IB["TOD"] = pd.Categorical(
         transbay_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1124,7 +1163,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         transbay_overall_IB,
         file_name=Path(markdown_output_dir / transbay_overall_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_overall_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1135,7 +1174,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     transbay_overall_OB["TOD"] = pd.Categorical(
         transbay_overall_OB["TOD"], categories=tod_order, ordered=True
@@ -1145,7 +1184,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         transbay_overall_OB,
         file_name=Path(markdown_output_dir / transbay_overall_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(transbay_overall_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1168,7 +1207,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     Countyline_CalTrain_IB["TOD"] = pd.Categorical(
         Countyline_CalTrain_IB["TOD"], categories=tod_order, ordered=True
@@ -1178,7 +1217,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_CalTrain_IB,
         file_name=Path(markdown_output_dir / Countyline_CalTrain_IB_md),
-        highlight_rows=[-1],
+        highlight_rows=[len(Countyline_CalTrain_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1189,7 +1228,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     Countyline_CalTrain_OB["TOD"] = pd.Categorical(
         Countyline_CalTrain_OB["TOD"], categories=tod_order, ordered=True
@@ -1199,7 +1238,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_CalTrain_OB,
         file_name=Path(markdown_output_dir / Countyline_CalTrain_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_CalTrain_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1210,7 +1249,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_SamTrans_IB["TOD"] = pd.Categorical(
         Countyline_SamTrans_IB["TOD"], categories=tod_order, ordered=True
@@ -1220,7 +1259,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_SamTrans_IB,
         file_name=Path(markdown_output_dir / Countyline_SamTrans_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_SamTrans_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1231,7 +1270,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_SamTrans_OB["TOD"] = pd.Categorical(
         Countyline_SamTrans_OB["TOD"], categories=tod_order, ordered=True
@@ -1241,7 +1280,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_SamTrans_OB,
         file_name=Path(markdown_output_dir / Countyline_SamTrans_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_SamTrans_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1252,7 +1291,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_overall_IB["TOD"] = pd.Categorical(
         Countyline_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1262,7 +1301,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_overall_IB,
         file_name=Path(markdown_output_dir / Countyline_overall_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_overall_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1273,7 +1312,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     Countyline_overall_OB["TOD"] = pd.Categorical(
         Countyline_overall_OB["TOD"], categories=tod_order, ordered=True
@@ -1283,7 +1322,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         Countyline_overall_OB,
         file_name=Path(markdown_output_dir / Countyline_overall_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(Countyline_overall_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1299,12 +1338,16 @@ def process_mkd_screenline(
     Countyline_CalTrain_OB[~Countyline_CalTrain_OB["TOD"].isin(["Total"])].to_csv(
         screenline_output_dir / Countyline_CalTrain_OB_csv, index=False
     )
-    Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])].to_csv(
-        screenline_output_dir / Countyline_SamTrans_IB_csv, index=False
-    )
-    Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])].to_csv(
-        screenline_output_dir / Countyline_SamTrans_OB_csv, index=False
-    )
+    Countyline_SamTrans_IB = Countyline_SamTrans_IB[~Countyline_SamTrans_IB["TOD"].isin(["Total"])]
+    Countyline_SamTrans_IB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_IB['Observed'] = pd.to_numeric(Countyline_SamTrans_IB['Observed'], errors='coerce')
+    Countyline_SamTrans_IB['Modeled'] = pd.to_numeric(Countyline_SamTrans_IB['Modeled'], errors='coerce')
+    Countyline_SamTrans_IB.to_csv(screenline_output_dir / Countyline_SamTrans_IB_csv, index=False)
+    Countyline_SamTrans_OB = Countyline_SamTrans_OB[~Countyline_SamTrans_OB["TOD"].isin(["Total"])]
+    Countyline_SamTrans_OB.replace("-", pd.NA, inplace=True)
+    Countyline_SamTrans_OB['Observed'] = pd.to_numeric(Countyline_SamTrans_OB['Observed'], errors='coerce')
+    Countyline_SamTrans_OB['Modeled'] = pd.to_numeric(Countyline_SamTrans_OB['Modeled'], errors='coerce')
+    Countyline_SamTrans_OB.to_csv(screenline_output_dir / Countyline_SamTrans_OB_csv, index=False)
     Countyline_overall_IB[~Countyline_overall_IB["TOD"].isin(["Total"])].to_csv(
         screenline_output_dir / Countyline_overall_IB_csv, index=False
     )
@@ -1322,7 +1365,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_Transit_IB["TOD"] = pd.Categorical(
         GG_Transit_IB["TOD"], categories=tod_order, ordered=True
@@ -1332,7 +1375,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_Transit_IB,
         file_name=Path(markdown_output_dir / GG_Transit_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_Transit_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1347,7 +1390,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     GG_Transit_OB["TOD"] = pd.Categorical(
         GG_Transit_OB["TOD"], categories=tod_order, ordered=True
@@ -1357,7 +1400,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_Transit_OB,
         file_name=Path(markdown_output_dir / GG_Transit_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_Transit_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1372,7 +1415,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_Ferry_IB["TOD"] = pd.Categorical(
         GG_Ferry_IB["TOD"], categories=tod_order, ordered=True
@@ -1382,7 +1425,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_Ferry_IB,
         file_name=Path(markdown_output_dir / GG_Ferry_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_Ferry_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1397,7 +1440,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "right",
+        "outer",
     )
     GG_Ferry_OB["TOD"] = pd.Categorical(
         GG_Ferry_OB["TOD"], categories=tod_order, ordered=True
@@ -1407,7 +1450,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_Ferry_OB,
         file_name=Path(markdown_output_dir / GG_Ferry_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_Ferry_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1418,7 +1461,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_overall_IB["TOD"] = pd.Categorical(
         GG_overall_IB["TOD"], categories=tod_order, ordered=True
@@ -1428,7 +1471,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_overall_IB,
         file_name=Path(markdown_output_dir / GG_overall_IB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_overall_IB)-1],
         center_align_columns=None,
         column_widths=70,
     )
@@ -1439,7 +1482,7 @@ def process_mkd_screenline(
         "TOD",
         "Ridership",
         "TOD",
-        "left",
+        "outer",
     )
     GG_overall_OB["TOD"] = pd.Categorical(
         GG_overall_OB["TOD"], categories=tod_order, ordered=True
@@ -1449,7 +1492,7 @@ def process_mkd_screenline(
     dataframe_to_markdown(
         GG_overall_OB,
         file_name=Path(markdown_output_dir / GG_overall_OB_md),
-        highlight_rows=[5],
+        highlight_rows=[len(GG_overall_OB)-1],
         center_align_columns=None,
         column_widths=70,
     )

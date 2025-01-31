@@ -11,7 +11,7 @@ bart_county = "observed_bart_county.csv"
 bart_screenline = "observed_bart_screenline.csv"
 muni_line = "observed_muni_line.csv"
 screenline = "observed_screenlines.csv"
-ntd = "observed_ntd.csv"
+ntd = "observed_operator_totals.csv"
 muni_name_match = "muni_line_name_match.csv"
 station_node_match = "station_node_match.csv"
 

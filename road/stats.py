@@ -273,6 +273,9 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
     for metric, y_field, file_suffix in zip(
             metrics, metric_fields, file_suffixes):
         file_path = os.path.join(output_dir, f"{file_prefix}_{file_suffix}")
+        
+        # Adjust group_var for the naming step if it's 'Observed Volume Category'
+        naming_group_var = "observedvolume" if group_var == 'Observed Volume Category' else group_var.lower().replace(' ', '')
 
         config = {
             "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
@@ -312,7 +315,7 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
             }
         }
         config_file_path = os.path.join(
-            output_dir, f"{outdir}/{group_var.lower().replace(' ', '')}_{metric}.vega.json")
+            output_dir, f"{outdir}/{naming_group_var}_{metric}.vega.json")
         try:
             with open(config_file_path, 'w') as f:
                 json.dump(config, f, indent=4)

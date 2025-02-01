@@ -140,12 +140,16 @@ def assign_ferry_name(name):
     transbay = [
         "90_FAOF",
         "90_FBHB",
-        "90FOAF",
+        "90_FOAF",
         "90_HBFB",
         "90_OAFW",
         "90_OAKOP",
         "90_OPOAK",
         "90_WFAO",
+        "94_FBFWVAL",
+        "94_FBVAL",
+        "94_VALFB",
+        "94_VALFWFB",
     ]
     GG_transit = [
         "91_LARKN",
@@ -154,10 +158,13 @@ def assign_ferry_name(name):
         "92_SAUFB",
         "93_FBTIB",
         "93_FWSAU",
+        "93_FWSAUR",
         "93_FWTIB",
         "93_SAUFW",
+        "93_SAUFWR",
         "93_TIBFB",
         "93_TIBFW",
+        "93_TIBFWR",
     ]
     if name in transbay:
         return "SF Bay Ferry"

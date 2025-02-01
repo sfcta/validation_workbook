@@ -88,7 +88,7 @@ def calcualte_weekday_upt(transit_input_dir, observed_NTD):
 
 name_mapping = {
     "AC Transit": "AC-Transit",
-    "Caltrain": "Caltrain",
+    "Caltrain": "CalTrain",
     "FAST": "FAST",
     "LAVTA-Wheels": "LAVTA",
     "SF MUNI": "MUNI",

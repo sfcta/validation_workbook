@@ -374,19 +374,19 @@ if __name__ == "__main__":
         combined_gdf,
         transit_input_dir,
         output_dir,
-        output_dir,
         observed_NTD,
         valTotal_Operator_md,
         valTotal_Operator,
+        model_MUNI_Line
     )
     process_valTotal_Submode(
         combined_gdf,
         transit_input_dir,
-        output_dir,
         output_dir,
         observed_NTD,
         valTotal_Submode,
         valTotal_Submode_md,
         valTotal_Service_md,
         valTotal_Service,
+        model_MUNI_Line
     )

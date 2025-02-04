@@ -10,6 +10,14 @@ def convert_to_integer(value):
         return int(value)
     except ValueError:
         return value
+    
+def custom_sort(route):
+    route = str(route)  # Ensure everything is treated as a string
+    if route[0].isdigit():  # If starts with a number
+        num_part = int(''.join(filter(str.isdigit, route)))  # Extract numeric part
+        return (0, num_part, route)  # Prioritize numbers first
+    else:
+        return (1, route)
 
 
 def process_data(
@@ -307,15 +315,9 @@ def process_mkd_muni(
         "outer",
     )
     MUNI_IB_df = pd.merge(MUNI_OB_df[["Route"]], MUNI_IB_df, on="Route", how="outer")
-    MUNI_IB_df = MUNI_IB_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_IB_df = MUNI_IB_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     MUNI_OB_df = pd.merge(MUNI_IB_df[["Route"]], MUNI_OB_df, on="Route", how="outer")
-    MUNI_OB_df = MUNI_OB_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_OB_df = MUNI_OB_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     dataframe_to_markdown(
         MUNI_IB_df,
         file_name=Path(markdown_output_dir / MUNI_ib_day),
@@ -345,10 +347,7 @@ def process_mkd_muni(
     MUNI_IB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_AM_df, on="Route", how="outer"
     )
-    MUNI_IB_AM_df = MUNI_IB_AM_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_IB_AM_df = MUNI_IB_AM_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     MUNI_IB_AM_df = MUNI_IB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_AM_df,
@@ -369,10 +368,7 @@ def process_mkd_muni(
     MUNI_IB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_IB_PM_df, on="Route", how="outer"
     )
-    MUNI_IB_PM_df = MUNI_IB_PM_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_IB_PM_df = MUNI_IB_PM_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     MUNI_IB_PM_df = MUNI_IB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_IB_PM_df,
@@ -393,10 +389,7 @@ def process_mkd_muni(
     MUNI_OB_AM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_AM_df, on="Route", how="outer"
     )
-    MUNI_OB_AM_df = MUNI_OB_AM_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_OB_AM_df = MUNI_OB_AM_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     MUNI_OB_AM_df = MUNI_OB_AM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_AM_df,
@@ -417,10 +410,7 @@ def process_mkd_muni(
     MUNI_OB_PM_df = pd.merge(
         MUNI_IB_df[["Route"]], MUNI_OB_PM_df, on="Route", how="outer"
     )
-    MUNI_OB_PM_df = MUNI_OB_PM_df.sort_values(
-        by="Route", 
-        key=lambda col: col.where(col != "Total").str.zfill(5)
-    )
+    MUNI_OB_PM_df = MUNI_OB_PM_df.sort_values(by="Route", key=lambda x: x.astype(str).map(custom_sort))
     MUNI_OB_PM_df = MUNI_OB_PM_df.fillna("-")
     dataframe_to_markdown(
         MUNI_OB_PM_df,

@@ -88,7 +88,7 @@ def calcualte_weekday_upt(transit_input_dir, observed_NTD):
 
 name_mapping = {
     "AC Transit": "AC-Transit",
-    "Caltrain": "CalTrain",
+    "CalTrain": "Caltrain",
     "FAST": "FAST",
     "LAVTA-Wheels": "LAVTA",
     "SF MUNI": "MUNI",
@@ -106,7 +106,7 @@ name_mapping = {
 }
 
 service_operator_dict = {
-    "Premium": ["AC Transbay", "ACE", "Amtrak", "CalTrain", "GGT-Bus", "SMART"],
+    "Premium": ["AC Transbay", "ACE", "Amtrak", "Caltrain", "GGT-Bus", "SMART"],
     "Local Bus": [
         "AC Eastbay",
         "CCCTA",

@@ -127,7 +127,7 @@ service_operator_dict = {
         "Vacaville City Coach",
         "VINE",
         "WestCat",
-        "GGT-Other"
+        "Marin Transit"
     ],
     "BART": ["BART"],
     "Light Rail": ["MUNI-Rail", "MUNI-Cable", "SCVTA-LRT", "MUNI-Streetcar"],
@@ -137,38 +137,9 @@ service_operator_dict = {
 
 # Get Ferry data
 def assign_ferry_name(name):
-    transbay = [
-        "90_FAOF",
-        "90_FBHB",
-        "90_FOAF",
-        "90_HBFB",
-        "90_OAFW",
-        "90_OAKOP",
-        "90_OPOAK",
-        "90_WFAO",
-        "94_FBFWVAL",
-        "94_FBVAL",
-        "94_VALFB",
-        "94_VALFWFB",
-    ]
-    GG_transit = [
-        "91_LARKN",
-        "91_LARKS",
-        "92_FBSAU",
-        "92_SAUFB",
-        "93_FBTIB",
-        "93_FWSAU",
-        "93_FWSAUR",
-        "93_FWTIB",
-        "93_SAUFW",
-        "93_SAUFWR",
-        "93_TIBFB",
-        "93_TIBFW",
-        "93_TIBFWR",
-    ]
-    if name in transbay:
+    if name.startswith("90_") or name.startswith("94_"):
         return "SF Bay Ferry"
-    elif name in GG_transit:
+    elif name.startswith("91_") or name.startswith("92_") or name.startswith("93_"):
         return "GGT-Ferry"
     else:
         return "Other"
@@ -204,7 +175,7 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
     gg_transit = read_dbf_and_groupby_sum(combined_gdf, "Golden Gate Transit", "MODE", "AB_BRDA")
 
     GG_bus_model = gg_transit[gg_transit["MODE"] == 23]["AB_BRDA"].iloc[0]
-    GG_local_model = gg_transit[gg_transit["MODE"] == 19]["AB_BRDA"].iloc[0]
+    marin_model = gg_transit[gg_transit["MODE"] == 19]["AB_BRDA"].iloc[0]
     VTA_LR_model = vta[vta["MODE"] == 21]["AB_BRDA"].iloc[0]
     VTA_bus_model = vta[vta["MODE"] == 19]["AB_BRDA"].iloc[0] + vta[vta["MODE"] == 25]["AB_BRDA"].iloc[0] + vta[vta["MODE"] == 20]["AB_BRDA"].iloc[0]
     model_muni_bus = muni[muni["Operator"] == "MUNI-Bus"]["Modeled"].iloc[0]
@@ -222,7 +193,6 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
         "Operator": [
             "GGT-Ferry",
             "GGT-Bus",
-            "GGT-Other",
             "SCVTA-Bus",
             "SCVTA-LRT",
             "SF Bay Ferry (WETA)",
@@ -232,12 +202,11 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
             "MUNI-Streetcar",
             "AC Transbay",
             "AC Eastbay",
-            "Ferry Other"
+            "Ferry Other",
         ],
         "Modeled": [
             model_GG_ferry,
             GG_bus_model,
-            GG_local_model,
             VTA_bus_model,
             VTA_LR_model,
             model_SF_Bay,
@@ -247,7 +216,7 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
             model_muni_street,
             ac_trans,
             ac_east,
-            model_other_ferry
+            model_other_ferry,
         ],
     }
     df_model_dic = pd.DataFrame(model_dic)
@@ -257,10 +226,14 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
         columns={"SYSTEM": "Operator", "AB_BRDA": "Modeled"}
     )
     bart_update = model_operator[model_operator["Operator"].isin(["BART", "EBART", "OAC"])]["Modeled"].sum()
+    sol_update = model_operator[model_operator["Operator"].isin(["Vallejo Transit", "Benicia"])]["Modeled"].sum()
 
     # Update the BART row
     model_operator.loc[model_operator["Operator"] == "BART", "Modeled"] = bart_update
-    model_operator = model_operator[~model_operator["Operator"].isin(["EBART", "OAC"])].reset_index(drop=True)
+    sol_row = pd.DataFrame({'Operator': ['SolTrans'], 'Modeled': [sol_update]})
+    marin_row = pd.DataFrame({'Operator': ['Marin Transit'], 'Modeled': [marin_model]})
+    model_operator = pd.concat([model_operator, sol_row,marin_row], ignore_index=True)
+    model_operator = model_operator[~model_operator["Operator"].isin(["EBART", "OAC", "Vallejo Transit", "Benicia"])].reset_index(drop=True)
     df_modeled = pd.concat([model_operator, df_model_dic])
     df_sf_ferry = pd.DataFrame(
         {"Operator": ["SF Bay Ferry (WETA)"], "Modeled": [model_SF_Bay]}
@@ -270,7 +243,6 @@ def process_total_val(combined_gdf, output_dir, model_MUNI_Line):
         model_operator["Operator"].map(name_mapping).fillna(model_operator["Operator"])
     )
     return df_modeled, model_operator
-
 
 def process_valTotal_operator(
     combined_gdf,
@@ -285,9 +257,11 @@ def process_valTotal_operator(
     observal_operator["Operator"] = (
         observal_operator["Operator"].map(name_mapping).fillna(observal_operator["Operator"])
     )
+    gg_transit = read_dbf_and_groupby_sum(combined_gdf, "Golden Gate Transit", "MODE", "AB_BRDA")
     df_modeled, model_operator = process_total_val(combined_gdf, output_dir, model_MUNI_Line)
     df_operator = pd.merge(observal_operator, model_operator, on="Operator", how="outer")
     modeled_other_sum = df_operator[df_operator["Observed"].isna()]["Modeled"].sum()
+    modeled_other_sum = modeled_other_sum - gg_transit[gg_transit["MODE"] == 19]["AB_BRDA"].iloc[0]
 
     # Add a new row for "Other"
     new_row = {
@@ -320,7 +294,7 @@ def process_valTotal_operator(
     dataframe_to_markdown(
         total_operator,
         file_name=output_dir / valTotal_Operator_md,
-        highlight_rows=[24],
+        highlight_rows=[len(total_operator)-1],
         center_align_columns=None,
         column_widths=100,
     )
@@ -414,7 +388,7 @@ def process_valTotal_Submode(
     dataframe_to_markdown(
         total_val,
         file_name=output_dir / valTotal_Submode_md,
-        highlight_rows=[30],
+        highlight_rows=[len(total_val)-1],
         center_align_columns=["Operator"],
         column_widths=100,
     )
@@ -431,7 +405,7 @@ def process_valTotal_Submode(
     dataframe_to_markdown(
         total_service,
         file_name=output_dir / valTotal_Service_md,
-        highlight_rows=[5],
+        highlight_rows=[len(total_service)-1],
         center_align_columns=None,
         column_widths=100,
     )

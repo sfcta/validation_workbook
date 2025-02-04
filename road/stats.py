@@ -191,10 +191,10 @@ def generate_and_save_tables(outdir, time_period_dfs, group_vars):
         # Reorder and reset the DataFrame for output
         count_df = reorder_dataframe(count_df, group_var)
 
-            # Round the metrics DataFrames for better readability
-        percent_rmse_df = percent_rmse_df.round(1)
-        relative_error_df = relative_error_df.round(2)
-        est_obs_ratio_df = est_obs_ratio_df.round(3)
+        # Round the metrics DataFrames for better readability
+        percent_rmse_df = percent_rmse_df.applymap(lambda x: f"{x:.1f}" if isinstance(x, (int, float)) else x)
+        relative_error_df = relative_error_df.applymap(lambda x: f"{x:.2f}" if isinstance(x, (int, float)) else x)
+        est_obs_ratio_df = est_obs_ratio_df.applymap(lambda x: f"{x:.3f}" if isinstance(x, (int, float)) else x)
 
         if group_var == 'Observed Volume Category':
             file_prefix = "observedvolume"
@@ -246,28 +246,30 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
 
     group_var_sort_orders = {
         'AT Group': [
+            'All Locations',
             'Core/CBD',
             'UrbBiz',
             'Urb',
-            'Sub',
-            'All Locations'],
+            'Sub'
+        ],
         'FT Group': [
+            'All Locations',
             'Fwy/Ramp',
             'Art',
             'Col',
-            'Loc',
-            'All Locations'],
+            'Loc'
+        ],
         'Observed Volume': [
+            'All Locations',
             '<10k',
             '10-20k',
             '20-50k',
-            '>=50k',
-            'All Locations'],
+            '>=50k'
+        ],
     }
     custom_order = group_var_sort_orders.get(group_var, None)
 
-    for metric, y_field, file_suffix in zip(
-            metrics, metric_fields, file_suffixes):
+    for metric, y_field, file_suffix in zip(metrics, metric_fields, file_suffixes):
         file_path = os.path.join(output_dir, f"{file_prefix}{file_suffix}")
 
         # Adjust group_var for the naming step if it's 'Observed Volume Category'
@@ -299,10 +301,6 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
                     "sort": custom_order,
                 },
                 "color": {
-                    "condition": {
-                        "test": f"datum['{group_var}'] == 'All Locations'",
-                        "value": "black"
-                    },
                     "field": group_var,
                     "type": "nominal",
                     "legend": {"title": "Category"},

@@ -259,13 +259,20 @@ def generate_and_save_vega_lite_configs(outdir, group_var, file_prefix):
             'Col',
             'Loc'
         ],
-        'Observed Volume': [
+        'Observed Volume Category': [
             'All Locations',
             '<10k',
             '10-20k',
             '20-50k',
             '>=50k'
         ],
+        'Loc Type': [
+            'All Locations',
+            'San Francisco',
+            'SF Screenline',
+            'Other County Screenline',
+            'Other'
+        ]
     }
     custom_order = group_var_sort_orders.get(group_var, None)
 

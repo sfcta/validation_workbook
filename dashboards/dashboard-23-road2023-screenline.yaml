@@ -1,7 +1,7 @@
 header:
   tab: '2023 Road Validation - Screenline'
   title: '2023 Road Validation - Screenline'
-  description: Modeled volume vs observed count Screenline
+  description: Modeled volume vs observed count for Screenline. The volume count includes only freeway data.
   triggerPattern: "validation2023"
 
 layout:

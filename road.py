@@ -8,6 +8,7 @@ from road.dataprocess import generate_loaded_network_file_names, filter_and_aggr
 from road.scatter import compute_and_save_errors, generate_vega_lite_json_est, generate_vega_lite_json_diffpercent
 from road.stats import prepare_time_period_dfs, generate_and_save_tables
 from road.map import calculate_differences, process_geospatial_data
+from road.screenline import generate_screenline_data
 
 def csv_col_letter_to_num(letter):
     num = 0
@@ -175,7 +176,7 @@ def validation_road(config):
     freeflow_path = config['MAP_INPUT']['freeflow_dir']
     shp_output_path = os.path.join(outdir, config['MAP_INPUT']['shp_out_dir'])
     output_name = os.path.join(outdir, config['MAP_INPUT']['output_filename'])
-
+    
     # Part 1 - Scatter Plot
     scatter_plot(est_df, obs_df, chosen_timeperiod, combined_df_cols, classification_col, output_file_name,
                  fields1, nominal_fields1, x_field1, y_field1, name1, 
@@ -190,6 +191,9 @@ def validation_road(config):
     # Part 3 - Map
     merged_df = calculate_differences(est_df, obs_df, output_name)
     process_geospatial_data(merged_df, freeflow_path, shp_output_path)
+    
+    # Part 4 - Screenline
+    generate_screenline_data(obs_filepath, output_name, outdir)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process TOML configuration file for validation.")

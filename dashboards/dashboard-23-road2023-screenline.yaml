@@ -1,0 +1,168 @@
+header:
+  tab: '2023 Road Validation - Screenline'
+  title: '2023 Road Validation - Screenline'
+  description: Modeled volume vs observed count for Screenline. The volume count includes only freeway data.
+  triggerPattern: "validation2023"
+
+layout:
+  ScreenlineAll IN:
+    - type: text
+      title: 'Screenline Overall - Inbound by Time of Day'
+      description: >
+        
+      file: 'screenline_ib.md'
+
+    - type: 'line'
+      title: 'Screenline Overall - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'screenline_ib.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  ScreenlineAll OB:
+    - type: text
+      title: 'Screenline Overall - Outbound by Time of Day'
+      description: >
+
+      file: 'screenline_ob.md'
+
+    - type: 'line'
+      title: 'Screenline Overall - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'screenline_ob.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  BayBridge IB:
+    - type: text
+      title: 'Bay Bridge Screenline - Inbound by Time of Day'
+      description: >
+
+      file: 'baybridge_screenline_ib.md'
+    
+    - type: 'line'
+      title: 'Bay Bridge Screenline - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'baybridge_screenline_ib.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  BayBridge OB:
+    - type: text
+      title: 'Bay Bridge Screenline - Outbound by Time of Day'
+      description: >
+
+      file: 'baybridge_screenline_ob.md'
+
+    - type: 'line'
+      title: 'Bay Bridge Screenline - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'baybridge_screenline_ob.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GoldenGate IN:
+    - type: text
+      title: 'Golden Gate Bridge Screenline - Inbound by Time of Day'
+      description: >
+
+        
+      file: 'ggb_screenline_ib.md'
+
+    - type: 'line'
+      title: 'Golden Gate Bridge Screenline - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'ggb_screenline_ib.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  GoldenGate OB:
+    - type: text
+      title: 'Golden Gate Bridge Screenline - Outbound by Time of Day'
+      description: >
+
+      file: 'ggb_screenline_ob.md'
+
+    - type: 'line'
+      title: 'Golden Gate Bridge Screenline - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'ggb_screenline_ob.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  SFSM IN:
+    - type: text
+      title: 'San Francisco / San Mateo County Line Screenline - Inbound by Time of Day'
+      description: >
+
+        
+      file: 'sfsm_screenline_ib.md'
+
+    - type: 'line'
+      title: 'San Francisco / San Mateo County Line Screenline - Inbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'sfsm_screenline_ib.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
+
+  SFSM OB:
+    - type: text
+      title: 'San Francisco / San Mateo County Line Screenline - Outbound by Time of Day'
+      description: >
+
+      file: 'sfsm_screenline_ob.md'
+
+    - type: 'line'
+      title: 'San Francisco / San Mateo County Line Screenline - Outbound by Time of Day'
+      description: ''
+      width: 1
+      dataset: 'sfsm_screenline_ob.csv'
+      x: 'TOD'
+      y1: 'Observed'
+      y2: 'Modeled'
+      xAxisName: 'TOD'
+      yAxisName: 'Ridership'
+      columns: [Observed, Modeled]
+      legendTitles: ['Observed', 'Modeled']
